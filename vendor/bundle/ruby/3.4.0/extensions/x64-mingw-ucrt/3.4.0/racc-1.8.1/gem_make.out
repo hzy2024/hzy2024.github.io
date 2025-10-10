@@ -1,0 +1,19 @@
+current directory: C:/Users/houzeying/Documents/GitHub/hzy2024.github.io/vendor/bundle/ruby/3.4.0/gems/racc-1.8.1/ext/racc/cparse
+C:/Ruby34-x64/bin/ruby.exe extconf.rb
+creating Makefile
+
+current directory: C:/Users/houzeying/Documents/GitHub/hzy2024.github.io/vendor/bundle/ruby/3.4.0/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20251010-13808-edw6p6 sitelibdir\=./.gem.20251010-13808-edw6p6 clean
+
+current directory: C:/Users/houzeying/Documents/GitHub/hzy2024.github.io/vendor/bundle/ruby/3.4.0/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20251010-13808-edw6p6 sitelibdir\=./.gem.20251010-13808-edw6p6
+generating cparse-x64-mingw-ucrt.def
+compiling cparse.c
+linking shared-object racc/cparse.so
+
+current directory: C:/Users/houzeying/Documents/GitHub/hzy2024.github.io/vendor/bundle/ruby/3.4.0/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20251010-13808-edw6p6 sitelibdir\=./.gem.20251010-13808-edw6p6 install
+/usr/bin/install -c -m 0755 cparse.so ./.gem.20251010-13808-edw6p6/racc
+
+current directory: C:/Users/houzeying/Documents/GitHub/hzy2024.github.io/vendor/bundle/ruby/3.4.0/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20251010-13808-edw6p6 sitelibdir\=./.gem.20251010-13808-edw6p6 clean
