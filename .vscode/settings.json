@@ -1,0 +1,15 @@
+{
+  "files.associations": {
+    "*.md": "markdown"
+  },
+  "[markdown]": {
+    "editor.wordWrap": "on",
+    "editor.quickSuggestions": {
+      "comments": "off",
+      "strings": "off",
+      "other": "off"
+    }
+  },
+  "markdown.extension.math.enabled": true,
+  "markdown.extension.preview.autoShowPreviewToSide": true
+}

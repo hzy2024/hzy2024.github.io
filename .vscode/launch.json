@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Jekyll Serve",
+      "type": "node",
+      "request": "launch",
+      "program": "cmd",
+      "args": ["/c", "bundle", "exec", "jekyll", "serve", "--livereload"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    }
+  ]
+}
