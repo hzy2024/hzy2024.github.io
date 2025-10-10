@@ -11,6 +11,11 @@ gem "jekyll-feed", "~> 0.12"
 gem "jekyll-sitemap", "~> 1.4"
 gem "jemoji", "~> 0.12"
 
+gem "kramdown", "~> 2.3.0"
+gem "kramdown-parser-gfm", "~> 1.1.0"
+gem "jekyll-feed", "~> 0.12"
+gem "jekyll-sitemap", "~> 1.4"
+
 group :jekyll_plugins do
   gem "jekyll-paginate"
 end
