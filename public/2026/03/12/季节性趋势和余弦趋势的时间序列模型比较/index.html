@@ -1,0 +1,392 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>季节性趋势和余弦趋势的时间序列模型比较 | Eason's page</title><meta name="author" content="Eason"><meta name="copyright" content="Eason"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="本文总结了对有季节性趋势的数据（比如某地连续几年的月度气温数据）的两种建模方法的比较，参考书目：时间序列分析分析及应用：R语言（Jonathan D.Cryer著）.  对于一个有周期性的数据, 我们往往可以对每个观测时间点获得数据的均值做一定的假设来说明其周期性的趋势，将其从随机项中剥离出来，并进一步实现一个回归模型. 我们可以表示为 \begin{equation*}     Y_t&#x3D;\mu_">
+<meta property="og:type" content="article">
+<meta property="og:title" content="季节性趋势和余弦趋势的时间序列模型比较">
+<meta property="og:url" content="http://hzy2024.github.io/2026/03/12/%E5%AD%A3%E8%8A%82%E6%80%A7%E8%B6%8B%E5%8A%BF%E5%92%8C%E4%BD%99%E5%BC%A6%E8%B6%8B%E5%8A%BF%E7%9A%84%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E6%A8%A1%E5%9E%8B%E6%AF%94%E8%BE%83/index.html">
+<meta property="og:site_name" content="Eason&#39;s page">
+<meta property="og:description" content="本文总结了对有季节性趋势的数据（比如某地连续几年的月度气温数据）的两种建模方法的比较，参考书目：时间序列分析分析及应用：R语言（Jonathan D.Cryer著）.  对于一个有周期性的数据, 我们往往可以对每个观测时间点获得数据的均值做一定的假设来说明其周期性的趋势，将其从随机项中剥离出来，并进一步实现一个回归模型. 我们可以表示为 \begin{equation*}     Y_t&#x3D;\mu_">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://hzy2024.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2026-03-12T07:56:01.000Z">
+<meta property="article:modified_time" content="2026-07-24T16:00:43.034Z">
+<meta property="article:author" content="Eason">
+<meta property="article:tag" content="时间序列分析">
+<meta property="article:tag" content="回归">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://hzy2024.github.io/img/avatar.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "季节性趋势和余弦趋势的时间序列模型比较",
+  "url": "http://hzy2024.github.io/2026/03/12/%E5%AD%A3%E8%8A%82%E6%80%A7%E8%B6%8B%E5%8A%BF%E5%92%8C%E4%BD%99%E5%BC%A6%E8%B6%8B%E5%8A%BF%E7%9A%84%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E6%A8%A1%E5%9E%8B%E6%AF%94%E8%BE%83/",
+  "image": "http://hzy2024.github.io/img/avatar.jpg",
+  "datePublished": "2026-03-12T07:56:01.000Z",
+  "dateModified": "2026-07-24T16:00:43.034Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Eason",
+      "url": "http://hzy2024.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://hzy2024.github.io/2026/03/12/%E5%AD%A3%E8%8A%82%E6%80%A7%E8%B6%8B%E5%8A%BF%E5%92%8C%E4%BD%99%E5%BC%A6%E8%B6%8B%E5%8A%BF%E7%9A%84%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E6%A8%A1%E5%9E%8B%E6%AF%94%E8%BE%83/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '季节性趋势和余弦趋势的时间序列模型比较',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div class="bg-animation" id="web_bg" style="background-image: url(/img/background.GIF);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">19</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">29</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Eason's page</span></a><a class="nav-page-title" href="/"><span class="site-name">季节性趋势和余弦趋势的时间序列模型比较</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">季节性趋势和余弦趋势的时间序列模型比较</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-03-12T07:56:01.000Z" title="发表于 2026-03-12 15:56:01">2026-03-12</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-07-24T16:00:43.034Z" title="更新于 2026-07-25 00:00:43">2026-07-25</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><div class="note info no-icon flat"><p>本文总结了对有季节性趋势的数据（比如某地连续几年的月度气温数据）的两种建模方法的比较，参考书目：时间序列分析分析及应用：R语言（Jonathan D.Cryer著）.</p>
+</div>
+<p>对于一个有周期性的数据, 我们往往可以对每个观测时间点获得数据的均值做一定的假设来说明其周期性的趋势，将其从随机项中剥离出来，并进一步实现一个回归模型. 我们可以表示为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    Y_t=\mu_t+…'>\begin{equation*}
+    Y_t=\mu_t+X_t,
+\end{equation*}
+</p>
+<p>其中 $ Y_t $ 是在时间 $ t $ 处的观测值, $ \mu_t $ 是观测值 $ Y_t $ 的均值函数, 是<strong>确定的</strong>， $ X_t $ 是一漂移项且满足对任意的 $ t $ 都有 $ \mathbb{E}(X_t)=0 $，注意我们总是假定从数据得到的时间序列是<strong>宽平稳</strong>的，这一点非常重要，因为这使得我们可以合理地对协方差函数/自相关函数的表示做简化. 下面对两种模型进行展开（<strong>本文中认为 $ 12 $ 个月为一个周期，即年气温的变化</strong>）：</p>
+<h3 id="季节均值模型"><a class="markdownIt-Anchor" href="#季节均值模型"></a> 季节均值模型</h3>
+<p>$ \mu_t $ 的一个很自然的假设是存在 $ 12 $ 个参数 $ \beta_1,\beta_2,\cdots,\beta_{12} $，给出了每月的期望平均气温，可记为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \mu_t=\beg…'>\begin{equation*}
+    \mu_t=\begin{cases}
+        \beta_1, &amp; t=1,13,25,\cdots\\
+        \beta_2, &amp; t=2,14,26,\cdots\\
+        \vdots\\
+        \beta_{12}, &amp; t=12,24,36,\cdots\\
+    \end{cases}
+\end{equation*}
+</p>
+<p>假设我们有 $ N $ 年的完整数据，采用最小二乘法很容易得到</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \hat{\beta…'>\begin{equation*}
+    \hat{\beta}_j=\dfrac{1}{N}\sum_{i=0}^{N-1}Y_{j+12i}.
+\end{equation*}
+</p>
+<p>这是因为我们需要把每个月在不同年份的数据整合做回归. 不难知道</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \text{Var}…'>\begin{equation*}
+    \text{Var}(\hat{\beta}_j)=\dfrac{\gamma_0}{N}\left[1+\sum_{k=1}^{N-1}\left(1-\dfrac{k}{N}\right)\rho_{12k}\right],\quad j=1,2,\cdots,12,
+\end{equation*}
+</p>
+<p>注意这里就对协方差函数和自相关函数利用宽平稳性做了简化：记 $ X_t,X_s $ 的协方差函数为 $ \text{Cov}(X_t,X_s)=\gamma_{t,s}=\gamma_{|s-t|} $，这是由宽平稳性 $ \gamma_{t,s}=\gamma_{0,t-s}=\gamma_{s-t,0}=\gamma_{0,s-t} $ 得到的. 对相关系数由上述定义不难知道</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \text{Corr…'>\begin{equation*}
+    \text{Corr}(X_t,X_s)=\dfrac{\gamma_{|t-s|}}{\gamma_0},
+\end{equation*}
+</p>
+<p>由此对方差中的表达式按完全平方展开并整理即可，比较容易，具体步骤这里不再写出.</p>
+<p>当 $ {X_t} $ 是白噪声序列时（即独立同分布序列），显然 $ \text{Var}(\hat{\beta}_j)=\gamma_0/N $；进一步，只要 $ \rho_{12k}=0~(k=1,2,\cdots,N-1)=0 $，也就是说每年同一月份之间的观测都不相关，每个估计量 $ \hat{\beta}_j $ 都具有和白噪声序列相同的方差 $ \gamma_0/N $.</p>
+<h3 id="余弦趋势模型"><a class="markdownIt-Anchor" href="#余弦趋势模型"></a> 余弦趋势模型</h3>
+<p>每年的气温波动总可以这样理解：冬季经春季到夏季气温逐渐升高，夏季经过秋季到冬季气温又下降至最低点，如此往复，因此选用余弦函数来拟合这种趋势是非常合理的. 我们先从一般的周期出发，假设</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \mu_t=\bet…'>\begin{equation*}
+    \mu_t=\beta_0+\beta\cos(2\pi ft+\Phi),
+\end{equation*}
+</p>
+<p>其中 $ \beta(&gt;0) $ 是振幅， $ f $ 是频率， $ \Phi $ 是相位. 由于三角函数可以展开，上式又可写为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \mu_t=\bet…'>\begin{equation*}
+    \mu_t=\beta_0+\beta_1\cos(2\pi ft)+\beta_2\sin(2\pi ft),
+\end{equation*}
+</p>
+<p>其中 $ \beta_1=\beta\cos\Phi,\beta_2=\beta\sin\Phi $. 现在我们设 $ f=m/n $，其中 $ 0&lt;m&lt;n/2 $ 且 $ m,n $ 均为正整数. 我们来推导三个系数的最小二乘估计量的形式. 记</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    Q(\boldsym…'>\begin{equation*}
+    Q(\boldsymbol{\beta})=Q(\beta_0,\beta_1,\beta_2)=\sum_{t=1}^n[Y_t-(\beta_0+\beta_1\cos(2\pi ft)+\beta_2\sin(2\pi ft))]^2,
+\end{equation*}
+</p>
+<p>对参数求导并令其等于 $ 0 $ 可以整理得到</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \begin{cas…'>\begin{equation*}
+    \begin{cases}
+        \dfrac{\partial Q}{\partial\beta_0}=-2(n\overline{Y}-n\beta_0)=0,\\
+        \dfrac{\partial Q}{\partial\beta_1}=-2\left[\sum_{t=1}^n\cos(2\pi ft)Y_t-\dfrac{n}{2}\beta_1\right]=0,\\
+        \dfrac{\partial Q}{\partial\beta_2}=-2\left[\sum_{t=1}^n\sin(2\pi ft)Y_t-\dfrac{n}{2}\beta_2\right]=0.
+    \end{cases}
+\end{equation*}
+</p>
+<p>其中 $ \overline{Y} $ 是原数据的平均值. 这里用到了</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+   \sum_{t=1}^…'>\begin{align*}
+   \sum_{t=1}^n\cos\left(\dfrac{2\pi mt}{n}\right)&amp;=\sum_{t=1}^n\sin\left(\dfrac{2\pi mt}{n}\right)=0,\\
+   \sum_{t=1}^n\cos^2\left(\dfrac{2\pi mt}{n}\right)&amp;=\sum_{t=1}^n\sin^2\left(\dfrac{2\pi mt}{n}\right)=\dfrac{n}{2}.
+\end{align*}
+</p>
+<p>两式通过欧拉公式和倍角公式马上可以得到. 此时我们可以马上写出三个系数的最小二乘估计量的表达式</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \hat{\beta…'>\begin{equation*}
+    \hat{\beta_0}=\overline{Y},~\hat{\beta}_1=\dfrac{2}{n}\left[\sum_{t=1}^n\cos\left(\dfrac{2\pi mt}{n}\right)Y_t\right],~\hat{\beta}_2=\dfrac{2}{n}\left[\sum_{t=1}^n\sin\left(\dfrac{2\pi mt}{n}\right)Y_t\right].
+\end{equation*}
+</p>
+<p>类比之前的式子可以写出</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \text{Var}…'>\begin{equation*}
+    \text{Var}(\hat{\beta}_1)=\dfrac{2\gamma_0}{n}\left[1+\dfrac{4}{n}\sum_{s=2}^{n}\sum_{t=1}^{s-1}\cos\left(\dfrac{2\pi mt}{n}\right)\cos\left(\dfrac{2\pi ms}{n}\right)\rho_{s-t}\right],
+\end{equation*}
+</p>
+<p>对于 $ \hat{\beta}_2 $ 只要把余弦替换为正弦即可.<br />
+接下来我们对序列的相关性做一些限定得到一些结果. 为了和季节均值模型对应，我们令 $ m=1,n=12 $，这就是说周期 $ T=2\pi/(2\pi f)=1/f=12 $ 个月. 当 $ {X_t} $ 是白噪声序列时，显然 $ \text{Var}(\hat{\beta}_0)=\gamma_0/n,\text{Var}(\hat{\beta}_1)=\text{Var}(\hat{\beta}_2)=2\gamma_0/n $. 现在假定 $ \rho_1\ne0,\rho_k=0,k&gt;1 $，立马可以得到</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \text{Var}…'>\begin{align*}
+    \text{Var}(\hat{\beta}_1)&amp;=\dfrac{2\gamma_0}{n}\left[1+\dfrac{4\rho_1}{n}\sum_{t=1}^{n-1}\cos\left(\dfrac{\pi t}{6}\right)\cos\left(\dfrac{\pi(t+1)}{6}\right)\right],\\
+    \text{Var}(\hat{\beta}_2)&amp;=\dfrac{2\gamma_0}{n}\left[1+\dfrac{4\rho_1}{n}\sum_{t=1}^{n-1}\sin\left(\dfrac{\pi t}{6}\right)\sin\left(\dfrac{\pi(t+1)}{6}\right)\right].
+\end{align*}
+</p>
+<h3 id="两种模型的比较"><a class="markdownIt-Anchor" href="#两种模型的比较"></a> 两种模型的比较</h3>
+<p>虽然两个模型不可直接比较，但我们可以旁敲侧击，比较同一时间点两个模型的估计量的（总）方差/标准差. 现在我们考虑两种模型的估计量对第一个月的估计的优劣，即 $ \hat{\mu}_1 $ 的标准差. 第一个模型中的 $ \hat{\mu}_1 $ 即季节均值模型中的 $ \hat{\beta}_1 $，对应两种情形（白噪声和年间不相关）方差也已给出. 而第二个模型的是</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \hat{\mu}_…'>\begin{equation*}
+    \hat{\mu}_1=\hat{\beta}_0+\hat{\beta}_1\cos\left(\dfrac{\pi}{6}\right)+\hat{\beta}_2\sin\left(\dfrac{\pi}{6}\right),
+\end{equation*}
+</p>
+<p>我们重点考察第二个模型对第一个月估计的方差. 首先要指出，余弦趋势模型的三个系数估计是渐近不相关的 <strong>（注意这里仍然要求有 $ f=m/n(m&lt;n/2) $ 的形式，否则是近似不相关的）</strong>，这点源于正交性. 我们只考察白噪声序列和 $ \rho_1\ne0,\rho_k=0(k&gt;1) $ 的情况. 记 $ \boldsymbol{\alpha}_1=(\cos(2\pi f)~\cos(4\pi f)~\cdots~\cos(2n\pi f))', \boldsymbol{\alpha}_2=(\sin(2\pi f)~\sin(4\pi f)~\cdots~\sin(2n\pi f))',\boldsymbol{Y}=(Y_1~Y_2~\cdots~Y_n)' $，那么系数的两两协方差可写为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \text{Cov}…'>\begin{align*}
+    \text{Cov}(\hat{\beta}_1,\hat{\beta}_2)&amp;=\dfrac{4}{n^2}\text{Cov}(\boldsymbol{\alpha}_1&#039;\boldsymbol{Y},\boldsymbol{\alpha}_2&#039;\boldsymbol{Y})=\dfrac{4}{n^2}\boldsymbol{\alpha}_1&#039;\text{Cov}(\boldsymbol{Y},\boldsymbol{Y})\boldsymbol{\alpha}_2,\\
+    \text{Cov}(\hat{\beta}_0,\hat{\beta}_1)&amp;=\dfrac{2}{n^2}\text{Cov}(\boldsymbol{1}&#039;\boldsymbol{Y},\boldsymbol{\alpha}_1&#039;\boldsymbol{Y})=\dfrac{2}{n^2}\boldsymbol{1}&#039;\text{Cov}(\boldsymbol{Y},\boldsymbol{Y})\boldsymbol{\alpha}_1,\\
+    \text{Cov}(\hat{\beta}_1,\hat{\beta}_2)&amp;=\dfrac{2}{n^2}\text{Cov}(\boldsymbol{1}&#039;\boldsymbol{Y},\boldsymbol{\alpha}_2&#039;\boldsymbol{Y})=\dfrac{2}{n^2}\boldsymbol{1}&#039;\text{Cov}(\boldsymbol{Y},\boldsymbol{Y})\boldsymbol{\alpha}_2.
+\end{align*}
+</p>
+<p>当为白噪声序列时，再次利用求和性质，可以得到三个协方差都等于 $ 0 $，这时是严格不相关的. 对于 $ \rho_1\ne0,\rho_k=0(k&gt;1) $，我们需要次对角线上的项进行估计. 以 $ \hat{\beta}_1,\hat{\beta}_2 $ 为例，此时不难求得</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \text{Cov}…'>\begin{align*}
+    \text{Cov}(\hat{\beta}_1,\hat{\beta}_2)&amp;=\dfrac{4}{n^2}\sum_{t=1}^{n-1}\left[\cos(2\pi f(t+1))\sin(2\pi ft)+\sin(2\pi f(t+1))\cos(2\pi ft)\right]\gamma_1\\
+    &amp;=\dfrac{4}{n^2}\sum_{t=1}^{n-1}\sin(2\pi f(2t+1))\gamma_1=-\dfrac{4}{n^2}\sin(2\pi f)\gamma_1=o\left(\dfrac{1}{n}\right).
+\end{align*}
+</p>
+<p>因此它们是渐近不相关的. 对于其他两个有相同的结论. 因此我们可以近似认为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \text{Var}…'>\begin{equation*}
+    \text{Var}(\hat{\mu}_1)=\text{Var}(\hat{\beta}_0)+\text{Var}{(\hat{\beta}_1)}\cdot\cos^2\left(\dfrac{\pi}{6}\right)+\text{Var}(\hat{\beta}_2)\cdot\sin^2\left(\dfrac{\pi}{6}\right).
+\end{equation*}
+</p>
+<p>现在的问题就在于对三个系数的方差的计算及估计. 如果是白噪声序列，先前我们已经得到了相应结果，整合一下，马上知道标准差之比为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \sqrt{\dfr…'>\begin{equation*}
+    \sqrt{\dfrac{\gamma_{0}/n+2\gamma_{0}/n}{\gamma_{0}/N}}=\sqrt{\dfrac{3N}{n}}.
+\end{equation*}
+</p>
+<p>不妨假设 $ n=12N $ （也就是观测时间一致），那么比值就是 $ 0.5 $，这说明余弦趋势模型的效果足足提升了一倍. 如果是 $ \rho_1\ne0,\rho_k=0(k&gt;1) $ 的情况，季节均值模型的估计量方差并未改变，在余弦趋势模型的小节末尾给出了 $ \hat{\beta}_1,\hat{\beta}_2 $ 的方差值，现在考察一下 $ \hat{\beta}_0 $ 以及另外两者的化简：</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \text{Var}…'>\begin{align*}
+    \text{Var}(\hat{\beta}_0)&amp;=\dfrac{\gamma_0}{n}+\dfrac{1}{n^2}\cdot(2n-2)\gamma_1=\dfrac{\gamma_0}{n}\left[1+2\left(1-\dfrac{1}{n}\right)\rho_1\right],\\
+    \text{Var}(\hat{\beta}_1)&amp;=\dfrac{2\gamma_0}{n}\left[1+\dfrac{4\rho_1}{n}\sum_{t=1}^{n-1}\left(\dfrac{\sqrt{3}}{2}\cos^2\left(\dfrac{\pi t}{6}\right)-\dfrac{1}{2}\cos\left(\dfrac{\pi t}{6}\right)\sin\left(\dfrac{\pi t}{6}\right)\right)\right]\\
+    &amp;=\dfrac{2\gamma_0}{n}\left[1+\dfrac{4\rho_1}{n}\left(\dfrac{\sqrt{3}n}{4}+\dfrac{1}{2}\sin\left(\dfrac{\pi(n-1)}{3}\right)\right)\right]=\dfrac{2\gamma_0}{n}\left(1+\sqrt{3}\rho_1+o\left(1\right)\right),\\
+    \text{Var}(\hat{\beta}_2)&amp;=\dfrac{2\gamma_0}{n}\left[1+\dfrac{2\rho_1}{n}\sum_{t=1}^{n-1}\left(\cos\left(\dfrac{\pi}{6}\right)-\cos\left(\dfrac{\pi(2t+1)}{6}\right)\right)\right]\\
+    &amp;=\dfrac{2\gamma_0}{n}\left[1+\dfrac{2\rho_1}{n}\left(\dfrac{\sqrt{3}n}{2}+\cos\left(\dfrac{\pi(2n+1)}{6}\right)\right)\right]=\dfrac{2\gamma_0}{n}\left(1+\sqrt{3}\rho_1+o\left(1\right)\right).
+\end{align*}
+</p>
+<p>其中 $ \hat{\beta}_1 $ 的估计是直接展开得到的， $ \hat{\beta}_2 $ 的估计用了积化和差化简. 因此此时余弦模型的总方差为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \text{Var}…'>\begin{equation*}
+    \text{Var}(\hat{\mu}_1)=\dfrac{\gamma_0}{n}\left[1+2\rho_1+2(1+\sqrt{3}\rho_1)+o\left(1\right)\right]\approx\dfrac{\gamma_0}{n}\left[3+2(1+\sqrt{3})\rho_1\right].
+\end{equation*}
+</p>
+<p>两个模型的标准差之比为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \sqrt{\dfr…'>\begin{equation*}
+    \sqrt{\dfrac{\gamma_0/n\cdot\left[3+2(1+\sqrt{3})\rho_1\right]}{\gamma_0/N}}=\sqrt{\left[3+2(1+\sqrt{3})\rho_1\right]\dfrac{N}{n}}.
+\end{equation*}
+</p>
+<p>对 $ \rho_1 $ 做适当的假定可以得到两模型的效果差别（注意 $ \rho_1 $ 不可能很小，否则会导致最小二乘估计失效），我们再次假设 $ n=12N $，在此假设下及上式有意义的范围内，余弦趋势模型总是能降低估计的方差. 且 $ \rho_1 $ 越小降低得越明显. 以 $ \rho_1=-0.4 $ 为例，计算后可得比率约为 $ 0.26 $，大大低于白噪声序列的比率.</p>
+<p><strong>注</strong> 符合 $ \rho_1\ne0,\rho_k=0(k&gt;1) $ 的条件的模型被称为<strong>一阶移动平均模型</strong>.</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://hzy2024.github.io">Eason</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://hzy2024.github.io/2026/03/12/%E5%AD%A3%E8%8A%82%E6%80%A7%E8%B6%8B%E5%8A%BF%E5%92%8C%E4%BD%99%E5%BC%A6%E8%B6%8B%E5%8A%BF%E7%9A%84%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E6%A8%A1%E5%9E%8B%E6%AF%94%E8%BE%83/">http://hzy2024.github.io/2026/03/12/%E5%AD%A3%E8%8A%82%E6%80%A7%E8%B6%8B%E5%8A%BF%E5%92%8C%E4%BD%99%E5%BC%A6%E8%B6%8B%E5%8A%BF%E7%9A%84%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E6%A8%A1%E5%9E%8B%E6%AF%94%E8%BE%83/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://hzy2024.github.io" target="_blank">Eason's page</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90/">时间序列分析</a><a class="post-meta__tags" href="/tags/%E5%9B%9E%E5%BD%92/">回归</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/03/15/%E4%B8%89%E5%A4%A7%E6%8A%BD%E6%A0%B7%E5%88%86%E5%B8%83%E5%9C%A8%E5%A4%9A%E5%85%83%E6%AD%A3%E6%80%81%E6%80%BB%E4%BD%93%E6%83%85%E5%BD%A2%E4%B8%8B%E7%9A%84%E6%8E%A8%E5%B9%BF/" title="三大抽样分布在多元正态总体情形下的推广"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">三大抽样分布在多元正态总体情形下的推广</div></div><div class="info-2"><div class="info-item-1">本文内容参考了应用多元统计分析（高惠璇著）一书.  一维情形下的三大抽样分布，即 $ \chi^2 $ 分布、 $ t $ 分布和 $ F $ 分布已为人所熟知，但在多元场合下也有对应的非常重要的分布：Wishart 分布、Hotelling $ T^2 $ 分布以及 Wilks $ \Lambda $ 分布. 它们构成了多元正态总体参数假设检验的重要基石. 本文将一步步构建这三种分布.  各分量独立的正态随机向量的二次型 设 $ n $ 维正态随机向量 $ \boldsymbol{X}=(X_1~X_2~\cdots~X_n)'\sim N(\boldsymbol{\mu},\sigma^2\boldsymbol{I}_n) $，其中 $ \boldsymbol{\mu}=(\mu_1,\cdots,\mu_n)' $. 当 $ \boldsymbol{\mu}=\boldsymbol{0} $ 时， \begin{equation*}     \xi=\dfrac{1}{\sigma^2}\boldsymbol{X}&#039;\boldsymbol{X}=\sum_{i=1...</div></div></div></a><a class="pagination-related" href="/2026/02/25/%E4%B8%80%E9%81%93%E7%A8%8D%E6%98%BE%E5%A4%8D%E6%9D%82%E7%9A%84%E9%9A%8F%E6%9C%BA%E6%A0%B7%E6%9C%AC%E6%96%B9%E5%B7%AE%E6%80%A7%E8%B4%A8%E7%9A%84%E9%A2%98%E7%9B%AE/" title="一道稍显复杂的随机样本方差性质的题目"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">一道稍显复杂的随机样本方差性质的题目</div></div><div class="info-2"><div class="info-item-1">设 $ X_1,\cdots,X_n $ 为一随机样本，其均值和方差分别记为 $ \overline{X} $ 和 $ S^2 $. (a) 证明： \begin{equation*}     S^2=\dfrac{1}{2n(n-1)}\sum_{i=1}^n\sum_{j=1}^n(X_i-X_j)^2; \end{equation*}  假设 $ X_i $ 的四阶矩存在且有限，记 $ \theta_1=\mathbb{E}X_i,~\theta_j=\mathbb{E}(X_i-\theta_1)^j,~j=2,3,4. $ (b) 证明 $ \text{Var}S^2=\dfrac{1}{n}\left(\theta_4-\dfrac{n-3}{n-1}\theta_2^2\right) $; (c) 用 $ \theta_1,\cdots,\theta_4 $ 表示 $ \text{Cov}(\overline{X},S^2) $，问 $ \text{Cov}(\overline{X},S^2) $ 何时得 $ 0 $ ?  解答 (a) 只要展开并验证即可. 我们有...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/04/04/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E9%9D%9E%E5%B9%B3%E7%A8%B3%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E6%A8%A1%E5%9E%8B/" title="时间序列分析——非平稳时间序列模型"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-04-04</div><div class="info-item-2">时间序列分析——非平稳时间序列模型</div></div><div class="info-2"><div class="info-item-1">平稳时间序列模型的建模已经可以对一些实际场景建模，但是平稳性实际是一个很强的条件，有更多的数据是不能以 $ \text{ARMA}(p,q) $ 模型建模的. 一个典型的非平稳的时间序列模型可以从均值上反映，即均值非常数，随时间 $ t $ 变化而变化，可以写为 $ \mu_t=g(t) $. 在季节性趋势和余弦趋势的时间序列模型比较一文中关于余弦趋势模型的建模就是一个典型的例子. 如果序列的自协方差函数和 $ t $ 有关，那么也是非平稳的. 事实上，我们可以从 $ \text{AR}(p) $ 模型的表达式出发，让其不满足平稳性条件来一窥非平稳时间序列. 我们考虑 $ \text{AR}(1) $ 模型，令 $ \phi=3 $，即 \begin{equation*}     Y_t=3Y_{t-1}+e_t, \end{equation*}  那么经过 $ t-1 $ 步迭代我们有 \begin{equation*}     Y_t=e_t+3e_{t-1}+\cdots+3^{t-1}e_1+3^tY_0, \end{equation*}  其中令 $ Y_0=0 $ 是...</div></div></div></a><a class="pagination-related" href="/2026/04/29/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E6%A8%A1%E5%9E%8B%E5%8F%82%E6%95%B0%E4%BC%B0%E8%AE%A1/" title="时间序列分析——模型参数估计"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-04-29</div><div class="info-item-2">时间序列分析——模型参数估计</div></div><div class="info-2"><div class="info-item-1">本文内容接时间序列分析——非平稳时间序列模型. 在做完模型阶数的选择后，进一步地我们可以进行模型参数的估计，从而真正完全确定模型长什么样. 我们有多种技术来进行参数估计. 我们先前已经验证了，对于 $ \text{ARMA}(p,q) $ 模型的自相关系数，样本自相关系数是其相合估计量. 模型中的系数可以通过 Yule-Walker 方程利用自相关函数反解出来. 这些关系将在后面的估计中使用到. 本文主要介绍矩估计、最小二乘估计和极大似然估计. 均从简单的模型出发推广一般形式.  矩估计  $ \text{MA}(q) $ 模型 我们首先以 $ \text{MA}(1) $ 为例说明矩估计是怎么进行的. 首先在该模型下， $ Y_t=e_t-\theta e_{t-1},\mathbb{E}(Y_t)=0 $. 我们有 ρ1=−θ1+θ2\rho_1=\dfrac{-\theta}{1+\theta^2}ρ1​=1+θ2−θ​，将其视为关于 $ \theta $ 的一元二次方程，就能解得 \begin{equation*}     \theta=\dfrac{-1\pm\sqrt...</div></div></div></a><a class="pagination-related" href="/2026/03/18/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%B9%B3%E7%A8%B3%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E6%A8%A1%E5%9E%8B/" title="时间序列分析——平稳时间序列模型"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-03-18</div><div class="info-item-2">时间序列分析——平稳时间序列模型</div></div><div class="info-2"><div class="info-item-1">本文对一般线性过程及其截断——滑动平均过程、自回归过程及两者的结合—— ARMA 模型的模型性质及估计量的一些基本统计性质做了总结，中间涉及到随机变量二次型期望和方差的推导.   一、一般线性过程 一般线性过程$ \lbrace Y_t\rbrace  $ 可以表示成现在和过去白噪声变量的加权线性组合 \begin{equation*}     Y_t=e_t+\psi_1e_{t-1}+\psi_2e_{t-2}+\cdots\quad\left(\sum_{n=1}^{\infty}\psi_n^2&lt;\infty\right) \end{equation*}  其中 $ e_t,\cdots,e_{t-q} $ 都是白噪声, 即均值为 $ 0 $ 且独立同分布的随机变量，并假设方差均为 $ \sigma_e^2 $. 我们现在通过 $ Y_t $ 的截断 \begin{equation*}   Y_{t,m}=\sum_{i=0}^{m}\psi_{i}e_{t-i}\to Y_{t}~~(m\to\infty) \end{equation*}  来说明括号内的条件起到...</div></div></div></a><a class="pagination-related" href="/2026/05/15/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E6%A8%A1%E5%9E%8B%E8%AF%8A%E6%96%AD%E4%B8%8E%E6%A8%A1%E5%9E%8B%E9%A2%84%E6%B5%8B/" title="时间序列分析——模型诊断与模型预测"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-05-15</div><div class="info-item-2">时间序列分析——模型诊断与模型预测</div></div><div class="info-2"><div class="info-item-1">本文内容接时间序列分析——模型参数估计. 现在我们基本完成了时间序列相关的模型构建、模型性质考察、模型选择、模型参数估计的任务. 接下来一个很重要的问题是：我们拟合的模型是否适当？我们在建立 $ \text{ARMA}(p,q) $ 模型时，实际上假定了 $ e_t $ 之间是独立的，且服从正态分布 $ N(0,\sigma_e^2) $ （当然在没有正态性时，我们仍然可以通过通过最小二乘法获得参数的估计，无需极大似然方法）. 说明模型不适当的一个例子可以看时间序列分析——非平稳时间序列模型一文中有关 $ \text{EACF} $ 的开头内容. 上面对于噪声项的假定实际上就是我们模型诊断的关键. 接下来关于模型诊断的内容主要围绕噪声项正态性及独立性的检验来进行说明.  模型诊断  $ e_t $ 正态性的检验 传统的数据正态性检验可以使用 $ \text{Q-Q} $ 图来看和正态分布的分位数线条的差异，但时间序列的特殊性使得我们不能使用这种方法，因为序列具有相关性. 下面要介绍的 Jarque-Bera 检验就是对时间序列噪声正态性检验的一个工具. 我们先从一般情况说起. 假...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Eason</div><div class="author-info-description">SUFE统计学大三本科生一枚~</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">19</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">29</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/hzy2024"><i class="fab fa-github"></i><span>访问我的 GitHub</span></a><div class="card-info-social-icons"><a class="social-icon" href="/img/qq.jpg" target="_blank" title="QQ"><i class="fab fa-qq" style="color: #1e3050;"></i></a><a class="social-icon" href="https://space.bilibili.com/345987732?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #fb7299;"></i></a><a class="social-icon" href="https://www.zhihu.com/people/perplexity-67" target="_blank" title="知乎"><i class="fab fa-zhihu" style="color: #1772f6;"></i></a><a class="social-icon" href="mailto:2023110611@stu.sufe.edu.cn" target="_blank" title="E-mail"><i class="fas fa-envelope" style="color: #0078d7;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">逐步完善网页ing...</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%A3%E8%8A%82%E5%9D%87%E5%80%BC%E6%A8%A1%E5%9E%8B"><span class="toc-number">1.</span> <span class="toc-text"> 季节均值模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%99%E5%BC%A6%E8%B6%8B%E5%8A%BF%E6%A8%A1%E5%9E%8B"><span class="toc-number">2.</span> <span class="toc-text"> 余弦趋势模型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%A4%E7%A7%8D%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%AF%94%E8%BE%83"><span class="toc-number">3.</span> <span class="toc-text"> 两种模型的比较</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/07/31/%E6%95%B0%E5%80%BC%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%87%BD%E6%95%B0%E9%80%BC%E8%BF%91%E4%B8%8E%E5%BF%AB%E9%80%9F%20Fourier%20%E5%8F%98%E6%8D%A2/" title="数值分析——函数逼近与快速 Fourier 变换">数值分析——函数逼近与快速 Fourier 变换</a><time datetime="2026-07-31T01:41:42.000Z" title="发表于 2026-07-31 09:41:42">2026-07-31</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/07/24/%E9%AB%98%E7%AD%89%E4%BB%A3%E6%95%B0%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E5%AE%9A%E4%B9%89%E5%8F%8A%E7%BB%93%E8%AE%BA/" title="高等代数中的一些定义及结论">高等代数中的一些定义及结论</a><time datetime="2026-07-24T15:59:45.000Z" title="发表于 2026-07-24 23:59:45">2026-07-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/07/10/EM-%E7%AE%97%E6%B3%95/" title="EM 算法">EM 算法</a><time datetime="2026-07-10T13:24:41.000Z" title="发表于 2026-07-10 21:24:41">2026-07-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/06/12/%E5%A4%9A%E5%85%83%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%88%A4%E5%88%AB%E5%88%86%E6%9E%90/" title="多元统计分析——判别分析">多元统计分析——判别分析</a><time datetime="2026-06-12T09:41:00.000Z" title="发表于 2026-06-12 17:41:00">2026-06-12</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/18/Riemann%E7%BA%A7%E6%95%B0%E9%87%8D%E6%8E%92%E5%AE%9A%E7%90%86/" title="Riemann级数重排定理">Riemann级数重排定理</a><time datetime="2026-05-18T07:30:16.000Z" title="发表于 2026-05-18 15:30:16">2026-05-18</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Eason</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        loader: {
+          load: [
+            // Four font extension packages (optional)
+            //- '[tex]/bbm',
+            //- '[tex]/bboldx',
+            //- '[tex]/dsfont',
+            '[tex]/mhchem'
+          ],
+          paths: {
+            'mathjax-newcm': '[mathjax]/../@mathjax/mathjax-newcm-font',
+
+            //- // Four font extension packages (optional)
+            //- 'mathjax-bbm-extension': '[mathjax]/../@mathjax/mathjax-bbm-font-extension',
+            //- 'mathjax-bboldx-extension': '[mathjax]/../@mathjax/mathjax-bboldx-font-extension',
+            //- 'mathjax-dsfont-extension': '[mathjax]/../@mathjax/mathjax-dsfont-font-extension',
+            'mathjax-mhchem-extension': '[mathjax]/../@mathjax/mathjax-mhchem-font-extension'
+          }
+        },
+        output: {
+          font: 'mathjax-newcm',
+        },
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+          packages: {
+            '[+]': [
+              'mhchem'
+            ]
+          }
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          menuOptions: {
+            settings: {
+              enrich: false  // Turn off Braille and voice narration text automatic generation
+            }
+          },
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax@4.1.0/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

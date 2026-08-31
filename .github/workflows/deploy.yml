@@ -1,0 +1,44 @@
+name: 自动部署 Hexo 博客
+
+# 触发条件：当你向 main 分支 push 代码时，启动此任务
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest # 使用 GitHub 提供的最新版 Linux 服务器
+
+    steps:
+      # 1. 机器人把你 main 分支的源码下载到服务器
+      - name: 拉取源码
+        uses: actions/checkout@v3
+
+      # 2. 机器人在服务器上安装 Node.js 环境
+      - name: 配置 Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # 3. 机器人在服务器上安装 Pandoc (专为你配置的！)
+      - name: 安装 Pandoc 渲染器
+        uses: r-lib/actions/setup-pandoc@v2
+
+      # 4. 安装 Hexo 和主题所需的依赖包
+      - name: 安装依赖包
+        run: npm install
+
+      # 5. 执行 Hexo 生成命令
+      - name: 生成静态网页
+        run: |
+          npx hexo clean
+          npx hexo generate
+
+      # 6. 把生成的 public 文件夹推送到 gh-pages 分支
+      - name: 部署到 GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: gh-pages

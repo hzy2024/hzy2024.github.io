@@ -1,0 +1,416 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>2026年度 MIT 积分大赛 Regular Season 解答 | Eason's page</title><meta name="author" content="Eason"><meta name="copyright" content="Eason"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="基本是自己做的，有两三道题的思路其实自己已经想到了但莫名其妙做不出来，于是翻了一下官方的录像回放...  Problem 1 \begin{align*}     \int_{0}^{2026}\left(\sum_{k&#x3D;0}^{\infty}\frac{x^{2026k+2025}}{k!}\right)\mathrm{d}x&amp;&#x3D;\int_{0}^{2026}x^{2025}\left(">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2026年度 MIT 积分大赛 Regular Season 解答">
+<meta property="og:url" content="http://hzy2024.github.io/2026/02/11/2026%E5%B9%B4%E5%BA%A6MIT%E7%A7%AF%E5%88%86%E5%A4%A7%E8%B5%9BRegular-Season%E8%A7%A3%E7%AD%94/index.html">
+<meta property="og:site_name" content="Eason&#39;s page">
+<meta property="og:description" content="基本是自己做的，有两三道题的思路其实自己已经想到了但莫名其妙做不出来，于是翻了一下官方的录像回放...  Problem 1 \begin{align*}     \int_{0}^{2026}\left(\sum_{k&#x3D;0}^{\infty}\frac{x^{2026k+2025}}{k!}\right)\mathrm{d}x&amp;&#x3D;\int_{0}^{2026}x^{2025}\left(">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://hzy2024.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2026-02-11T08:24:30.000Z">
+<meta property="article:modified_time" content="2026-03-18T14:15:46.741Z">
+<meta property="article:author" content="Eason">
+<meta property="article:tag" content="数学">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://hzy2024.github.io/img/avatar.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "2026年度 MIT 积分大赛 Regular Season 解答",
+  "url": "http://hzy2024.github.io/2026/02/11/2026%E5%B9%B4%E5%BA%A6MIT%E7%A7%AF%E5%88%86%E5%A4%A7%E8%B5%9BRegular-Season%E8%A7%A3%E7%AD%94/",
+  "image": "http://hzy2024.github.io/img/avatar.jpg",
+  "datePublished": "2026-02-11T08:24:30.000Z",
+  "dateModified": "2026-03-18T14:15:46.741Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Eason",
+      "url": "http://hzy2024.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://hzy2024.github.io/2026/02/11/2026%E5%B9%B4%E5%BA%A6MIT%E7%A7%AF%E5%88%86%E5%A4%A7%E8%B5%9BRegular-Season%E8%A7%A3%E7%AD%94/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '2026年度 MIT 积分大赛 Regular Season 解答',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div class="bg-animation" id="web_bg" style="background-image: url(/img/background.GIF);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">19</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">29</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Eason's page</span></a><a class="nav-page-title" href="/"><span class="site-name">2026年度 MIT 积分大赛 Regular Season 解答</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">2026年度 MIT 积分大赛 Regular Season 解答</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-02-11T08:24:30.000Z" title="发表于 2026-02-11 16:24:30">2026-02-11</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-03-18T14:15:46.741Z" title="更新于 2026-03-18 22:15:46">2026-03-18</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%9D%82%E9%A1%B9/">杂项</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><p><em>基本是自己做的，有两三道题的思路其实自己已经想到了但莫名其妙做不出来，于是翻了一下官方的录像回放...</em></p>
+<h3 id="problem-1"><a class="markdownIt-Anchor" href="#problem-1"></a> Problem 1</h3>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \int_{0}^{…'>\begin{align*}
+    \int_{0}^{2026}\left(\sum_{k=0}^{\infty}\frac{x^{2026k+2025}}{k!}\right)\mathrm{d}x&amp;=\int_{0}^{2026}x^{2025}\left(\sum_{k=0}^\infty\frac{(x^{2026})^k}{k!}\right)\mathrm{d}x\\
+    &amp;=\int_{0}^{2026}x^{2025}\mathrm{e}^{x^2026}\mathrm{d}x\\
+    &amp;=\left.\frac{\mathrm{e}^{x^{2026}}}{2026}\right|_{0}^{2026}=\frac{\mathrm{e}^{2026^{2026}}-1}{2026}.
+\end{align*}
+</p>
+<h3 id="problem-2"><a class="markdownIt-Anchor" href="#problem-2"></a> Problem 2</h3>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \int_{0}^{…'>\begin{align*}
+    \int_{0}^{\log(34)}\left(2+\frac{1}{2\mathrm{e}^x-1}+\frac{1}{2\mathrm{e}^x-1}\right)\mathrm{d}x&amp;=\int_{0}^{\log(34)}\frac{2\mathrm{e}^x}{2\mathrm{e}^x-1}+\frac{3\mathrm{e}^x}{3\mathrm{e}^x-1}\mathrm{d}x\\
+    &amp;=\int_{1}^{34}\frac{2}{2t-1}+\frac{3}{3t-1}\mathrm{d}t\\
+    &amp;=\left.\log[(2t-1)(3t-1)]\right|_{1}^{34}=\log\left(\frac{6767}{2}\right).
+\end{align*}
+</p>
+<h3 id="problem-3"><a class="markdownIt-Anchor" href="#problem-3"></a> Problem 3</h3>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    &amp;\int_{0}^…'>\begin{align*}
+    &amp;\int_{0}^{\frac{1}{2}}\left(\cos(\pi x)-\pi\left(\frac{1}{4}-x^2\right)\left(\frac{5}{4}-x^2\right)\right)\mathrm{d}x\\&amp;=\left.\frac{1}{\pi}\sin(\pi x)\right|_{0}^{\frac{1}{2}}-\pi\int_{0}^{\frac{1}{2}}\left(x^4-\frac{3}{2}x^2+\frac{5}{16}\right)\mathrm{d}x\\
+    &amp;=\frac{1}{\pi}-\pi\left(\frac{1}{5}\cdot\frac{1}{32}-\frac{1}{2}\cdot\frac{1}{8}+\frac{5}{32}\right)=\frac{1}{\pi}-\frac{\pi}{10}.
+\end{align*}
+</p>
+<h3 id="problem-4"><a class="markdownIt-Anchor" href="#problem-4"></a> Problem 4</h3>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \int_{\int…'>\begin{align*}
+    \int_{\int_{\int_{\int_{0}^1x\mathrm{d}x}^{1}\mathrm{d}x}^{1}\mathrm{d}x}^{\int_{0}^{\int_{0}^{\int_{0}^{1}x\mathrm{d}x}x\mathrm{d}x}x\mathrm{d}x}x\mathrm{d}x
+    &amp;=\int_{\int_{\int_{1/2}^{1}x\mathrm{d}x}^{1}\mathrm{d}x}^{\int_{0}^{\int_{0}^{1/2}x\mathrm{d}x}x\mathrm{d}x}x\mathrm{d}x\\
+    &amp;=\int_{\int_{3/8}^{1}x\mathrm{d}x}^{\int_{0}^{1/8}x\mathrm{d}x}x\mathrm{d}x\\
+    &amp;=\int_{55/128}^{1/128}x\mathrm{d}x=-\frac{189}{2048}.
+\end{align*}
+</p>
+<h3 id="problem-5"><a class="markdownIt-Anchor" href="#problem-5"></a> Problem 5</h3>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \int\frac{…'>\begin{align*}
+    \int\frac{4x^2-1}{x^2(x^2-1)}\mathrm{d}x
+    &amp;=\int\frac{3}{x^2-1}+\frac{1}{x^2}\mathrm{d}x\\
+    &amp;=-\frac{1}{x}+\frac{3}{2}\log\left|\frac{x-1}{x+1}\right|+C.
+\end{align*}
+</p>
+<h3 id="problem-6"><a class="markdownIt-Anchor" href="#problem-6"></a> Problem 6</h3>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \int\frac{…'>\begin{align*}
+    \int\frac{\mathrm{d}x}{27x-x^{-1/3}}&amp;=\int\frac{x^{1/3}\mathrm{d}x}{27x^{4/3}-1}
+    =\int\frac{3}{4}\cdot\frac{\mathrm{d}t}{27t-1}\quad(t=x^{4/3})\\&amp;=\frac{1}{36}\log\left|27x^{\frac{4}{3}}-1\right|+C.
+\end{align*}
+</p>
+<h3 id="problem-7"><a class="markdownIt-Anchor" href="#problem-7"></a> Problem 7</h3>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \int\frac{…'>\begin{align*}
+    \int\frac{2\sqrt{x}+1}{\sqrt{x^2+x\sqrt{x}}}\mathrm{d}x&amp;=\int\frac{2+1/\sqrt{x}}{\sqrt{x+\sqrt{x}}}\mathrm{d}x\\
+    &amp;=2\int\frac{1}{\sqrt{x+\sqrt{x}}}\mathrm{d}(x+\sqrt{x})\\&amp;=4\sqrt{x+\sqrt{x}}+C.
+\end{align*}
+</p>
+<h3 id="problem-8"><a class="markdownIt-Anchor" href="#problem-8"></a> Problem 8</h3>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \int\frac{…'>\begin{align*}
+    \int\frac{\mathrm{e}^x}{\mathrm{e}^{2x}-\mathrm{e}^{-2x}}\mathrm{d}x&amp;=\int\frac{t^2}{t^4-1}\mathrm{d}t\quad(t=\mathrm{e}^x)\\
+    &amp;=\frac{1}{2}\left(\int\frac{1}{t^2+1}\mathrm{d}t+\int\frac{1}{t^2-1}\mathrm{d}t\right)\\
+    &amp;=\frac{1}{2}\arctan(\mathrm{e}^x)+\frac{1}{4}\log\left|\frac{\mathrm{e}^x-1}{\mathrm{e}^x+1}\right|+C.
+\end{align*}
+</p>
+<h3 id="problem-9"><a class="markdownIt-Anchor" href="#problem-9"></a> Problem 9</h3>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+   &amp;\int_{0}^\…'>\begin{align*}
+   &amp;\int_{0}^\pi\frac{|\sin(x)+\sin(2x)+\sin(3x)+\sin(4x)|}{\sin(x)+\sin(2x)+\sin(3x)+\sin(4x)}\mathrm{d}x\\
+    &amp;=\int_{0}^{\pi}\text{sgn}(\sin(x)+\sin(2x)+\sin(3x)+\sin(4x))\mathrm{d}x\\
+    &amp;=\int_{0}^{\pi}\text{sgn}\left[\sin\left(\frac{5}{2}x\right)\cos\left(\frac{3}{2}x\right)+\sin\left(\frac{5}{2}x\right)\cos\left(\frac{1}{2}x\right)\right]\mathrm{d}x\\
+    &amp;=\int_{0}^\pi\text{sgn}\left[\sin\left(\frac{5}{2}x\right)\cos\left(x\right)\cos\left(\frac{1}{2}x\right)\right]\mathrm{d}x\\
+    &amp;=\frac{2\pi}{5}-\frac{\pi}{10}+\frac{3\pi}{10}-\frac{\pi}{5}=\frac{2\pi}{5}.
+\end{align*}
+</p>
+<h3 id="problem-10"><a class="markdownIt-Anchor" href="#problem-10"></a> Problem 10</h3>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \int_{0}^1…'>\begin{align*}
+    \int_{0}^1\frac{1-x}{\sqrt{\mathrm{e}^{2x}-x^2}}\mathrm{d}x&amp;=\int_{0}^{1}\frac{(1-x)\mathrm{e}^{-x}}{1-(x\mathrm{e}^{-x})^2}\mathrm{d}x\\
+    &amp;=\arcsin(x\mathrm{e}^{-x})|_0^1=\arcsin\left(\frac{1}{\mathrm{e}}\right).
+\end{align*}
+</p>
+<h3 id="problem-11"><a class="markdownIt-Anchor" href="#problem-11"></a> Problem 11</h3>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    &amp;\int_{0}^…'>\begin{align*}
+    &amp;\int_{0}^{2026}\left\{x+\frac{1}{2}\left\lfloor\frac{x}{2}\right\rfloor+\frac{1}{3}\left\lfloor\frac{x}{3}\right\rfloor+\frac{1}{4}\left\lfloor\frac{x}{4}\right\rfloor+\cdots\right\}\mathrm{d}x\\
+    &amp;=\sum_{n=0}^{2025}\int_{n}^{n+1}\left\{x+\frac{1}{2}\left\lfloor\frac{x}{2}\right\rfloor+\frac{1}{3}\left\lfloor\frac{x}{3}\right\rfloor+\frac{1}{4}\left\lfloor\frac{x}{4}\right\rfloor+\cdots\right\}\mathrm{d}x\\
+    &amp;=2026\int_{0}^1x\mathrm{d}x=1013.
+\end{align*}
+</p>
+<p><strong>注</strong>  本题需要注意到在 $ [n,n+1] $ 这个区间上，后面的取整项的值并不会发生改变，所以我们可以对每个长度为 $ 1 $ 的区间平移积分区域，由于 $ f(x)={x} $ 是一个周期为 $ 1 $ 的周期函数，因此每一块积分都等于在 $ [0,1] $ 上的积分。</p>
+<h3 id="problem-12"><a class="markdownIt-Anchor" href="#problem-12"></a> Problem 12</h3>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \int_{1/2}…'>\begin{align*}
+    \int_{1/2}^2\frac{x^8}{x^8-x^6+x^4-x^2+1}\mathrm{d}x&amp;=\int_{1/2}^2\frac{1/x^2}{x^8-x^6+x^4-x^2+1}\mathrm{d}x\\
+    &amp;=\frac{1}{2}\int_{1/2}^2\frac{1}{x^2}\frac{x^{10}+1}{x^8-x^6+x^4-x^2+1}\mathrm{d}x\\
+    &amp;=\frac{1}{2}\int_{1/2}^2\frac{x^2+1}{x^2}\mathrm{d}x=\frac{3}{2}.
+\end{align*}
+</p>
+<h3 id="problem-13"><a class="markdownIt-Anchor" href="#problem-13"></a> Problem 13</h3>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \int(\text…'>\begin{align*}
+    \int(\text{arcsinh}(x))^2\mathrm{d}x&amp;=x(\text{arcsinh}(x))^2-\int\frac{2x\text{arcsinh}x}{\sqrt{1+x^2}}\mathrm{d}x\\
+    &amp;=x(\text{arcsinh}(x))^2-2\text{arcsinh}(x)\sqrt{1+x^2}+2x+C.
+\end{align*}
+</p>
+<p><strong>注</strong>  本题需要注意到 $ (\text{arcsinh}(x))^{\prime}=(\log(\sqrt{1+x^{2}}+x))^{\prime}=1/(\sqrt{1+x^{2}}) $。</p>
+<h3 id="problem-14"><a class="markdownIt-Anchor" href="#problem-14"></a> Problem 14</h3>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \int\cos^2…'>\begin{align*}
+    \int\cos^2(2026x)\cos(1013x)\mathrm{d}x&amp;=\frac{1}{2}\int[\cos(1013x)+\cos(4052x)\cos(1013x)]\mathrm{d}x\\
+    &amp;=\frac{1}{2026}\sin(1013x)+\frac{1}{4}\int[\cos(5065x)+\cos(3039x)]\mathrm{d}x\\
+    &amp;=\frac{\sin(1013x)}{2026}+\frac{\sin(3039x)}{12156}+\frac{\sin(5065x)}{20260}+C.
+\end{align*}
+</p>
+<h3 id="problem-15"><a class="markdownIt-Anchor" href="#problem-15"></a> Problem 15</h3>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \int\mathr…'>\begin{align*}
+    \int\mathrm{e}^x\arcsin(\tanh(x))\mathrm{d}x&amp;=\mathrm{e}^x\arcsin(\tanh(x))-\int\frac{\mathrm{e}^x/\cosh^2(x)}{\sqrt{1-\tanh^2(x)}}\mathrm{d}x\\
+    &amp;=\mathrm{e}^x\arcsin(\tanh(x))-\int\frac{2\mathrm{e}^x}{\mathrm{e}^x+\mathrm{e}^{-x}}\mathrm{d}x\\
+    &amp;=\mathrm{e}^x\arcsin(\tanh(x))-\log(\mathrm{e}^{2x}+1)+C.
+\end{align*}
+</p>
+<h3 id="problem-16"><a class="markdownIt-Anchor" href="#problem-16"></a> Problem 16</h3>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \int\frac{…'>\begin{align*}
+    \int\frac{x((1-x^2)\cos(x)+2x\sin(x))}{(1+x^2)^2}\mathrm{d}x&amp;=-\frac{1}{2}\int((1-x^2)\cos(x)+2x\sin(x))\mathrm{d}\left(\frac{1}{1+x^2}\right)\\
+    &amp;=-\frac{(1-x^2)\cos(x)+2x\sin(x)}{2(1+x^2)}+\frac{1}{2}\int\sin(x)\mathrm{d}x\\
+    &amp;=-\frac{\cos(x)+x\sin(x)}{1+x^2}+C.
+\end{align*}
+</p>
+<h3 id="problem-17"><a class="markdownIt-Anchor" href="#problem-17"></a> Problem 17</h3>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    &amp;\int_{0}^…'>\begin{align*}
+    &amp;\int_{0}^1\sin((x-1)(5x-1))\sin(x(3x-2))\mathrm{d}x\\&amp;=\frac{1}{2}\int_{0}^1\cos(2x^2-4x+1)-\cos(8x^2-8x+1)\mathrm{d}x\\
+    &amp;=\int_{0}^{1/2}\cos(8x^2-8x+1)\mathrm{d}x-\frac{1}{2}\int_{0}^{1}\cos(8x^2-8x+1)\mathrm{d}x\\&amp;=0.
+\end{align*}
+</p>
+<p><strong>注</strong>  第三步对前一个积分用到了换元 $ x=2t $，需要对式子结构很熟悉，最后等于 $ 0 $ 则是因为里面的二次函数对称轴为 $ 1/2 $，因此可使用区间再现。</p>
+<h3 id="problem-18"><a class="markdownIt-Anchor" href="#problem-18"></a> Problem 18</h3>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \int_{1/4}…'>\begin{align*}
+    \int_{1/4}^{\sqrt{2}}\frac{\mathrm{d}x}{x(x^{x^{x^\cdots}}\log(x)-1)}&amp;=\int_{1/2}^2\frac{\mathrm{d}((\log t)/t)}{\log t-1}\quad\left(t=x^{x^{x^{\cdots}}}\right)\\
+    &amp;=-\int_{1/2}^{2}\frac{1}{t^2}\mathrm{d}t=-\frac{3}{2}.
+\end{align*}
+</p>
+<p><strong>注</strong>   换元时积分上下限的确定使用了等式 $ \log x={\log t}/{t} $，以及 $ f(t)=\log t/t $ 在 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mn>0</mn><mo separator="true">,</mo><mn>2</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(0,2)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord">2</span><span class="mclose">)</span></span></span></span> 上的单调性。此外，无穷指数塔 $ x^{x^{x^{\cdots}}} $ 在 $ 0&lt;x&lt;\mathrm{e}^{1/\mathrm{e}} $ 时是收敛的，因此不用担心积分区域不存在的问题。</p>
+<h3 id="problem-19"><a class="markdownIt-Anchor" href="#problem-19"></a> Problem 19</h3>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    &amp;\int_0^1\…'>\begin{align*}
+    &amp;\int_0^1\frac{1+((2026+2x-x^2)^2-2)(2026+4x-4x^2)^2}{(2025+2x-x^2)(2027+2x-x^2)(2025+4x-4x^2)(2027+4x-4x^2)}\mathrm{d}x
+\end{align*}
+</p>
+<p>这题需要注意到两个恒等式：</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    a(x)=(2025…'>\begin{align*}
+    a(x)=(2025+2x-x^2)(2027+2x-x^2)&amp;=(2026+2x-x^2)^2-1,\\
+    b(x)=(2025+4x-4x^2)(2027+4x-4x^2)&amp;=(2026+4x-4x^2)^2-1,
+\end{align*}
+</p>
+<p>原积分就变为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \int_{0}^{…'>\begin{equation*}
+    \int_{0}^{1}\frac{1+(a(x)-1)(b(x)+1)}{a(x)b(x)}\mathrm{d}x=1+\int_{0}^{1}\left(\frac{1}{b(x)}-\frac{1}{a(x)}\right)\mathrm{d}x.
+\end{equation*}
+</p>
+<p>再次利用第 $ 17 $ 题中的方法可以得到</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \int_{0}^{…'>\begin{align*}
+    \int_{0}^{1}\frac{1}{b(x)}\mathrm{d}x=\frac{1}{2}\int_{0}^{2}\frac{1}{a(x)}\mathrm{d}x=\int_{0}^{1}\frac{1}{a(x)}\mathrm{d}x.
+\end{align*}
+</p>
+<p>因此后面的积分值相互抵消，原积分值就是 $ 1 $ 。</p>
+<h3 id="problem-20"><a class="markdownIt-Anchor" href="#problem-20"></a> Problem 20</h3>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    &amp;\int_{1/2…'>\begin{align*}
+    &amp;\int_{1/2}^{1}4^{x-1}\left(1+4^{4^{x-1}-1}\left(1+4^{4^{4^{x-1}-1}-1}(1+\cdots)\right)\right)\mathrm{d}x=I\\
+    &amp;=\frac{1}{2\log4}+\frac{1}{\log4}\int_{1/2}^14^{t-1}\left(1+4^{4^{t-1}-1}\left(1+\cdots\right)\right)\mathrm{d}t
+    \\&amp;=\frac{1}{2\log4}+\frac{1}{\log4}I~~\Rightarrow~~I=\frac{1}{2(\log4-1)}.
+\end{align*}
+</p>
+<p><strong>注</strong>  该题的关键点在于使用 $ t=4^{x-1} $ 换元后，积分的上下限始终不改变。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://hzy2024.github.io">Eason</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://hzy2024.github.io/2026/02/11/2026%E5%B9%B4%E5%BA%A6MIT%E7%A7%AF%E5%88%86%E5%A4%A7%E8%B5%9BRegular-Season%E8%A7%A3%E7%AD%94/">http://hzy2024.github.io/2026/02/11/2026%E5%B9%B4%E5%BA%A6MIT%E7%A7%AF%E5%88%86%E5%A4%A7%E8%B5%9BRegular-Season%E8%A7%A3%E7%AD%94/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://hzy2024.github.io" target="_blank">Eason's page</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%95%B0%E5%AD%A6/">数学</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/02/25/%E5%A4%9A%E5%85%83%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83/" title="多元正态分布"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">多元正态分布</div></div><div class="info-2"><div class="info-item-1">本文内容参考了 George Casella 所著的统计推断（第二版）及高惠璇应用多元统计分析有关多维随机变量的内容.  本文对多元正态分布的一些基础的结论做了一些总结. 多元正态分布是用相互独立且同 $ N(0,1) $ 分布的随机变量通过线性变换来定义的：设 $ \boldsymbol{U}=(U_1,U_2,\cdots,U_n)'$ 为随机向量，各分量间相互独立且同 $ N(0,1) $ 分布；设 $ \boldsymbol{\mu} $ 为 $ n $ 维常数向量， $ \boldsymbol{A}$ 为 $ n\times p $ 常数矩阵，则称 $ \boldsymbol{X}=\boldsymbol{AU}+\boldsymbol{\mu} $ 的分布为 $ n $ 元正态分布，或称 $ \boldsymbol{X} $ 为 $ n $ 元正态随机向量，记为 $ \boldsymbol{X}\sim N(\boldsymbol{\mu},\boldsymbol{AA}') $.  二元正态分布 一般来说较为熟知的多元正态分布是二元正态分布，其密度函数形式是 \be...</div></div></div></a><a class="pagination-related" href="/2026/01/30/%E6%B3%9B%E5%87%BD%E5%88%86%E6%9E%90%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/" title="泛函分析课程笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">泛函分析课程笔记</div></div><div class="info-2"><div class="info-item-1">本 pdf 是本人学习泛函分析时整理的笔记，基本上是对《实变函数与泛函分析基础（第四版）》（程其襄、张奠宙、胡善文、薛以锋著）泛函分析部分的学到的内容的再整理，同时补充了一些老师课程 ppt 上的内容。本科学的泛函分析基于“线性”的观点来看待各种空间，结构可以说相当优美，把很多问题都归纳到了一个抽象的结构下，本人也非常喜欢这门课程。 pdf 中可能有些 typo，如果发现也可发邮件联系我。                               全屏阅读 / 下载 PDF                   (如果上方预览无法显示，请点击按钮直接阅读)      </div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/04/04/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E9%9D%9E%E5%B9%B3%E7%A8%B3%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E6%A8%A1%E5%9E%8B/" title="时间序列分析——非平稳时间序列模型"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-04-04</div><div class="info-item-2">时间序列分析——非平稳时间序列模型</div></div><div class="info-2"><div class="info-item-1">平稳时间序列模型的建模已经可以对一些实际场景建模，但是平稳性实际是一个很强的条件，有更多的数据是不能以 $ \text{ARMA}(p,q) $ 模型建模的. 一个典型的非平稳的时间序列模型可以从均值上反映，即均值非常数，随时间 $ t $ 变化而变化，可以写为 $ \mu_t=g(t) $. 在季节性趋势和余弦趋势的时间序列模型比较一文中关于余弦趋势模型的建模就是一个典型的例子. 如果序列的自协方差函数和 $ t $ 有关，那么也是非平稳的. 事实上，我们可以从 $ \text{AR}(p) $ 模型的表达式出发，让其不满足平稳性条件来一窥非平稳时间序列. 我们考虑 $ \text{AR}(1) $ 模型，令 $ \phi=3 $，即 \begin{equation*}     Y_t=3Y_{t-1}+e_t, \end{equation*}  那么经过 $ t-1 $ 步迭代我们有 \begin{equation*}     Y_t=e_t+3e_{t-1}+\cdots+3^{t-1}e_1+3^tY_0, \end{equation*}  其中令 $ Y_0=0 $ 是...</div></div></div></a><a class="pagination-related" href="/2026/01/30/%E9%92%9F%E5%BC%80%E8%8E%B1%E3%80%8AA-Course-in-Probability-Theory%E3%80%8B%E4%B9%A0%E9%A2%98%E8%A7%A3%E7%AD%94/" title="钟开莱《概率论教程》习题解答"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-01-30</div><div class="info-item-2">钟开莱《概率论教程》习题解答</div></div><div class="info-2"><div class="info-item-1">本文为机械工业出版社出版的《A Course in Probability Theory》英文原书第 3 版的习题解答。 本解答持续更新，习题解答编写实属不易，请尊重本人的劳动成果，任何引用请注明出处。                               全屏阅读 / 下载 PDF                   (如果上方预览无法显示，请点击按钮直接阅读)      </div></div></div></a><a class="pagination-related" href="/2026/02/25/%E4%B8%80%E9%81%93%E7%A8%8D%E6%98%BE%E5%A4%8D%E6%9D%82%E7%9A%84%E9%9A%8F%E6%9C%BA%E6%A0%B7%E6%9C%AC%E6%96%B9%E5%B7%AE%E6%80%A7%E8%B4%A8%E7%9A%84%E9%A2%98%E7%9B%AE/" title="一道稍显复杂的随机样本方差性质的题目"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-25</div><div class="info-item-2">一道稍显复杂的随机样本方差性质的题目</div></div><div class="info-2"><div class="info-item-1">设 $ X_1,\cdots,X_n $ 为一随机样本，其均值和方差分别记为 $ \overline{X} $ 和 $ S^2 $. (a) 证明： \begin{equation*}     S^2=\dfrac{1}{2n(n-1)}\sum_{i=1}^n\sum_{j=1}^n(X_i-X_j)^2; \end{equation*}  假设 $ X_i $ 的四阶矩存在且有限，记 $ \theta_1=\mathbb{E}X_i,~\theta_j=\mathbb{E}(X_i-\theta_1)^j,~j=2,3,4. $ (b) 证明 $ \text{Var}S^2=\dfrac{1}{n}\left(\theta_4-\dfrac{n-3}{n-1}\theta_2^2\right) $; (c) 用 $ \theta_1,\cdots,\theta_4 $ 表示 $ \text{Cov}(\overline{X},S^2) $，问 $ \text{Cov}(\overline{X},S^2) $ 何时得 $ 0 $ ?  解答 (a) 只要展开并验证即可. 我们有...</div></div></div></a><a class="pagination-related" href="/2026/07/24/%E9%AB%98%E7%AD%89%E4%BB%A3%E6%95%B0%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E5%AE%9A%E4%B9%89%E5%8F%8A%E7%BB%93%E8%AE%BA/" title="高等代数中的一些定义及结论"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-24</div><div class="info-item-2">高等代数中的一些定义及结论</div></div><div class="info-2"><div class="info-item-1">本文档历时一年多写成，初衷是为了练习 LaTeX，后面逐渐发展补充为一本小册子的形式. 详细信息请见前言和文章内容.                                全屏阅读 / 下载 PDF                   (如果上方预览无法显示，请点击按钮直接阅读)      </div></div></div></a><a class="pagination-related" href="/2026/02/25/%E5%A4%9A%E5%85%83%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83/" title="多元正态分布"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-25</div><div class="info-item-2">多元正态分布</div></div><div class="info-2"><div class="info-item-1">本文内容参考了 George Casella 所著的统计推断（第二版）及高惠璇应用多元统计分析有关多维随机变量的内容.  本文对多元正态分布的一些基础的结论做了一些总结. 多元正态分布是用相互独立且同 $ N(0,1) $ 分布的随机变量通过线性变换来定义的：设 $ \boldsymbol{U}=(U_1,U_2,\cdots,U_n)'$ 为随机向量，各分量间相互独立且同 $ N(0,1) $ 分布；设 $ \boldsymbol{\mu} $ 为 $ n $ 维常数向量， $ \boldsymbol{A}$ 为 $ n\times p $ 常数矩阵，则称 $ \boldsymbol{X}=\boldsymbol{AU}+\boldsymbol{\mu} $ 的分布为 $ n $ 元正态分布，或称 $ \boldsymbol{X} $ 为 $ n $ 元正态随机向量，记为 $ \boldsymbol{X}\sim N(\boldsymbol{\mu},\boldsymbol{AA}') $.  二元正态分布 一般来说较为熟知的多元正态分布是二元正态分布，其密度函数形式是 \be...</div></div></div></a><a class="pagination-related" href="/2026/03/30/%E5%90%91%E9%87%8F%E4%B8%8E%E7%9F%A9%E9%98%B5%E7%9A%84%E6%B1%82%E5%AF%BC/" title="向量与矩阵的求导"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-03-30</div><div class="info-item-2">向量与矩阵的求导</div></div><div class="info-2"><div class="info-item-1">本文参考了网络上关于矩阵代数有关知识，总结了向量及矩阵求导的相关技术，对于大规模批次的数据处理相当有用，是机器学习的一大基石.                                全屏阅读 / 下载 PDF                   (如果上方预览无法显示，请点击按钮直接阅读)      </div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Eason</div><div class="author-info-description">SUFE统计学大三本科生一枚~</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">19</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">29</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/hzy2024"><i class="fab fa-github"></i><span>访问我的 GitHub</span></a><div class="card-info-social-icons"><a class="social-icon" href="/img/qq.jpg" target="_blank" title="QQ"><i class="fab fa-qq" style="color: #1e3050;"></i></a><a class="social-icon" href="https://space.bilibili.com/345987732?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #fb7299;"></i></a><a class="social-icon" href="https://www.zhihu.com/people/perplexity-67" target="_blank" title="知乎"><i class="fab fa-zhihu" style="color: #1772f6;"></i></a><a class="social-icon" href="mailto:2023110611@stu.sufe.edu.cn" target="_blank" title="E-mail"><i class="fas fa-envelope" style="color: #0078d7;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">逐步完善网页ing...</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#problem-1"><span class="toc-number">1.</span> <span class="toc-text"> Problem 1</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#problem-2"><span class="toc-number">2.</span> <span class="toc-text"> Problem 2</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#problem-3"><span class="toc-number">3.</span> <span class="toc-text"> Problem 3</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#problem-4"><span class="toc-number">4.</span> <span class="toc-text"> Problem 4</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#problem-5"><span class="toc-number">5.</span> <span class="toc-text"> Problem 5</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#problem-6"><span class="toc-number">6.</span> <span class="toc-text"> Problem 6</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#problem-7"><span class="toc-number">7.</span> <span class="toc-text"> Problem 7</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#problem-8"><span class="toc-number">8.</span> <span class="toc-text"> Problem 8</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#problem-9"><span class="toc-number">9.</span> <span class="toc-text"> Problem 9</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#problem-10"><span class="toc-number">10.</span> <span class="toc-text"> Problem 10</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#problem-11"><span class="toc-number">11.</span> <span class="toc-text"> Problem 11</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#problem-12"><span class="toc-number">12.</span> <span class="toc-text"> Problem 12</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#problem-13"><span class="toc-number">13.</span> <span class="toc-text"> Problem 13</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#problem-14"><span class="toc-number">14.</span> <span class="toc-text"> Problem 14</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#problem-15"><span class="toc-number">15.</span> <span class="toc-text"> Problem 15</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#problem-16"><span class="toc-number">16.</span> <span class="toc-text"> Problem 16</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#problem-17"><span class="toc-number">17.</span> <span class="toc-text"> Problem 17</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#problem-18"><span class="toc-number">18.</span> <span class="toc-text"> Problem 18</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#problem-19"><span class="toc-number">19.</span> <span class="toc-text"> Problem 19</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#problem-20"><span class="toc-number">20.</span> <span class="toc-text"> Problem 20</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/07/31/%E6%95%B0%E5%80%BC%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%87%BD%E6%95%B0%E9%80%BC%E8%BF%91%E4%B8%8E%E5%BF%AB%E9%80%9F%20Fourier%20%E5%8F%98%E6%8D%A2/" title="数值分析——函数逼近与快速 Fourier 变换">数值分析——函数逼近与快速 Fourier 变换</a><time datetime="2026-07-31T01:41:42.000Z" title="发表于 2026-07-31 09:41:42">2026-07-31</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/07/24/%E9%AB%98%E7%AD%89%E4%BB%A3%E6%95%B0%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E5%AE%9A%E4%B9%89%E5%8F%8A%E7%BB%93%E8%AE%BA/" title="高等代数中的一些定义及结论">高等代数中的一些定义及结论</a><time datetime="2026-07-24T15:59:45.000Z" title="发表于 2026-07-24 23:59:45">2026-07-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/07/10/EM-%E7%AE%97%E6%B3%95/" title="EM 算法">EM 算法</a><time datetime="2026-07-10T13:24:41.000Z" title="发表于 2026-07-10 21:24:41">2026-07-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/06/12/%E5%A4%9A%E5%85%83%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%88%A4%E5%88%AB%E5%88%86%E6%9E%90/" title="多元统计分析——判别分析">多元统计分析——判别分析</a><time datetime="2026-06-12T09:41:00.000Z" title="发表于 2026-06-12 17:41:00">2026-06-12</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/18/Riemann%E7%BA%A7%E6%95%B0%E9%87%8D%E6%8E%92%E5%AE%9A%E7%90%86/" title="Riemann级数重排定理">Riemann级数重排定理</a><time datetime="2026-05-18T07:30:16.000Z" title="发表于 2026-05-18 15:30:16">2026-05-18</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Eason</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        loader: {
+          load: [
+            // Four font extension packages (optional)
+            //- '[tex]/bbm',
+            //- '[tex]/bboldx',
+            //- '[tex]/dsfont',
+            '[tex]/mhchem'
+          ],
+          paths: {
+            'mathjax-newcm': '[mathjax]/../@mathjax/mathjax-newcm-font',
+
+            //- // Four font extension packages (optional)
+            //- 'mathjax-bbm-extension': '[mathjax]/../@mathjax/mathjax-bbm-font-extension',
+            //- 'mathjax-bboldx-extension': '[mathjax]/../@mathjax/mathjax-bboldx-font-extension',
+            //- 'mathjax-dsfont-extension': '[mathjax]/../@mathjax/mathjax-dsfont-font-extension',
+            'mathjax-mhchem-extension': '[mathjax]/../@mathjax/mathjax-mhchem-font-extension'
+          }
+        },
+        output: {
+          font: 'mathjax-newcm',
+        },
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+          packages: {
+            '[+]': [
+              'mhchem'
+            ]
+          }
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          menuOptions: {
+            settings: {
+              enrich: false  // Turn off Braille and voice narration text automatic generation
+            }
+          },
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax@4.1.0/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

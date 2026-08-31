@@ -1,0 +1,819 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>EM 算法 | Eason's page</title><meta name="author" content="Eason"><meta name="copyright" content="Eason"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="本文是对经典文章 Maximum Likelihood from Incomplete Data via the EM Algorithm 的回顾，并且参考文章 On The Convergence Properties of EM Algorithm 对原始文献中关于算法错误收敛性的证明进行了修正，篇幅上进行了删减.  EM 算法是用来求解不完全观测数据的极大似然估计的有效算法. 关于 EM 算">
+<meta property="og:type" content="article">
+<meta property="og:title" content="EM 算法">
+<meta property="og:url" content="http://hzy2024.github.io/2026/07/10/EM-%E7%AE%97%E6%B3%95/index.html">
+<meta property="og:site_name" content="Eason&#39;s page">
+<meta property="og:description" content="本文是对经典文章 Maximum Likelihood from Incomplete Data via the EM Algorithm 的回顾，并且参考文章 On The Convergence Properties of EM Algorithm 对原始文献中关于算法错误收敛性的证明进行了修正，篇幅上进行了删减.  EM 算法是用来求解不完全观测数据的极大似然估计的有效算法. 关于 EM 算">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://hzy2024.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2026-07-10T13:24:41.000Z">
+<meta property="article:modified_time" content="2026-07-14T05:57:56.051Z">
+<meta property="article:author" content="Eason">
+<meta property="article:tag" content="数理统计">
+<meta property="article:tag" content="极大似然估计">
+<meta property="article:tag" content="统计机器学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://hzy2024.github.io/img/avatar.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "EM 算法",
+  "url": "http://hzy2024.github.io/2026/07/10/EM-%E7%AE%97%E6%B3%95/",
+  "image": "http://hzy2024.github.io/img/avatar.jpg",
+  "datePublished": "2026-07-10T13:24:41.000Z",
+  "dateModified": "2026-07-14T05:57:56.051Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Eason",
+      "url": "http://hzy2024.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://hzy2024.github.io/2026/07/10/EM-%E7%AE%97%E6%B3%95/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'EM 算法',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div class="bg-animation" id="web_bg" style="background-image: url(/img/background.GIF);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">19</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">29</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Eason's page</span></a><a class="nav-page-title" href="/"><span class="site-name">EM 算法</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">EM 算法</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-07-10T13:24:41.000Z" title="发表于 2026-07-10 21:24:41">2026-07-10</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-07-14T05:57:56.051Z" title="更新于 2026-07-14 13:57:56">2026-07-14</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%96%87%E7%8C%AE%E9%98%85%E8%AF%BB/">文献阅读</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E6%96%87%E7%8C%AE%E9%98%85%E8%AF%BB/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><div class="note info no-icon flat"><p>本文是对经典文章 <a href="https://rss.onlinelibrary.wiley.com/doi/abs/10.1111/j.2517-6161.1977.tb01600.x" title="" target=""><strong>Maximum Likelihood from Incomplete Data via the <em>EM</em> Algorithm</strong></a> 的回顾，并且参考文章 <a href="https://www.jstor.org/stable/2240463" title="" target=""><strong>On The Convergence Properties of EM Algorithm</strong></a> 对原始文献中关于算法错误收敛性的证明进行了修正，篇幅上进行了删减.</p>
+</div>
+<p><strong>EM 算法</strong>是用来求解不完全观测数据的极大似然估计的有效算法. 关于 EM 算法的讨论在二十世纪六七十年代就逐步开展了. 本篇内容所基于的文章实际上结合了很多有关作者的研究.<br />
+首先我们给出<strong>不完全数据</strong>的一般表达：</p>
+<div class="note primary no-icon flat"><p>设有两个样本空间 $ \mathcal{X},\mathcal{Y} $ 并且有一个从 $ \mathcal{X} $ 到 $ \mathcal{Y} $ 的<strong>多对一映射</strong> $ \boldsymbol{x}\to\boldsymbol{y}(\boldsymbol{x}) $，其中 $ \boldsymbol{y} $ 是样本空间 $ \mathcal{Y} $ 的一个实现，而对应的 $ \boldsymbol{x} $ 无法直接观测到，其信息蕴含在 $ \mathcal{X}(\boldsymbol{y}):=\lbrace \boldsymbol{x}\in\mathcal{X}:\boldsymbol{y}=\boldsymbol{y}(\boldsymbol{x})\rbrace $ 这一集合中，其中 $ \boldsymbol{y} $ 是一条观测到的数据. $ \mathcal{X}(\boldsymbol{y}) $ 实际上可以看作 $ \mathcal{Y} $ 到 $ \mathcal{X} $ 的逆映射. 我们称 $ \boldsymbol{x} $ 为<strong>完全数据（complete data）</strong>，相应地， $ \boldsymbol{y} $ 为<strong>不完全数据（incomplete data）</strong>.<br />
+<strong>注意</strong>： $ \boldsymbol{x} $ 甚至可以是传统意义上被称作参数的数据.</p>
+</div>
+<p>假设我们有一族依赖于参数 $ \boldsymbol{\phi} $ 的完全数据的样本密度函数 $ f(\boldsymbol{x}|\boldsymbol{\phi}) $，对应的不完全数据的样本密度函数为 $ g(\boldsymbol{y}|\boldsymbol{\phi}) $，那么由上面的定义可以知道有如下关系</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    g(\boldsym…'>\begin{equation*}
+    g(\boldsymbol{y}|\boldsymbol{\phi})=\int_{\mathcal{X}(\boldsymbol{y})}f(\boldsymbol{x}|\boldsymbol{\phi})\mathrm{d}\boldsymbol{x}.
+\end{equation*}
+</p>
+<p>EM 算法是为了找到使得一个参数 $ \boldsymbol{\phi} $ 使得 $ g(\boldsymbol{y}|\boldsymbol{\phi}) $ 在给定 $ \boldsymbol{y} $ 时最大化，但这也可以通过对完全数据空间的密度函数族的必要使用来实现. 有些时候我们可以对原始的密度函数族做出假定且这些假定比较直观，但有些时候需要通过某些方式去定义 $ f(\cdot|\cdot) $. EM 算法具体可以分为两个步骤，即 E 步（期望步）和 M 步（最大化步），我们用一个数值案例来说明其是怎么操作的，给出一些直觉.</p>
+<h2 id="引入以多项分布为例"><a class="markdownIt-Anchor" href="#引入以多项分布为例"></a> 引入：以多项分布为例</h2>
+<p>Rao 在一篇论文中给出了将 197 种动物分成四类的例子，其服从多项分布. 观测数据为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{y}=(y_1,y_2,y_3,y_4)=(125,18,20,34),
+\end{equation*}
+</p>
+<p>经典的对群体建立的基因模型给出了每类出现的概率分布为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \left(\fra…'>\begin{equation*}
+    \left(\frac{1}{2}+\frac{1}{4}\pi,\frac{1}{4}(1-\pi),\frac{1}{4}(1-\pi),\frac{1}{4}\pi\right), \quad 0\le\pi\le 1.
+\end{equation*}
+</p>
+<p>于是观测数据的概率分布为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    g(\boldsym…'>\begin{equation*}
+    g(\boldsymbol{y}|\pi)=\frac{(y_1+y_2+y_3+y_4)!}{y_1!y_2!y_3!y_4!}\left(\frac{1}{2}+\frac{1}{4}\pi\right)^{y_1}\left(\frac{1}{4}-\frac{1}{4}\pi\right)^{y_2}\left(\frac{1}{4}-\frac{1}{4}\pi\right)^{y_3}\left(\frac{1}{4}\pi\right)^{y_4}.
+\end{equation*}
+</p>
+<p>我们的目标是求出 $ \pi $ 的极大似然估计. 然而，虽然我们可以直接得到对数似然函数的驻点并求出 $ \hat{\pi} $，但是通过一些计算可以看到，求解实际上需要解一个三次方程，直接计算极为麻烦. 为此，我们将观测得到的 $ \boldsymbol{y} $ 进行拆分，<strong>改写成一个有五类的多项分布</strong>的总体. 这个步骤<strong>实际上就指定了映射 $ \boldsymbol{y}(\boldsymbol{x}) $</strong>. 具体而言，我们将 $ y_1 $ 拆成 $ y_1=x_1+x_2 $ 并且 $ x_1 $ 出现概率指定为 $ \dfrac{1}{2} $， $ x_2 $ 出现概率指定为 $ \dfrac{\pi}{4} $，其他保持不变，即 $ y_2=x_3,y_3=x_4,y_4=x_5 $ 并且出现概率保持不变. 那么完全数据的概率质量函数就是</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    f(\boldsym…'>\begin{equation*}
+    f(\boldsymbol{x}|\pi)=\frac{(x_1+x_2+x_3+x_4+x_5)!}{x_1!x_2!x_3!x_4!x_5!}\left(\frac{1}{2}\right)^{x_1}\left(\frac{1}{4}\pi\right)^{x_2}\left(\frac{1}{4}-\frac{1}{4}\pi\right)^{x_3}\left(\frac{1}{4}-\frac{1}{4}\pi\right)^{x_4}\left(\frac{1}{4}\pi\right)^{x_5}.
+\end{equation*}
+</p>
+<p>注意这里 $ x_1,x_2 $ 是随机变量，但满足 $ x_1+x_2=y_1=125 $. EM 算法的操作步骤具体体现为：首先在给定 $ \boldsymbol{y} $ 时得到完全数据 $ \boldsymbol{x} $ 的充分统计量的估计值，然后用极大似然方法在估计得到的完全数据下求出新的参数估计值. 在本例中，我们从 $ \pi^{(0)} $ 开始，重复上述步骤得到 $ \pi^{(p)},p=1,2,\cdots $. 为了说明具体的操作，首先注意 $ x_3,x_4,x_5 $ 都是固定的，实际上我们只要得到 $ x_1,x_2 $ 在第 $ p $ 步时的期望. 我们首先通过 Bayes 定理求出 $ x_1^{(p)}(x_2^{(p)}) $ 的分布，有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \mathbb{P}…'>\begin{align*}
+    \mathbb{P}(x_1^{(p)}|\boldsymbol{y},\pi^{(p)})&amp;=\frac{f(x_1^{(p)},y_1-x_1^{(p)},y_2,y_3,y_4|\pi^{(p)})}{g(\boldsymbol{y}|\pi^{(p)})}\\
+    &amp;=\binom{y_1}{x_1^{(p)}}\left(\dfrac{2}{2+\pi}\right)^{x_1^{(p)}}\left(\frac{\pi}{2+\pi}\right)^{y_1-x_1^{(p)}}\sim b\left(y_1,\frac{2}{2+\pi^{(p)}}\right).
+\end{align*}
+</p>
+<p>于是对 $ x_1,x_2 $ 求期望分别有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \mathbb{E}…'>\begin{equation*}
+    \mathbb{E}[x_1^{(p)}|\boldsymbol{y},\pi^{(p)}]=y_1\cdot\dfrac{2}{2+\pi^{(p)}},~~\mathbb{E}[x_2^{(p)}|\boldsymbol{y},\pi^{(p)}]=y_1\cdot\dfrac{\pi^{(p)}}{2+\pi^{(p)}}.
+\end{equation*}
+</p>
+<p>这就是 EM 算法中的 E 步. 接下来使用估计得到的完全数据 $ \boldsymbol{x}^{(p)}=(x_1^{(p)},x_2^{(p)},x_3,x_4,x_5) $ 代入 $ f $，得到关于 $ \pi $ 的似然函数. 为了计算简便，这里我们直接使用对数似然，表达式可写作</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \ell(\pi|\…'>\begin{equation*}
+    \ell(\pi|\boldsymbol{x}^{(p)})=(x_2^{(p)}+x_5)\log\pi+(x_3+x_4)\log(1-\pi)+C,
+\end{equation*}
+</p>
+<p>其中 $ C $ 是与 $ \pi $ 无关的常量. 求解驻点易得更新等式</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \pi^{(p+1)…'>\begin{equation*}
+    \pi^{(p+1)}=\frac{x_2^{(p)}+x_5}{x_2^{(p)}+x_5+x_3+x_4}.
+\end{equation*}
+</p>
+<p>反复迭代至指定收敛精度就能得到 $ \hat{\pi} $. 原始文章通过对上述迭代式解不动点给出了具体的数值 $ \hat{\pi}\approx 0.6268214980 $. 我们可以通过如下 <code>python</code> 代码来实现具体求解过程：</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">EM</span>(<span class="params">y0, pi0, pi_true, tol=<span class="number">1e-6</span>, max_iter=<span class="number">1000</span></span>):</span><br><span class="line">    y1, pi_old = y0[<span class="number">0</span>], pi0</span><br><span class="line">    x3, x4, x5 = y0[<span class="number">1</span>], y0[<span class="number">2</span>], y0[<span class="number">3</span>]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(max_iter):</span><br><span class="line">        <span class="comment"># E 步</span></span><br><span class="line">        <span class="comment"># x1 = y1 * 2 / (2 + pi_old) 这一步其实可以省略</span></span><br><span class="line">        x2 = y1 * pi_old / (<span class="number">2</span> + pi_old)</span><br><span class="line">        <span class="comment"># M 步</span></span><br><span class="line">        pi_new = (x2 + x5) / (x2 + x5 + x3 + x4)</span><br><span class="line">        <span class="comment"># 检查收敛性</span></span><br><span class="line">        <span class="keyword">if</span>(np.<span class="built_in">abs</span>(pi_new - pi_old) &lt; tol):</span><br><span class="line">            <span class="keyword">return</span> pi_new</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;Iteration <span class="subst">&#123;i+<span class="number">1</span>&#125;</span>: pi = <span class="subst">&#123;pi_new:<span class="number">.9</span>f&#125;</span>, pi - pi_true = <span class="subst">&#123;pi_new - pi_true:<span class="number">.9</span>f&#125;</span>, rate = <span class="subst">&#123;(pi_new - pi_true) / (pi_old - pi_true):<span class="number">.4</span>f&#125;</span>&quot;</span>)</span><br><span class="line">        pi_old = pi_new <span class="comment"># 更新参数</span></span><br><span class="line"></span><br><span class="line">y0, pi0, pi_true = np.array([<span class="number">125</span>, <span class="number">18</span>, <span class="number">20</span>, <span class="number">34</span>]), np.array(<span class="number">0.5</span>), np.array(<span class="number">0.6268214980</span>)</span><br><span class="line">res = EM(y0, pi0, pi_true)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出</span></span><br><span class="line">Iteration <span class="number">1</span>: pi = <span class="number">0.608247423</span>, pi - pi_true = -<span class="number">0.018574075</span>, rate = <span class="number">0.1465</span></span><br><span class="line">Iteration <span class="number">2</span>: pi = <span class="number">0.624321050</span>, pi - pi_true = -<span class="number">0.002500448</span>, rate = <span class="number">0.1346</span></span><br><span class="line">Iteration <span class="number">3</span>: pi = <span class="number">0.626488879</span>, pi - pi_true = -<span class="number">0.000332619</span>, rate = <span class="number">0.1330</span></span><br><span class="line">Iteration <span class="number">4</span>: pi = <span class="number">0.626777322</span>, pi - pi_true = -<span class="number">0.000044176</span>, rate = <span class="number">0.1328</span></span><br><span class="line">Iteration <span class="number">5</span>: pi = <span class="number">0.626815632</span>, pi - pi_true = -<span class="number">0.000005866</span>, rate = <span class="number">0.1328</span></span><br><span class="line">Iteration <span class="number">6</span>: pi = <span class="number">0.626820719</span>, pi - pi_true = -<span class="number">0.000000779</span>, rate = <span class="number">0.1328</span></span><br></pre></td></tr></table></figure>
+<p>经测试结果和论文中得到的是完全一致的. 这样的迭代计算降低了原来求解三次方程的复杂度，并且能够保证收敛到真值. 关于收敛性我们后文会展开进一步讨论.</p>
+<h2 id="em-算法的一般形式"><a class="markdownIt-Anchor" href="#em-算法的一般形式"></a> EM 算法的一般形式</h2>
+<h3 id="指数族形式"><a class="markdownIt-Anchor" href="#指数族形式"></a> 指数族形式</h3>
+<p>我们先在对完全数据的密度函数族 $ f(\boldsymbol{x}|\boldsymbol{\phi}) $ 限制较严格的基础上来谈 EM 算法. 我们首先假设 $ f $ 是<strong>正则指数族</strong>，其具有如下形式</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    f(\boldsym…'>\begin{equation*}
+    f(\boldsymbol{x}|\boldsymbol{\phi})=b(\boldsymbol{x})\exp[\boldsymbol{\phi}&#039;\boldsymbol{T}(\boldsymbol{x})]/a(\boldsymbol{\phi}).
+\end{equation*}
+</p>
+<p>其中 $ \boldsymbol{\phi}\in\Omega\subset\mathbb{R}^{r\times 1} $ 为参数向量，其中 $ \Omega $ 为凸集. $ \boldsymbol{T}(\boldsymbol{x})\in\mathbb{R}^{r\times1} $ 为完全数据的充分统计量. 上述关于参数的正则性条件保证了在不同充分统计量的选择下，通过一个非奇异 $ r\times r $ 线性变换和不同充分统计量所联系的参数向量是唯一确定的. 满足上述正则条件的参数被称为<strong>自然参数</strong>. 注意，自然参数和传统意义上的分布参数会有不同，可能和一个非线性变换联系在一起. 比如对二项分布 $ b(n,p) $（其中 $ n $ 是确定的），写成指数族可以发现 $ \phi=\log\left(\dfrac{p}{1-p}\right) $. <strong>现在我们都将 $ \boldsymbol{\phi} $ 视作自然参数</strong>. 此外我们要求，对所有的 $ \boldsymbol{\phi}\in\Omega $，密度函数 $ f(\cdot|\boldsymbol{\phi}) $ 都具有共同的支撑.<br />
+现在我们可以阐述<strong>对于正则指数族的 EM 算法</strong>. 假设 $ \boldsymbol{\phi}^{(p)} $ 是 $ p $ 步迭代后得到的参数估计，那么接下来两步可以归纳为：</p>
+<div class="note default no-icon flat"><ol>
+<li>E-步：通过</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{T}^{(p)}=\mathbb{E}[\boldsymbol{T}(\boldsymbol{X})|\boldsymbol{y},\boldsymbol{\phi}^{(p)}]
+\end{equation*}
+</p>
+<p>得到关于完全数据充分统计量的估计；</p>
+<ol start="2">
+<li>M-步：通过方程</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \mathbb{E}…'>\begin{equation*}
+    \mathbb{E}[\boldsymbol{T}(\boldsymbol{X})|\boldsymbol{\phi}]=\boldsymbol{T}^{(p)}
+\end{equation*}
+</p>
+<p>确定更新后的参数 $ \boldsymbol{\phi}^{(p+1)} $.</p>
+</div>
+<p>这里的 M 步可能有些让人匪夷所思，似乎和极大化似然函数没有关系. 但实际上，注意我们现在有指数族的形式，我们的等价目标是极大化 $ \ell(\boldsymbol{\phi})=\log f(\boldsymbol{x}|\boldsymbol{\phi}) $. 通过对参数 $ \boldsymbol{\phi} $ 求偏导数就能得到新的参数 $ \boldsymbol{\phi}^{(p+1)} $ 需要满足</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \frac{\par…'>\begin{equation*}
+    \frac{\partial\log a(\boldsymbol{\phi})}{\partial\boldsymbol{\phi}}=\boldsymbol{T}(\boldsymbol{x})=\boldsymbol{T}^{(p)}.
+\end{equation*}
+</p>
+<p>而概率密度的积分必须为 $ 1 $，因此我们有如下的等式：</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \frac{\par…'>\begin{align*}
+    \frac{\partial}{\partial\boldsymbol{\phi}}\int f(\boldsymbol{x}|\boldsymbol{\phi})\mathrm{d}\boldsymbol{x}&amp;=\frac{1}{a^2(\boldsymbol{\phi})}\int\left[a(\boldsymbol{\phi})\boldsymbol{T}(\boldsymbol{x})-\frac{\partial a(\boldsymbol{\phi})}{\partial\boldsymbol{\phi}}\right]b(\boldsymbol{x})\exp(\boldsymbol{\phi}&#039;\boldsymbol{T}(\boldsymbol{x}))\mathrm{d}\boldsymbol{x}\\
+    &amp;=\mathbb{E}[\boldsymbol{T}(\boldsymbol{X})|\boldsymbol{\phi}]-\frac{\partial\log a(\boldsymbol{\phi})}{\partial\boldsymbol{\phi}}=0.
+\end{align*}
+</p>
+<p>于是我们确定了对数配分函数的偏导数. 注意我们现在更新得到的充分统计量是 $ \boldsymbol{T}^{(p)} $，因此就得到了 M-步需要满足的等式. 可以看到，从形式上来看上我们不需要知道 $ \boldsymbol{x}\in\mathcal{X} $ 的具体数值，只要知道统计量的数值即可. 当然在对统计量的实际计算时，还是可能需要确定 $ \boldsymbol{x} $ 的值来计算. 对于 M-步而言，一个困难是对应的方程可能不可解，此时极大值点落在 $ \Omega $ 的边界上，这种情况我们留到更一般的情形讨论. 但如果可解，那么由凸函数及正则指数族的性质可知极大值点是唯一的.<br />
+在进行一般情形的讨论前，首先我们说明 EM 算法确实能够让参数估计收敛到 $ L(\boldsymbol{\phi})=\log g(\boldsymbol{y}|\boldsymbol{\phi}) $ 的 MLE $ \boldsymbol{\phi}^* $. 记给定 $ \boldsymbol{y},\boldsymbol{\phi} $ 时 $ \boldsymbol{x} $ 的条件密度为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    k(\boldsym…'>\begin{equation*}
+    k(\boldsymbol{x}|\boldsymbol{y},\boldsymbol{\phi})=\frac{f(\boldsymbol{x}|\boldsymbol{\phi})}{g(\boldsymbol{y}|\boldsymbol{\phi})}\Rightarrow L(\boldsymbol{\phi})=\log f(\boldsymbol{x}|\boldsymbol{\phi})-\log k(\boldsymbol{x}|\boldsymbol{y},\boldsymbol{\phi})
+\end{equation*}
+</p>
+<p>对于指数族，利用 $ f $ 和 $ g $ 的积分联系，我们可以将 $ k $ 写作</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    k(\boldsym…'>\begin{equation*}
+    k(\boldsymbol{x}|\boldsymbol{y},\boldsymbol{\phi})=b(\boldsymbol{x})\exp[\boldsymbol{\phi}&#039;\boldsymbol{T}(\boldsymbol{x})]/a(\boldsymbol{\phi}|\boldsymbol{y}),
+\end{equation*}
+</p>
+<p>其中</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    a(\boldsym…'>\begin{equation*}
+    a(\boldsymbol{\phi}|\boldsymbol{y})=\int_{\mathcal{X}(\boldsymbol{y})}b(\boldsymbol{x})\exp[\boldsymbol{\phi}&#039;\boldsymbol{T}(\boldsymbol{x})]\mathrm{d}\boldsymbol{x}.
+\end{equation*}
+</p>
+<p>利用概率密度积分恒等式马上可以得到</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    a(\boldsym…'>\begin{equation*}
+    a(\boldsymbol{\phi})=\int_{\mathcal{X}}b(\boldsymbol{x})\exp[\boldsymbol{\phi}&#039;\boldsymbol{T}(\boldsymbol{x})]\mathrm{d}\boldsymbol{x},
+\end{equation*}
+</p>
+<p>于是</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    L(\boldsym…'>\begin{equation*}
+    L(\boldsymbol{\phi})=-\log a(\boldsymbol{\phi})+\log a(\boldsymbol{\phi}|\boldsymbol{y}).
+\end{equation*}
+</p>
+<p>利用对数配分函数偏导数的结果，简记 $ \boldsymbol{T}=\boldsymbol{T}(\boldsymbol{X}) $， 我们可以得到如下极为重要的形式：</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \frac{\par…'>\begin{equation*}
+    \frac{\partial L(\boldsymbol{\phi})}{\partial{\boldsymbol{\phi}}}:=\mathbf{D}L(\boldsymbol{\phi})=-\mathbb{E}[\boldsymbol{T}|\boldsymbol{\phi}]+\mathbb{E}[\boldsymbol{T}|\boldsymbol{y},\boldsymbol{\phi}].
+\end{equation*}
+</p>
+<p><strong>该式是理解 EM 算法的关键.</strong> 如果算法收敛到某个参数 $ \boldsymbol{\phi}^{\ast} $，那么有 $ \boldsymbol{\phi}^{(p)}=\boldsymbol{\phi}^{(p+1)}=\boldsymbol{\phi}^{\ast},p\to\infty $. 结合之前提及的关于指数族的 EM 算法更新步骤可知，有 $ \mathbb{E}[\boldsymbol{T}|\boldsymbol{\phi}^{\ast}]=\mathbb{E}[\boldsymbol{T}|\boldsymbol{y},\boldsymbol{\phi}^{\ast}]\Leftrightarrow\mathbf{D}L(\boldsymbol{\phi})|_{\boldsymbol{\phi}=\boldsymbol{\phi^{\ast}}}=0 $，这说明 $ \boldsymbol{\phi^{\ast}} $ 就是 MLE.<br />
+Sundberg（1974）通过对上面的配分函数进行不断求偏导，得到了两组比较显然但有重要意义的式子：</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \begin{cas…'>\begin{equation*}
+    \begin{cases}
+        \mathbf{D}^ka(\boldsymbol{\phi})=a(\boldsymbol{\phi})\mathbb{E}[\boldsymbol{T}^k|\boldsymbol{\phi}]\\
+        \mathbf{D}^ka(\boldsymbol{\phi}|\boldsymbol{y})=a(\boldsymbol{\phi}|\boldsymbol{y})\mathbb{E}[\boldsymbol{T}^k|\boldsymbol{y},\boldsymbol{\phi}]
+    \end{cases}\quad
+     \begin{cases}
+        \mathbf{D}^k\log a(\boldsymbol{\phi})=\mathbf{K}^k(\boldsymbol{T}|\boldsymbol{\phi})\\
+        \mathbf{D}^k\log a(\boldsymbol{\phi}|\boldsymbol{y})=\mathbf{K}^k(\boldsymbol{T}|\boldsymbol{y},\boldsymbol{\phi})
+    \end{cases}
+\end{equation*}
+</p>
+<p>注意这里 $ \mathbf{D}^k $ 表示的是 $ k $ 阶的所有偏导数构成的<strong>张量</strong>，即一个 $ k $ 维数组. 相应地 $ \boldsymbol{T}^k=\boldsymbol{T}\otimes\boldsymbol{T}\otimes\cdots\otimes\boldsymbol{T} $ 表示由 $ \boldsymbol{T} $ 产生的 $ k $ 阶<strong>张量</strong>. 通过积分号下的求导我们可以得到充分统计量的 $ k $ 阶原点矩. $ \mathbf{K} $ 是叫做<strong>累积量</strong>的一个东西，类似于高阶特征. 当 $ k=1 $ 时就是期望， $ k=2 $ 是就是协方差阵，依次类推. 利用累积量，我们还可以直接导出</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \mathbf{D}…'>\begin{equation*}
+    \mathbf{D}^k L(\boldsymbol{\phi})=-\mathbf{K}^k(\boldsymbol{T}|\boldsymbol{\phi})+\mathbf{K}^k(\boldsymbol{T}|\boldsymbol{y},\boldsymbol{\phi}).
+\end{equation*}
+</p>
+<p>该式是说，似然函数的任意阶偏导数都可以通过将充分统计量的条件累积量和无条件累积量作差得到.<br />
+现在我们假定完全数据的密度函数族不再是正则指数族，而是<strong>曲指数族</strong>. 这是说， $ \boldsymbol{\phi} $ 包含在 $ r $ 维凸区域 $ \Omega $ 的一个曲子流形 $ \Omega_0 $ 中. 比如一维正态分布，我们假定位置参数和尺度参数为 $ (\mu,\mu^2) $，此时参数空间就从凸区域 $ \mathbb{R}\times\mathbb{R}_+ $ 退化到一条不含原点的抛物线. 这时我们需要将 M-步改写为如下形式：</p>
+<div class="note default no-icon flat"><ol start="2">
+<li>M-步：令 $ \boldsymbol{\phi}^{(p+1)} $ 为使得 $ -\log a(\boldsymbol{\phi})+\boldsymbol{\phi}'\boldsymbol{T}^{(p)} $ 在 $ \Omega_0 $ 上极大化的点 $ \boldsymbol{\phi} $.</li>
+</ol>
+</div>
+<h3 id="一般形式"><a class="markdownIt-Anchor" href="#一般形式"></a> 一般形式</h3>
+<p>接下来我们去掉指数族的条件，定义</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    Q(\boldsym…'>\begin{equation*}
+    Q(\boldsymbol{\phi}&#039;|\boldsymbol{\phi})=\mathbb{E}[\log f(\boldsymbol{X}|\boldsymbol{\phi}&#039;)|\boldsymbol{y},\boldsymbol{\phi}],
+\end{equation*}
+</p>
+<p>并假设对任意 $ \boldsymbol{\phi}\in\Omega $ 和几乎处处的 $ \boldsymbol{x}\in\mathcal{X} $ 均有 $ f(\boldsymbol{x}|\boldsymbol{\phi})&gt;0 $. EM 算法可以阐述如下：</p>
+<div class="note primary no-icon flat"><ol>
+<li>
+<p>E-步：计算 $ Q(\boldsymbol{\phi}|\boldsymbol{\phi}^{(p)}) $；</p>
+</li>
+<li>
+<p>M-步：选择 $ \boldsymbol{\phi}^{(p+1)} $ 为使得 $ Q(\boldsymbol{\phi}|\boldsymbol{\phi}^{(p)}) $ 在参数空间 $ \Omega $ 上极大化的 $ \boldsymbol{\phi} $.</p>
+</li>
+</ol>
+<p><strong>注意，这里的 $ \boldsymbol{\phi}^{(p+1)} $ 的选择可以是不唯一的，从极大化的过程定义了一个点到集合的映射. 后续在算法收敛性讨论时我们会进一步说明.</strong></p>
+</div>
+<p>这样做的经验想法是，我们要找 MLE $ \boldsymbol{\phi}^* $，但是我们并不清楚完全数据的密度函数，因此需要对在给定条件 $ \boldsymbol{y},\boldsymbol{\phi}^{(p)} $ 下的期望似然做极大化. 容易观察到指数族的 EM 算法只是上述一般化 EM 算法步骤的一个特例，其计算更为简单方便. 对于上述一般情形，我们需要对全空间的 $ \boldsymbol{\phi} $ 计算 $ Q(\boldsymbol{\phi}|\boldsymbol{\phi^{(p)}}) $ 来寻找下一个极大值点，而对于指数族，由于我们已经导出了简单形式，只要计算充分统计量的期望值 $ \boldsymbol{T}^{(p)} $ 就可以直接求解出下一个参数点.</p>
+<h3 id="后验形式"><a class="markdownIt-Anchor" href="#后验形式"></a> 后验形式</h3>
+<p>EM 算法的思想也可以直接迁移到贝叶斯统计中. 我们知道贝叶斯定理的形式是</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    p(\boldsym…'>\begin{equation*}
+    p(\boldsymbol{\phi}|\boldsymbol{x})=\frac{p(\boldsymbol{x}|\boldsymbol{\phi})\cdot p(\boldsymbol{\phi})}{p(\boldsymbol{x})}\propto p(\boldsymbol{x}|\boldsymbol{\phi})\cdot p(\boldsymbol{\phi}),
+\end{equation*}
+</p>
+<p>这里为方便起见对概率密度函数的符号不做区分，释义是后验概率正比于对参数的先验乘上对事件的先验认知. 将其直接迁移到 EM 算法中，我们想要极大化后验概率，等价于极大化右边的分子，而由于我们并不清楚完全数据的概率分布，但知道给定不完全数据和参数下的条件分布，于是问题等价于极大化 $ Q(\boldsymbol{\phi}|\boldsymbol{\phi}^{(p)})+\log p(\boldsymbol{\phi})=Q(\boldsymbol{\phi}|\boldsymbol{\phi}^{(p)})+G(\boldsymbol{\phi}) $. 如果 $ G(\boldsymbol{\phi}) $ 是共轭先验族中的对数密度，那么前面的加和形式会和 $ Q(\boldsymbol{\phi}|\boldsymbol{\phi}^{(p)}) $ 有相似的函数形式，这方便了最大化问题的求解.</p>
+<h2 id="em-算法的一般理论性质"><a class="markdownIt-Anchor" href="#em-算法的一般理论性质"></a> EM 算法的一般理论性质</h2>
+<p>首先引入函数</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    H(\boldsym…'>\begin{equation*}
+    H(\boldsymbol{\phi}&#039;|\boldsymbol{\phi})=\mathbb{E}[\log k(\boldsymbol{X}|\boldsymbol{y},\boldsymbol{\phi}&#039;)|\boldsymbol{y},\boldsymbol{\phi}],
+\end{equation*}
+</p>
+<p>那么根据前述定义，取条件期望就有下述等式：</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    Q(\boldsym…'>\begin{equation*}
+    Q(\boldsymbol{\phi}&#039;|\boldsymbol{\phi})=L(\boldsymbol{\phi}&#039;)+H(\boldsymbol{\phi}&#039;|\boldsymbol{\phi}).
+\end{equation*}
+</p>
+<h3 id="单调性相关讨论"><a class="markdownIt-Anchor" href="#单调性相关讨论"></a> 单调性相关讨论</h3>
+<div class="note info no-icon flat"><p><strong>引理 1</strong> 对于任意的 $ (\boldsymbol{\phi}',\boldsymbol{\phi})\in\Omega\times\Omega $, 都有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    H(\boldsym…'>\begin{equation*}
+    H(\boldsymbol{\phi}&#039;|\boldsymbol{\phi})\le H(\boldsymbol{\phi}|\boldsymbol{\phi}),
+\end{equation*}
+</p>
+<p>等号当且仅当 $ k(\boldsymbol{x}|\boldsymbol{y},\boldsymbol{\phi}')=k(\boldsymbol{x}|\boldsymbol{y},\boldsymbol{\phi}) $ 几乎处处成立.</p>
+</div>
+<p>这个不等式的证明实际上直接依据 K-L 散度的非负性即可，本质上是由 Jensen 不等式和对数函数的凹性导出的，这里不再赘述.<br />
+为了契合“迭代算法”这一框架，我们可以通过一个 $ \Omega\to\Omega $ 的映射法则 $ \mathbf{M} $ 来定义参数每一步的变化，即 $ \boldsymbol{\phi}^{p}\to\boldsymbol{\phi}^{(p+1)}\Leftrightarrow\boldsymbol{\phi}^{(p+1)}=\mathbf{M}(\boldsymbol{\phi}^{(p)}) $. 由此我们可以定义<strong>广义 EM 算法</strong>：</p>
+<div class="note default no-icon flat"><p><strong>定义</strong> 一个配备了映射 $ \mathbf{M}(\boldsymbol{\phi}) $ 的迭代算法被称为<strong>广义 EM 算法（GEM 算法）</strong>，如果</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    Q(\mathbf{…'>\begin{equation*}
+    Q(\mathbf{M}(\boldsymbol{\phi})|\boldsymbol{\phi})\ge Q(\boldsymbol{\phi}|\boldsymbol{\phi})
+\end{equation*}
+</p>
+<p>对所有 $ \boldsymbol{\phi}\in\Omega $ 都成立.</p>
+</div>
+<p>可以注意到，先前的 EM 算法和 GEM 算法的定义是相容的，因为我们要在旧参数的基础上找到使得 $ Q $ 全局极大化的新参数. 我们有如下定理：</p>
+<div class="note info no-icon flat"><p><strong>定理 1</strong> 对所有的 GEM 算法，均有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    L(\mathbf{…'>\begin{equation*}
+    L(\mathbf{M}(\boldsymbol{\phi}))\ge L(\boldsymbol{\phi}),\quad\forall\boldsymbol{\phi}\in\Omega.
+\end{equation*}
+</p>
+<p>等号成立当且仅当</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    Q(\mathbf{…'>\begin{equation*}
+    Q(\mathbf{M}(\boldsymbol{\phi})|\boldsymbol{\phi})=Q(\boldsymbol{\phi}|\boldsymbol{\phi}),\quad k(\boldsymbol{x}|\boldsymbol{y},\mathbf{M}(\boldsymbol{\phi}))=k(\boldsymbol{x}|\boldsymbol{y},\boldsymbol{\phi})
+\end{equation*}
+</p>
+<p>同时几乎处处成立.</p>
+</div>
+<p><strong>证明</strong> 注意等式</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    L(\mathbf{…'>\begin{equation*}
+    L(\mathbf{M}(\boldsymbol{\phi}))-L(\boldsymbol{\phi})=\lbrace Q(\mathbf{M}(\boldsymbol{\phi})|\boldsymbol{\phi})-Q(\boldsymbol{\phi}|\boldsymbol{\phi})\rbrace+\lbrace H(\boldsymbol{\phi}|\boldsymbol{\phi})-H(\mathbf{M}(\boldsymbol{\phi})|\boldsymbol{\phi})\rbrace,
+\end{equation*}
+</p>
+<p>根据引理 1 和 EM 算法的极大化要求即得其非负，取等条件结合引理 1 即得.</p>
+<div class="note warning no-icon flat"><p><strong>实际上原文作者在定义映射 $ \mathbf{M} $ 时犯了一个错误，在寻找极大值点时，极大值点不一定是唯一的. 在先前正则指数族与参数空间为凸集的情况下，确实能够保证映射找到的点时唯一的，然而在更一般的情形下并不是这样.</strong> 事实上，我们需要定义 $ \mathbf{M} $ 为<strong>点到集合的映射</strong>，具体而言，$ \mathbf{M} $ 将一个空间 $ \mathcal{X} $ 中的点映射成该空间中的一个集合. <strong>后文若没有特殊说明，都采用这种理解方式.</strong> 不过在修改定义后，对定理 1 和下面两个推论是没有影响的，结论仍然成立.</p>
+</div>
+<p>由定理 1 我们可以马上导出如下两个推论：</p>
+<div class="note info no-icon flat"><p><strong>推论 1</strong> 如果对某些 $ \boldsymbol{\phi}^{\ast}\in\Omega,L(\boldsymbol{\phi}^{\ast})\ge L(\boldsymbol{\phi}) $ 对任意 $ \boldsymbol{\phi}\in\Omega $ 成立. 那么对于任意的 GEM 算法，有</p>
+<p>(a) $ L(\mathbf{M}(\boldsymbol{\phi}^{\ast}))=L(\boldsymbol{\phi}^{\ast}) $；<br />
+(b) $ Q(\mathbf{M}(\boldsymbol{\phi}^{\ast})|\boldsymbol{\phi}^{\ast})=Q(\boldsymbol{\phi}^{\ast}|\boldsymbol{\phi}^{\ast})$ 几乎处处成立；<br />
+(c) $ k(\boldsymbol{x}|\boldsymbol{y},\mathbf{M}(\boldsymbol{\phi}^{\ast}))=k(\boldsymbol{x}|\boldsymbol{y},\boldsymbol{\phi}^{\ast}) $ 几乎处处成立.</p>
+<p><strong>推论 2</strong> 如果对某个 $ \boldsymbol{\phi}^{\ast}\in\Omega, L(\boldsymbol{\phi}^{\ast})&gt;L(\boldsymbol{\phi}) $ 对任意的 $ \boldsymbol{\phi}\ne\boldsymbol{\phi}^{\ast},\boldsymbol{\phi}\in\Omega $ 均成立，那么对任何 GEM 算法，均有 $ \mathbf{M}(\boldsymbol{\phi}^*)=\boldsymbol{\phi}^{\ast} $.</p>
+</div>
+<p>上述两个推论实际类似于极大似然估计的不变性和在严格极大值下的唯一性，推论 2 更强的条件保证了映射不动点唯一.</p>
+<h3 id="收敛性相关讨论"><a class="markdownIt-Anchor" href="#收敛性相关讨论"></a> 收敛性相关讨论</h3>
+<p><strong>接下来的定理 2 原文中的证明是有问题的，这里本人对照 Wu（1983）的文章进行了修正，在逻辑上保证通顺</strong>. 这些定理主要是为了说明 EM 算法的收敛性质. 方便起见，我们直接说明需要增补的一些条件：</p>
+<div class="note default no-icon flat"><p>I. $ \Omega_{\boldsymbol{\phi}_0}=\lbrace\boldsymbol{\phi}\in\Omega:L(\boldsymbol{\phi})\ge L(\boldsymbol{\phi}_0) \rbrace $ 对任意的 $ L(\boldsymbol{\phi}_0)&gt;-\infty $ 是紧的；</p>
+<p>II. $ L $ 在 $ \Omega $ 上连续，且在 $ \Omega $ 的内部可微；</p>
+<p>III. 对于 $ \boldsymbol{\phi}_{0}\in\Omega $， $ \Omega_{\boldsymbol{\phi}_0} $ 包含在 $ \Omega $ 的内部.</p>
+</div>
+<p>由于 Fermat 引理求得的驻点可以是局部极大值、鞍点以及全局最大值，因此我们需要上述更强的条件来支撑证明. 在正式说明 EM 算法的收敛性之前，我们不加证明地给出如下定理（详情见<a href="https://pubsonline.informs.org/doi/pdf/10.1287/mnsc.16.1.1?download=true" title="" target="">Zangwill 1969</a>）</p>
+<div class="note info no-icon flat"><p><strong>全局收敛定理</strong> 令序列 $ \lbrace x_{k}\rbrace_{k=0}^{\infty} $ 是由 $ x_{k+1}\in\mathbf{M}(x_k) $ 产生的，其中 $ \mathbf{M} $ 是 $ X $ 上的点到集合映射. 令 $ \Gamma\subset X $ 是给定的解集合，并假设 (i) 所有的点 $ x_k $ 都含于紧集 $ S\subset X $；(ii) $ \mathbf{M} $ 在 $ \Gamma $ 的补集上是闭的；(iii) 存在 $ X $ 上的连续函数 $ \alpha $ 使得 (a) 如果 $ x\notin\Gamma $，那么 $ \alpha(y)&gt;\alpha(x),\forall y\in\mathbf{M}(x) $，以及 (b) 如果 $ x\in\Gamma $，那么 $ \alpha(y)\ge\alpha(x),\forall y\in\mathbf{M}(x) $.<br />
+那么所有的 $ \lbrace x_k\rbrace $ 的极限点都属于 $ \Gamma $，并且对于某些 $ x\in\Gamma $， $ \alpha(x_k) $ 单调收敛到 $ \alpha(x) $.</p>
+</div>
+<p>这里简单解释一下所需要的几个条件的含义：条件 (i) 保证了参数能够有收敛的极限点而不跑到无穷远处，条件 (ii) 保证了在迭代进行足够多步时，参数的位置不发生振荡或漂移，条件 (iii) 保证了迭代不会陷入死循环，保证算法始终能朝着最优值靠近.<br />
+现在我们令 $ \mathbf{M} $ 是 GEM 中的点到集合映射，并且 $ \alpha $ 是似然函数 $ L $，并选取集合 $ \Gamma $ 为 $ \mathscr{M} $（ $ \Omega $ 内部的所有局部极大值点） 或 $ \mathscr{I} $（ $ \Omega $ 内部的所有驻点），那么我们有如下定理：</p>
+<div class="note info no-icon flat"><p><strong>定理 2.1</strong> 令 $ \lbrace \boldsymbol{\phi}_{p}\rbrace $ 是由 $ \boldsymbol{\phi}_{p+1}\in\mathbf{M}(\boldsymbol{\phi}_p) $ 产生的 GEM 序列，并假设 (i) $ \mathbf{M} $ 是一个在 $ \mathscr{I}(\mathscr{M}) $ 的补集上闭的点到集合映射，(ii) 对任意的 $ \boldsymbol{\phi}_{p}\notin\mathscr{I}(\mathscr{M}) $，都有 $ L(\boldsymbol{\phi}_{p+1})&gt;L(\boldsymbol{\phi}_p) $.<br />
+那么序列 $ \lbrace\boldsymbol{\phi}_p\rbrace $ 所有可能的极限点都是 $ L $ 的驻点（或局部极大值点），并且对于某些 $ \boldsymbol{\phi}^{\ast}\in\mathscr{I}(\mathscr{M}),L(\boldsymbol{\phi}_p) $ 能够单调收敛到 $ L^*=L(\boldsymbol{\phi}^{\ast}) $.</p>
+</div>
+<p>对于 EM 算法，一个使 $ \mathbf{M} $ 是闭映射的简单的充分条件是</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    Q(\boldsym…'>\begin{equation*}
+    Q(\boldsymbol{\phi}|\boldsymbol{\psi})\text{ 关于 }\boldsymbol{\phi},\boldsymbol{\psi}\text{ 均连续}.
+\end{equation*}
+</p>
+<p>由此，我们有如下定理：</p>
+<div class="note info no-icon flat"><p><strong>定理 2.2</strong> 假设 $ Q $ 满足上述连续性假设，那么由 EM 算法生成的任何迭代序列 $ \lbrace\boldsymbol{\phi}_p\rbrace $ 的所有极限点都是 $ L $ 的驻点，并且对于某些驻点 $ \boldsymbol{\phi}^{\ast},L(\boldsymbol{\phi}_p) $ 能够单调收敛到 $ L^*=L(\boldsymbol{\phi}^{\ast}) $.</p>
+</div>
+<p>定理证明从略. 上述两个定理只能说明函数值能够收敛到驻点的函数值，而还无法说明参数点列的收敛性. Wu 的文章中指出原文的证明没有很直接的方式补救，相应地给出了能使得 $ \boldsymbol{\phi}_p\to\boldsymbol{\phi}^* $ 的一些条件，并由此出发推导了一些定理. 这里我们不加证明地给出最实用条件最容易验证的一个推论，具体相关定理及内容仍见 Wu 的文章：</p>
+<div class="note info no-icon flat"><p>如果 $ L(\boldsymbol{\phi}) $ 在 $ \Omega $ 上是单峰的，仅有 $ \boldsymbol{\phi}^* $ 为其驻点，并且 $ \mathbf{D}^{10}Q(\boldsymbol{\phi}'|\boldsymbol{\phi}) $ 关于 $ \boldsymbol{\phi} $ 和 $ \boldsymbol{\phi}' $ 连续，那么任何 EM 序列 $ \lbrace\boldsymbol{\phi}_p\rbrace $ 都收敛到 $ L(\boldsymbol{\phi}) $ 的唯一极大值点 $ \boldsymbol{\phi}^* $.</p>
+</div>
+<p><strong>注意定理中 $ \mathbf{D}^{10} $ 符号表示对第一个变量求梯度，而对第二个变量不做操作，后文中的 $ \mathbf{D}^{20} $ 就表示第一个变量的 Hessian 矩阵，其他微分符号以此类推.</strong> 我们在后文都对 $ L,Q,H $ 做出一阶及二阶偏导数连续的假定进行证明. 在收敛性条件的保证下，我们可以导出如下中值定理以及收敛速率的结论.</p>
+<div class="note info no-icon flat"><p><strong>定理 3</strong> 假设 $ \lbrace\boldsymbol{\phi}^{(p)}\rbrace $ 是一 GEM 序列且满足 $ \mathbf{D}^{10}Q(\boldsymbol{\phi}^{(p+1)}|\boldsymbol{\phi}^{(p)})=\boldsymbol{0} $，那么有如下中值定理成立：</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    Q(\boldsym…'>\begin{equation*}
+    Q(\boldsymbol{\phi}^{(p+1)}|\boldsymbol{\phi}^{(p)})-Q(\boldsymbol{\phi}^{(p)}|\boldsymbol{\phi}^{(p)})=-(\boldsymbol{\phi}^{(p+1)}-\boldsymbol{\phi}^{(p)})&#039;\mathbf{D}^{20}Q(\boldsymbol{\phi}_0^{(p+1)}|\boldsymbol{\phi}^{(p)})(\boldsymbol{\phi}^{(p+1)}-\boldsymbol{\phi}^{(p)}),
+\end{equation*}
+</p>
+<p>其中 $ \boldsymbol{\phi}_0^{(p+1)} $ 位于连接 $ \boldsymbol{\phi}^{(p)} $ 和 $ \boldsymbol{\phi}^{(p+1)} $ 的线段上.</p>
+<p><strong>定理 4</strong> 假设 $ \lbrace\boldsymbol{\phi}^{(p)}\rbrace $ 是一 GEM 序列，使得<br />
+(1) $ \boldsymbol{\phi}^{(p)}\to\boldsymbol{\phi}^{\ast}\in\overline{\Omega},p\to\infty $；<br />
+(2) $ \mathbf{D}^{10}Q(\boldsymbol{\phi}^{(p+1)}|\boldsymbol{\phi}^{(p)})=\boldsymbol{0} $，</p>
+<p>那么有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \mathbf{D}…'>\begin{equation*}
+    \mathbf{D}L(\boldsymbol{\phi}^{\ast})=\boldsymbol{0},\mathbf{D}\mathbf{M}(\boldsymbol{\phi}^{\ast})=\mathbf{D}^{20}H(\boldsymbol{\phi}^{\ast}|\boldsymbol{\phi}^{\ast})\left[\mathbf{D}^{20}Q(\boldsymbol{\phi}^{\ast}|\boldsymbol{\phi}^{\ast})\right]^{-1}.
+\end{equation*}
+</p>
+</div>
+<p>这里需要做一些符号上的解释. $ \mathbf{DM}(\boldsymbol{\phi}^{\ast}) $ 代表的是映射 $ \mathbf{M} $ 在 $ \boldsymbol{\phi}^{\ast} $ 处的 Jacobi 矩阵，如果其所有特征值都在 $ [0,1) $ 内，其最大特征值越小，意味着算法的收敛速度越快，越靠近 $ 1 $ 则意味着收敛越慢. 定理 3 的推导非常容易，定理 4 的推导使用了得分函数及 Fisher 信息量相关的经典结论以及 GEM 算法的额外假定，并不十分困难，这里我们略去证明. 此外，上述两个定理本人删去了涉及原文错误收敛性条件的结论. 定理 4 其实反映了统计学中非常重要的一个原理：<strong>缺失信息原理</strong>. 当我们拥有的信息多而缺失部分少时，相对应地算法收敛会更快，因为我们不需要花费太多时间采用某种手段补全缺失的信息；否则，我们很难准确推断出缺失信息的真实情况，在算法上表现为无法收敛.<br />
+针对本文开头给出的例子，我们可以给出算法的收敛速度. 参考 E 步后给出的密度函数以及对数似然函数，经过一些代数变形有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \mathbf{D}…'>\begin{align*}
+    \mathbf{D}^{20}Q(\pi&#039;|\pi)&amp;=-\lbrace\mathbb{E}[X_2|\boldsymbol{y},\pi]+y_4\rbrace/\pi&#039;^2-(y_2+y_3)/(1-\pi&#039;)^2,\\
+    \mathbf{D}^{20}H(\pi&#039;|\pi)&amp;=-\mathbb{E}[X_2|\boldsymbol{y},\pi]/\pi&#039;^2+y_1/(2+\pi&#039;)^2.
+\end{align*}
+</p>
+<p>将 $ \pi,\pi' $ 换为之前求出的 $ \hat{\pi} $，经过计算可知 $ \mathbf{DM}(\hat{\pi})\approx0.132778 $，先前的代码输出结果也印证了这一点. 原文还给出了让 EM 算法更快收敛或者运算更高效的方法，这里不展开叙述.</p>
+<h2 id="应用"><a class="markdownIt-Anchor" href="#应用"></a> 应用</h2>
+<p>EM 算法作为一个一般性算法，在不同的统计场景下有极为丰富的应用. 原始文献大多以文字描述，因此阅读起来并不方便，并且缺乏应用性，所以本文并不打算对原文进行复述. 这里我们通过更加具体的例子来展示 EM 算法到底怎么使用，并给出相应的 <code>python</code> 代码.</p>
+<h3 id="高斯混合模型gmm"><a class="markdownIt-Anchor" href="#高斯混合模型gmm"></a> 高斯混合模型（GMM）</h3>
+<p>假设我们现在有 $ K $ 类服从多元正态分布的总体，维度为 $ D $，每类服从正态分布 $ \mathcal{N}(\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)=(2\pi)^{-D/2}|\boldsymbol{\Sigma}_k|^{-1/2}\exp\left[-\dfrac{1}{2}(\boldsymbol{x}-\boldsymbol{\mu}_k)'\boldsymbol{\Sigma}^{-1}_k(\boldsymbol{x}-\boldsymbol{\mu}_k)\right] $ （假设协方差阵均正定）以及观测到的数据集 $ \boldsymbol{x}_1,\cdots,\boldsymbol{x}_N $，但是我们不知道这些数据到底属于哪一类，即数据服从一个混合正态分布</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    g(\boldsym…'>\begin{equation*}
+    g(\boldsymbol{x}|\boldsymbol{\theta})=\sum_{k=1}^K\pi_k\cdot\mathcal{N}(\boldsymbol{x}|\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k),
+\end{equation*}
+</p>
+<p>可以注意到参数 $ \boldsymbol{\theta}=(\pi_k,\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k),k=1,\cdots,K,\sum_{k=1}^K\pi_k=1 $. 直接写出数据的对数似然函数会发现，由于求和号的存在，求解变得异常困难甚至不可能. 但是如果我们知道每个数据具体属于哪一类，那么问题将会简单很多. 这时候就要构建一个完全数据，表示观测数据到底属于哪一类. 我们引入一个离散型随机变量 $ z_n $，其取 $ k $ 的概率为 $ \pi_k $，以及对应的服从两点分布的一个示性函数 $ \mathbb{I}(z_n=k):=z_{nk} $，那么这时候完全数据的似然函数可以写为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    L(\boldsym…'>\begin{equation*}
+    L(\boldsymbol{\theta}|\boldsymbol{X},\boldsymbol{z})=\prod_{n=1}^Nf(\boldsymbol{x}_n,z_n|\boldsymbol{\theta})=\prod_{n=1}^N\prod_{k=1}^K[\pi_k\cdot\mathcal{N}(\boldsymbol{x}_n|\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)]^{z_{nk}}.
+\end{equation*}
+</p>
+<p>这时对数似然函数就有非常简洁的形式. 我们首先进行 E 步的操作：</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    Q(\boldsym…'>\begin{align*}
+    Q(\boldsymbol{\theta}|\boldsymbol{\theta}^{(t)})&amp;=\mathbb{E}_{\boldsymbol{Z}|\boldsymbol{X},\boldsymbol{\theta}^{(t)}}[\log L(\boldsymbol{\theta}|\boldsymbol{X},\boldsymbol{Z})|\boldsymbol{X},\boldsymbol{\theta}^{(t)}]\\
+    &amp;=\sum_{n=1}^N\sum_{k=1}^K\mathbb{E}[z_{nk}|\boldsymbol{x}_{n},\boldsymbol{\theta}^{(t)}]\cdot[\log\pi_k+\log\mathcal{N}(\boldsymbol{x}_n|\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)]\\
+    &amp;=\sum_{n=1}^N\sum_{k=1}^K\mathbb{P}(z_{n}=k|\boldsymbol{x}_{n},\boldsymbol{\theta}^{(t)})\cdot[\log\pi_k+\log\mathcal{N}(\boldsymbol{x}_n|\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)]\\
+    &amp;=\sum_{n=1}^N\sum_{k=1}^K\frac{f(\boldsymbol{x}_n,k|\boldsymbol{\theta}^{(t)})}{g(\boldsymbol{x}_n|\boldsymbol{\theta}^{(t)})}\cdot[\log\pi_k+\log\mathcal{N}(\boldsymbol{x}_n|\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)]\\
+    &amp;:=\sum_{n=1}^N\sum_{k=1}^K\gamma_{nk}^{(t)}\cdot[\log\pi_k+\log\mathcal{N}(\boldsymbol{x}_n|\boldsymbol{\mu}_k,\boldsymbol{\Sigma}_k)].
+\end{align*}
+</p>
+<p><strong>这里一定要分清楚参数的不同含义，求期望时用的是已有参数，注意符号的上下标.</strong> 接下来进行 M 步的操作，现在我们有一个约束条件 $ \sum_{k=1}^K\pi_k=1 $，因此问题是带约束的，需要使用 Lagrange 乘子法. 写出 Lagrange 函数为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    F(\boldsym…'>\begin{equation*}
+    F(\boldsymbol{\theta})=Q(\boldsymbol{\theta}|\boldsymbol{\theta}^{(t)})+\lambda\left(\sum_{k=1}^K\pi_k-1\right),
+\end{equation*}
+</p>
+<p>对每类均值、方差、出现概率分别求导，可以得到</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \frac{\par…'>\begin{align*}
+    \frac{\partial F}{\partial \boldsymbol{\mu_k}}&amp;=-\boldsymbol{\Sigma}_k^{-1}\left[\sum_{n=1}^N\gamma_{nk}^{(t)}(\boldsymbol{x}_n-\boldsymbol{\mu}_k)\right],\\
+    \frac{\partial F}{\partial \boldsymbol{\Sigma}_k^{-1}}&amp;=\frac{1}{2}\sum_{n=1}^N\gamma_{nk}^{(t)}\left[\boldsymbol{\Sigma}_k-(\boldsymbol{x}_n-\boldsymbol{\mu}_k)(\boldsymbol{x}_n-\boldsymbol{\mu}_k)&#039;\right],\\
+    \frac{\partial F}{\partial\pi_k}&amp;=\sum_{n=1}^N\gamma_{nk}^{(t)}\pi_k^{-1}+\lambda,\\
+    \dfrac{\partial F}{\partial\lambda}&amp;=\sum_{k=1}^K\pi_k-1.
+\end{align*}
+</p>
+<p>令偏导数全为零，可以解得</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \boldsymbo…'>\begin{align*}
+    \boldsymbol{\mu}_k^{(t+1)}&amp;=\frac{\sum_{n=1}^N\gamma_{nk}^{(t)}\boldsymbol{x}_n}{\sum_{n=1}^N\gamma_{nk}^{(t)}},\\
+    \boldsymbol{\Sigma}_{k}^{(t+1)}&amp;=\frac{\sum_{n=1}^N\gamma_{nk}^{(t)}(\boldsymbol{x}_n-\boldsymbol{\mu}_k^{(t+1)})(\boldsymbol{x}_n-\boldsymbol{\mu}_k^{(t+1)})&#039;}{\sum_{n=1}^N\gamma_{nk}^{(t)}},\\
+    \pi_k^{(t+1)}&amp;=\frac{\sum_{n=1}^N\gamma_{nk}^{(t)}}{N}.
+\end{align*}
+</p>
+<p>迭代至各类别稳定即可. GMM 模型实际上属于机器学习中的<strong>无监督学习</strong>，是用于聚类的. 实际中，只要给定输入数据和想要的聚类类别，算法最后就能输出对应类的均值、协方差阵以及出现概率. 下面给出模拟数据及 EM 算法聚类的 <code>python</code> 代码示例.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"><span class="keyword">from</span> scipy.stats <span class="keyword">import</span> multivariate_normal</span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成模拟数据</span></span><br><span class="line">np.random.seed(<span class="number">123</span>)</span><br><span class="line">N = <span class="number">3000</span>       <span class="comment"># 数据总数</span></span><br><span class="line">K_true = <span class="number">3</span>     <span class="comment"># 真实的类别数</span></span><br><span class="line">D = <span class="number">2</span>          <span class="comment"># 数据维度 (2D 方便画图)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 定义 3 个不同高斯分布的真实参数 (均值, 协方差, 混合权重)</span></span><br><span class="line">means_true = np.array([</span><br><span class="line">    [<span class="number">0</span>, <span class="number">4</span>], [<span class="number">2</span> * <span class="number">3</span>**<span class="number">0.5</span>, -<span class="number">2</span>], [-<span class="number">2</span> * <span class="number">3</span>**<span class="number">0.5</span>,-<span class="number">2</span>]</span><br><span class="line">])</span><br><span class="line">covs_true = np.array([</span><br><span class="line">    [[<span class="number">1</span>, <span class="number">0</span>], [<span class="number">0</span>, <span class="number">1</span>]], </span><br><span class="line">    [[<span class="number">4</span>, <span class="number">1.5</span>], [<span class="number">1.5</span>, <span class="number">1</span>]], </span><br><span class="line">    [[<span class="number">1</span>, -<span class="number">0.8</span>], [-<span class="number">0.8</span>, <span class="number">2</span>]],</span><br><span class="line">])</span><br><span class="line">pi_true = np.array([<span class="number">0.2</span>,<span class="number">0.5</span>,<span class="number">0.3</span>]) <span class="comment"># 各自类别的概率</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成隐变量 z (真实标签) 和观测数据 X</span></span><br><span class="line">z_true = np.random.choice(K_true, size=N, p=pi_true)</span><br><span class="line">X = np.zeros((N, D))</span><br><span class="line"><span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(K_true):</span><br><span class="line">    idx = (z_true == k)</span><br><span class="line">    X[idx] = np.random.multivariate_normal(means_true[k], covs_true[k], size=np.<span class="built_in">sum</span>(idx))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># EM 算法实现</span></span><br><span class="line">K = <span class="number">3</span> <span class="comment"># 假设我们知道要聚成 3 类</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 1. 初始化参数</span></span><br><span class="line"><span class="comment"># 权重：平均分配</span></span><br><span class="line">pi = np.ones(K) / K</span><br><span class="line"><span class="comment"># 均值：从数据中随机挑 K 个点作为初始中心</span></span><br><span class="line">random_idx = np.random.choice(N, K, replace=<span class="literal">False</span>)</span><br><span class="line">mu = X[random_idx].copy()</span><br><span class="line"><span class="comment"># 协方差：初始化为整个数据集的协方差矩阵</span></span><br><span class="line">covariances = np.array([np.cov(X.T) <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(K)])</span><br><span class="line"></span><br><span class="line">max_iter = <span class="number">200</span></span><br><span class="line">tol = <span class="number">1e-6</span></span><br><span class="line">log_likelihoods = []</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> it <span class="keyword">in</span> <span class="built_in">range</span>(max_iter):</span><br><span class="line">    <span class="comment"># E-步</span></span><br><span class="line">    <span class="comment"># weighted_pdfs 矩阵存储: pi_k * N(x_n | mu_k, Sigma_k)</span></span><br><span class="line">    weighted_pdfs = np.zeros((N, K))</span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(K):</span><br><span class="line">        <span class="comment"># 计算第 k 个高斯分布在所有点上的概率密度，并乘以其先验权重</span></span><br><span class="line">        weighted_pdfs[:, k] = pi[k] * multivariate_normal.pdf(X, mean=mu[k], cov=covariances[k])</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 每一行的和就是边缘概率 p(x_n)</span></span><br><span class="line">    sum_pdfs = np.<span class="built_in">sum</span>(weighted_pdfs, axis=<span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 计算当前的对数似然函数并记录</span></span><br><span class="line">    log_likelihood = np.<span class="built_in">sum</span>(np.log(sum_pdfs))</span><br><span class="line">    log_likelihoods.append(log_likelihood)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 判断是否收敛（如果似然函数增加极小，则停止）</span></span><br><span class="line">    <span class="keyword">if</span> it &gt; <span class="number">0</span> <span class="keyword">and</span> (log_likelihood - log_likelihoods[-<span class="number">2</span>]) &lt; tol:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;算法在第 <span class="subst">&#123;it&#125;</span> 次迭代收敛！&quot;</span>)</span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">        </span><br><span class="line">    <span class="comment"># 计算责任度 gamma: (N, K) 维矩阵</span></span><br><span class="line">    gamma = weighted_pdfs / sum_pdfs</span><br><span class="line"></span><br><span class="line">    <span class="comment"># M-步</span></span><br><span class="line">    <span class="comment"># 计算第 k 类的“有效数据量” N_k</span></span><br><span class="line">    N_k = np.<span class="built_in">sum</span>(gamma, axis=<span class="number">0</span>) <span class="comment"># 形状: (K,)</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 1. 更新混合权重 pi</span></span><br><span class="line">    pi = N_k / N</span><br><span class="line">    <span class="comment"># 2. 更新均值 mu (加权平均)</span></span><br><span class="line">    mu = (gamma.T @ X) / N_k[:, np.newaxis]</span><br><span class="line">    <span class="comment"># 3. 更新协方差阵</span></span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(K):</span><br><span class="line">        <span class="comment"># 计算所有点到当前类均值的向量差: (N, D)</span></span><br><span class="line">        diff = X - mu[k]</span><br><span class="line">        <span class="comment"># 对差值乘以责任度权重: (N, D)</span></span><br><span class="line">        weighted_diff = diff * gamma[:, k:k+<span class="number">1</span>]</span><br><span class="line">        <span class="comment"># 计算加权协方差矩阵，除以有效数据量</span></span><br><span class="line">        covariances[k] = (weighted_diff.T @ diff) / N_k[k]</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 在对角线上加一个极小的数，防止协方差矩阵由于数据太少变成奇异矩阵（不可逆）</span></span><br><span class="line">        covariances[k] += np.eye(D) * <span class="number">1e-6</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 打印算法估计得到的各参数</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;\n&quot;</span> + <span class="string">&quot;=&quot;</span>*<span class="number">45</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;EM 算法估计的最终 GMM 参数报告：&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;=&quot;</span>*<span class="number">45</span>)</span><br><span class="line"><span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">range</span>(K):</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;【类别 <span class="subst">&#123;k&#125;</span>】&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;出现概率 (pi) : <span class="subst">&#123;pi[k]:<span class="number">.4</span>f&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;样本均值 (mu) : [<span class="subst">&#123;mu[k, <span class="number">0</span>]:<span class="number">.4</span>f&#125;</span>, <span class="subst">&#123;mu[k, <span class="number">1</span>]:<span class="number">.4</span>f&#125;</span>]&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;协方差矩阵    :\n<span class="subst">&#123;covariances[k]&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;-&quot;</span> * <span class="number">45</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 结果可视化</span></span><br><span class="line"><span class="comment"># 根据最终的责任度，把点分配给概率最大的那一类</span></span><br><span class="line">z_pred = np.argmax(gamma, axis=<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">plt.figure(figsize=(<span class="number">15</span>, <span class="number">5</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 图1：真实的分类情况</span></span><br><span class="line">plt.subplot(<span class="number">1</span>, <span class="number">3</span>, <span class="number">1</span>)</span><br><span class="line">plt.scatter(X[:, <span class="number">0</span>], X[:, <span class="number">1</span>], c=z_true, cmap=<span class="string">&#x27;viridis&#x27;</span>, s=<span class="number">10</span>, alpha=<span class="number">0.7</span>)</span><br><span class="line">plt.title(<span class="string">&quot;True GMM Clusters&quot;</span>)</span><br><span class="line">plt.xlabel(<span class="string">&quot;X1&quot;</span>); plt.ylabel(<span class="string">&quot;X2&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 图2：EM算法聚类的结果</span></span><br><span class="line">plt.subplot(<span class="number">1</span>, <span class="number">3</span>, <span class="number">2</span>)</span><br><span class="line">plt.scatter(X[:, <span class="number">0</span>], X[:, <span class="number">1</span>], c=z_pred, cmap=<span class="string">&#x27;viridis&#x27;</span>, s=<span class="number">10</span>, alpha=<span class="number">0.7</span>)</span><br><span class="line">plt.scatter(mu[:, <span class="number">0</span>], mu[:, <span class="number">1</span>], c=<span class="string">&#x27;red&#x27;</span>, marker=<span class="string">&#x27;X&#x27;</span>, s=<span class="number">100</span>, label=<span class="string">&#x27;Est. Centers&#x27;</span>)</span><br><span class="line">plt.title(<span class="string">&quot;EM Algorithm Predicted Clusters&quot;</span>)</span><br><span class="line">plt.xlabel(<span class="string">&quot;X1&quot;</span>); plt.ylabel(<span class="string">&quot;X2&quot;</span>)</span><br><span class="line">plt.legend()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 图3：对数似然函数的单调递增曲线 (证明 Theorem 1)</span></span><br><span class="line">plt.subplot(<span class="number">1</span>, <span class="number">3</span>, <span class="number">3</span>)</span><br><span class="line">plt.plot(log_likelihoods, marker=<span class="string">&#x27;o&#x27;</span>, c=<span class="string">&#x27;blue&#x27;</span>)</span><br><span class="line">plt.title(<span class="string">&quot;Log-Likelihood Convergence&quot;</span>)</span><br><span class="line">plt.xlabel(<span class="string">&quot;Iteration&quot;</span>)</span><br><span class="line">plt.ylabel(<span class="string">&quot;Log-Likelihood&quot;</span>)</span><br><span class="line">plt.grid(<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">plt.tight_layout()</span><br><span class="line">plt.show()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 文字输出结果</span></span><br><span class="line">算法在第 <span class="number">24</span> 次迭代收敛！</span><br><span class="line"></span><br><span class="line">=============================================</span><br><span class="line">EM 算法估计的最终 GMM 参数报告：</span><br><span class="line">=============================================</span><br><span class="line">【类别 <span class="number">0</span>】</span><br><span class="line">出现概率 (pi) : <span class="number">0.4944</span></span><br><span class="line">样本均值 (mu) : [<span class="number">3.3666</span>, -<span class="number">2.0111</span>]</span><br><span class="line">协方差矩阵    :</span><br><span class="line">[[<span class="number">3.98001108</span> <span class="number">1.43869209</span>]</span><br><span class="line"> [<span class="number">1.43869209</span> <span class="number">0.95601346</span>]]</span><br><span class="line">---------------------------------------------</span><br><span class="line">【类别 <span class="number">1</span>】</span><br><span class="line">出现概率 (pi) : <span class="number">0.3016</span></span><br><span class="line">样本均值 (mu) : [-<span class="number">3.5158</span>, -<span class="number">2.0075</span>]</span><br><span class="line">协方差矩阵    :</span><br><span class="line">[[ <span class="number">1.04799398</span> -<span class="number">0.88332531</span>]</span><br><span class="line"> [-<span class="number">0.88332531</span>  <span class="number">2.13381526</span>]]</span><br><span class="line">---------------------------------------------</span><br><span class="line">【类别 <span class="number">2</span>】</span><br><span class="line">出现概率 (pi) : <span class="number">0.2040</span></span><br><span class="line">样本均值 (mu) : [-<span class="number">0.0149</span>, <span class="number">4.0394</span>]</span><br><span class="line">协方差矩阵    :</span><br><span class="line">[[<span class="number">0.92494905</span> <span class="number">0.05520281</span>]</span><br><span class="line"> [<span class="number">0.05520281</span> <span class="number">0.99308669</span>]]</span><br><span class="line">---------------------------------------------</span><br></pre></td></tr></table></figure>
+<p>可以看到，EM 算法准确地将每一类进行了划分，并且给出了准确地出现概率. 由于是无监督学习，因此类别和原始设定的类会有所差异，但是我们并不关心类具体的顺序，只关心能否正确识别每一类.<br />
+GMM 模型还可以完全迁移到其他模型上，一个典型例子就是总共有 $ K $ 枚硬币，选择其中某枚的概率为 $ \pi_k,k=1,\cdots,K $，并且这些硬币间质地是不均的，现在进行 $ N $ 次实验，第 $ n $ 次实验抛掷 $ m_n $ 次选择的硬币，正面朝上的次数为 $ x_n $，我们可以用 EM 算法来估计出抛掷硬币类型被选中的概率和这枚硬币正面朝上的概率，具体操作仅仅需要将 GMM 模型中的正态分布换为 $ K $ 个二项分布再进行求解即可.</p>
+<h3 id="含有缺失数据的多元正态分布的恢复"><a class="markdownIt-Anchor" href="#含有缺失数据的多元正态分布的恢复"></a> 含有缺失数据的多元正态分布的恢复</h3>
+<p>假设我们有一组服从多元正态分布 $ \mathcal{N}(\boldsymbol{\mu},\boldsymbol{\Sigma}) $ 的独立同分布数据 $ \lbrace y_n\rbrace_{n=1}^N,y_n\in\mathbb{R}^D $，但是我们仅仅观测到了其中部分维度的数据（不妨认为就是前 $ d $ 维），记为 $ \boldsymbol{y}_{n,o} $，而剩下的维度未观测到，记为 $ \boldsymbol{y}_{n,m} $，那么潜变量就是未观测到的维度的数据. 现在我们想要估计完全的 $ \boldsymbol{\mu},\boldsymbol{\Sigma} $.<br />
+当 $ \lbrace y_n\rbrace $ 被完全观测到时，显然有对数似然函数</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \ell(\bold…'>\begin{equation*}
+    \ell(\boldsymbol{\mu},\boldsymbol{\Sigma}|\boldsymbol{Y})=-\frac{N}{2}\log|\boldsymbol{\Sigma}|-\frac{1}{2}\sum_{n=1}^N(\boldsymbol{y}_n-\boldsymbol{\mu})&#039;\boldsymbol{\Sigma}^{-1}(\boldsymbol{y}_n-\boldsymbol{\mu})+C.
+\end{equation*}
+</p>
+<p>现在我们来构建 EM 算法的步骤. 对于 E 步，对原始数据每一条做同样的划分，即</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{y}_n=\begin{pmatrix}
+        \boldsymbol{y}_{n,o}\\
+        \boldsymbol{y}_{n,m}
+    \end{pmatrix},\boldsymbol{\mu}=\begin{pmatrix}
+        \boldsymbol{\mu}_{o}\\
+        \boldsymbol{\mu}_{m}
+    \end{pmatrix},
+    \boldsymbol{\Sigma}=\begin{pmatrix}
+        \boldsymbol{\Sigma}_{oo}&amp; \boldsymbol{\Sigma}_{om} \\
+        \boldsymbol{\Sigma}_{mo} &amp; \boldsymbol{\Sigma}_{mm}
+    \end{pmatrix}.
+\end{equation*}
+</p>
+<p>那么根据多元正态分布的条件期望公式，我们有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \mathbb{E}…'>\begin{align*}
+    \mathbb{E}[\boldsymbol{y}_{n,m}|\boldsymbol{y}_{n,o}]&amp;=\boldsymbol{\mu}_m+\boldsymbol{\Sigma}_{mo}\boldsymbol{\Sigma}_{oo}^{-1}(\boldsymbol{y}_{n,o}-\boldsymbol{\mu}_o),\\
+    \text{Cov}(\boldsymbol{y}_{n,m}|\boldsymbol{y}_{n,o})&amp;=\boldsymbol{\Sigma}_{mm}-\boldsymbol{\Sigma}_{mo}\boldsymbol{\Sigma}_{oo}^{-1}\boldsymbol{\Sigma}_{om}.
+\end{align*}
+</p>
+<p>我们知道多元正态分布的充分统计量是样本均值和样本方差，与之相关联的两个重要统计量是 $ \boldsymbol{y}_n,\boldsymbol{y}_n\boldsymbol{y}_n' $，其能构建出对应的充分统计量. 利用协方差阵的恒等式可得</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \hat{\bold…'>\begin{equation*}
+    \hat{\boldsymbol{y}}_n=\mathbb{E}[\boldsymbol{y}_{n,m}|\boldsymbol{y}_{n,o}],~~\mathbb{E}[\boldsymbol{y}_n\boldsymbol{y}_n&#039;|\boldsymbol{y}_{n,o}]=\hat{\boldsymbol{y}}_n\hat{\boldsymbol{y}}_n&#039;+\begin{pmatrix}
+        \boldsymbol{O} &amp; \boldsymbol{O} \\
+        \boldsymbol{O} &amp; \text{Cov}(\boldsymbol{y}_{n,m}|\boldsymbol{y}_{n,o})
+    \end{pmatrix}.
+\end{equation*}
+</p>
+<p>对于 M 步，我们要极大化对数似然函数，根据熟知的极大化相关结论（详见<a href="/2026/02/25/%E5%A4%9A%E5%85%83%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83/" title="多元正态分布">多元正态分布</a>一文），定义</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \tilde{S}_…'>\begin{equation*}
+    \tilde{S}_1=\sum_{n=1}^N\mathbb{E}[\boldsymbol{y}_n^{(t)}|\boldsymbol{y}_{n,o}],~~\tilde{S}_2=\sum_{n=1}^N\mathbb{E}[\boldsymbol{y}_n^{(t)}\boldsymbol{y}_{n}^{(t)}{&#039;}|\boldsymbol{y}_{n,o}],
+\end{equation*}
+</p>
+<p>那么更新步骤为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \boldsymbo…'>\begin{align*}
+    \boldsymbol{\mu}^{(t+1)}=\frac{1}{N}\tilde{S}_1,~~\boldsymbol{\Sigma}^{(t+1)}=\frac{1}{N}\tilde{S}_2-\boldsymbol{\mu}^{(t+1)}\boldsymbol{\mu}^{(t+1)}{&#039;}.
+\end{align*}
+</p>
+<p>注意协方差阵的计算是经过交叉项的化简的.<strong>在设定迭代初始值时，注意观测部分的均值和协方差阵是可以直接计算得到的，其余部分可以进行随机初始化（也可以选择其他填充方式），经过迭代仍会收敛</strong>. 具体代码这里不再给出.</p>
+<div class="note warning no-icon flat"><p>说到这里，本人其实就产生了一个疑问：<strong>EM 算法针对缺失数据的数字特征估计能做到如此精确吗？</strong> 问了问 AI，本人认为这几点是比较对的，在满足如下条件时，EM 算法能够较精确地刻画缺失部分的数字特征：</p>
+<ol>
+<li>特征之间高度相关. 如果特征间几乎无关联，那么对于缺失数据会倾向于用均值填充，此时不能获取缺失数据足够有用的信息；</li>
+<li>缺失机制必须是“完全随机”或“条件随机”. 这是由著名统计学家，也是 EM 算法的提出者之一，Donald Rubin 所提出的. 这两个术语的意思实际上是对<strong>缺失值产生的原因进行了刻画</strong>. 大致意思是，数据的缺失如果是不慎遗失或者可以通过其他变量进行大致推断的，那么 EM 算法是非常有效的. 如果数据的缺失和缺失值的大小位置等有相关关系，那么 EM 算法就会失效.</li>
+<li>数据本身要符合多元正态分布. 如果数据间存在强烈的非线性关系，或者某一维度的数据本身有严重的偏倚，那么 EM 算法在建模时就已经失效了，更不用说算法本身.</li>
+</ol>
+</div>
+<h3 id="隐马尔可夫模型hmm与-baum-welch-算法"><a class="markdownIt-Anchor" href="#隐马尔可夫模型hmm与-baum-welch-算法"></a> 隐马尔可夫模型（HMM）与 Baum-Welch 算法</h3>
+<p>隐马尔可夫模型是统计模型中经典的<strong>概率图模型</strong>. 用通俗的语言说，就是存在一条“明线”和“暗线”，观测就是明线，表示的是在每个时间点的一些已知的状态，而暗线就是潜变量，我们无法得知具体情况. 一个实际例子是，我知道我的朋友每天具体干了什么活动，我想要用这个序列来推测朋友所在城市每天的天气是怎么样的.<br />
+假设我们已经观测到了一序列数据 $ \boldsymbol{X}=\lbrace x_1,\cdots,x_T\rbrace $，现在我们要推断隐藏态 $ \boldsymbol{Z}=\lbrace z_1,\cdots,z_T\rbrace $ 在每一时刻的概率分布. HMM 模型可以抽象为一个五元组 $ (Q,V,\boldsymbol{\pi},\boldsymbol{A},\boldsymbol{B}) $，其中 $ Q=\lbrace q_1,\cdots,q_K\rbrace $ 为所有隐藏过程的可能状态， $ V=\lbrace v_1,\cdots,v_L \rbrace $. 简单起见，我们令 $ q_i=i,v_j=j,i=1,\cdots,K,j=1,\cdots,L. \boldsymbol{\pi}\in\mathbb{R}^K $ 表示初始状态概率向量，而 $ \boldsymbol{A}\in\mathbb{R}^{K\times K},\boldsymbol{B}\in\mathbb{R}^{K\times L} $ 分别是（隐藏状态的）转移概率矩阵和（从隐藏态到观测态的）发射矩阵. 这两个矩阵的定义是基于两个假设，即<strong>隐藏状态的马尔可夫性</strong></p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \mathbb{P}…'>\begin{equation*}
+    \mathbb{P}(z_t|z_{t-1},x_{t-1},\cdots,z_{1},x_{1})=\mathbb{P}(z_t|z_{t-1})
+\end{equation*}
+</p>
+<p>和<strong>观测独立性假设</strong></p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \mathbb{P}…'>\begin{equation*}
+    \mathbb{P}(x_t|z_{T},x_{T},\cdots,z_t,\cdots,z_{1},x_{1})=\mathbb{P}(x_t|z_{t})
+\end{equation*}
+</p>
+<p>只有这两个假设成立才能建立 HMM，并且建立后文的推导. 现在我们就需要对参数组 $ \boldsymbol{\theta}=(\boldsymbol{\pi},\boldsymbol{A},\boldsymbol{B}) $ 中的元素进行估计. 定义</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \pi_j=\mat…'>\begin{equation*}
+    \pi_j=\mathbb{P}(z_1=j),A_{ij}=\mathbb{P}(z_{t+1}=j|z_t=i),B_j(x)=\mathbb{P}(x_{t}=x|z_t=j)
+\end{equation*}
+</p>
+<p>来表示参数空间中的每一元，根据我们的假设以及条件概率公式，完全数据的似然函数及相应的对数似然可以写为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    f(\boldsym…'>\begin{align*}
+    f(\boldsymbol{X},\boldsymbol{Z}|\boldsymbol{\theta})&amp;=p(z_1)\cdot p(x_1|z_1)\cdot p(z_2|z_1,x_1)\cdots p(x_{T}|\boldsymbol{X}_{-T},\boldsymbol{Z})\\
+    &amp;=p(z_1)\cdot p(x_1|z_1)\cdot p(z_2|z_1)\cdots p(x_{T}|z_T)\\
+    &amp;=p(z_1)\prod_{t=1}^{T-1}p(z_{t+1}|z_t)\prod_{t=1}^Tp(x_t|z_t),\\
+    \ell(\boldsymbol{\theta}|\boldsymbol{X},\boldsymbol{Z})&amp;=\log\pi_{z_1}+\sum_{t=1}^{T-1}\log A_{z_{t},z_{t+1}}+\sum_{t=1}^T\log B_{z_t}(x_t).
+\end{align*}
+</p>
+<p>这里为了式子的简便对符号不加以区分，但只要清楚这个序列是怎么生成的，就不会混淆符号的释义. 对数似然直接把乘号变为加号即可.<br />
+接下来我们需要进行 E 步. 观察似然函数的形式，后两个随机变量的期望需要计算两个后验概率</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \gamma_t(i…'>\begin{align*}
+    \gamma_t(i)&amp;=\mathbb{P}(z_t=i|\boldsymbol{X},\boldsymbol{\theta}^{(n)}),\\
+    \xi_t(i,j)&amp;=\mathbb{P}(z_t=i,z_{t+1}=j|\boldsymbol{X},\boldsymbol{\theta}^{(n)}),
+\end{align*}
+</p>
+<p>首先来看 $ \gamma_t(i) $. 由 Bayes 公式，我们有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \gamma_t(i…'>\begin{equation*}
+    \gamma_t(i)=\frac{\mathbb{P}(z_{t}=i,\boldsymbol{X}|\boldsymbol{\theta}^{(n)})}{\mathbb{P}(\boldsymbol{X}|\boldsymbol{\theta}^{(n)})}=\frac{\mathbb{P}(z_{t}=i,\boldsymbol{X}|\boldsymbol{\theta}^{(n)})}{\sum_{k=1}^K\mathbb{P}(z_{t}=k,\boldsymbol{X}|\boldsymbol{\theta}^{(n)})}
+\end{equation*}
+</p>
+<p>将分子的概率进行拆分，可以得到</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \mathbb{P}…'>\begin{align*}
+    \mathbb{P}(z_{t}=i,\boldsymbol{X}|\boldsymbol{\theta}^{(n)})&amp;=\mathbb{P}(z_t=i,x_1,\cdots,x_t|\boldsymbol{\theta}^{(n)})\cdot\mathbb{P}(x_{t+1},\cdots,x_{T}|z_{t}=i,x_1,\cdots,x_t,\boldsymbol{\theta}^{(n)})\\
+    &amp;=\mathbb{P}(z_t=i,x_1,\cdots,x_t|\boldsymbol{\theta}^{(n)})\cdot\mathbb{P}(x_{t+1},\cdots,x_{T}|z_{t}=i,\boldsymbol{\theta}^{(n)}):=\alpha_t(i)\cdot\beta_t(i).
+\end{align*}
+</p>
+<p>这把概率拆成了“过去”和未来两个部分. 利用 HMM 的假定，我们分别对两者建立递推式，称为前向与后向传播.</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \alpha_{t+…'>\begin{align*}
+    \alpha_{t+1}(j)&amp;=\sum_{i=1}^K\mathbb{P}(z_{t+1}=j,z_t=i,x_1,\cdots,x_{t+1}|\boldsymbol{\theta}^{(n)})\\
+    &amp;=\sum_{i=1}^K\mathbb{P}(x_{t+1}|z_{t+1}=j,\boldsymbol{\theta}^{(n)})\cdot\mathbb{P}(z_{t+1}=j|z_t=i,\boldsymbol{\theta}^{(n)})\cdot\mathbb{P}(z_t=i,x_1,\cdots,x_{t}|\boldsymbol{\theta}^{(n)})\\
+    &amp;=\left[\sum_{i=1}^K \alpha_t(i)A_{ij}\right]B_{j}(x_{t+1}),\quad(\alpha_1(j)=\pi_j\cdot B_j(x_1))\\
+    \beta_t(i)&amp;=\sum_{j=1}^K\mathbb{P}(z_{t+1}=j,x_{t+1},\cdots,x_{T}|z_t=i,\boldsymbol{\theta}^{(n)})\\
+    &amp;=\sum_{j=1}^K\mathbb{P}(z_{t+1}=j|z_t=i,\boldsymbol{\theta}^{(n)})\cdot\mathbb{P}(x_{t+1}|z_{t+1}=j,\boldsymbol{\theta}^{(n)})\cdot\mathbb{P}(x_{t+2},\cdots,x_{T}|z_{t+1}=j,\boldsymbol{\theta}^{(n)})\\
+    &amp;=\sum_{j=1}^KA_{ij}B_{j}(x_{t+1})\beta_{t+1}(j).\quad(\beta_T(i)=1)
+\end{align*}
+</p>
+<p>利用上述递推式，可得 $ \gamma_t(i)=\dfrac{\alpha_t(i)\beta_t(i)}{\sum_{i=1}^K\alpha_t(i)\beta_t(i)} $. 利用和 $ \gamma_t(i) $ 完全相同的方法，可以导出</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \xi_t(i,j)…'>\begin{equation*}
+    \xi_t(i,j)=\frac{\alpha_t(i)A_{ij}B_j(x_{t+1})\beta_{t+1}(j)}{\sum_{i&#039;,j&#039;=1}^{K}\alpha_t(i&#039;)A_{i&#039;j&#039;}B_j&#039;(x_{t+1})\beta_{t+1}(j&#039;)}.
+\end{equation*}
+</p>
+<p><strong>注意上面的取期望过程都是在参数 $ \boldsymbol{\theta}^{(n)} $ 下进行的，因此实际上所有的更新量都需要带一个上标 $ (n) $，为了符号的简洁这里并未写出.</strong><br />
+算出了概率分布，接下来的 M 步更新就比较简单了. 我们要求解的是多个带约束的优化问题，类似于 GMM 的求法，通过 Lagrange 乘数法可以得到更新公式</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \pi_k^{(n+…'>\begin{align*}
+    \pi_k^{(n+1)}&amp;=\gamma_1^{(n)}(k),\\
+    A_{ij}^{(n+1)}&amp;=\frac{\sum_{t=1}^{T-1}\xi_t^{(n)}(i,j)}{\sum_{t=1}^{T-1}\gamma_t^{(n)}(i)},\\
+    B_{i}^{(n+1)}(v)&amp;=\frac{\sum_{t=1}^T\gamma_t^{(n)}(i)\mathbb{I}(x_t=v)}{\sum_{t=1}^T\gamma_t^{(n)}(i)}.
+\end{align*}
+</p>
+<p>上述算法通常被称作<strong>Baum-Welch 算法</strong>，其本质就是 EM 算法. 接下来给出相应的 <code>python</code> 代码，产生模拟数据并且测试算法的效果. <strong>注意，由于序列较长，因此会导致概率的指数级别的衰减，在代码中有一个对 $ \alpha,\beta $ 的缩放技巧，且并不影响最终值.</strong> 最后给出训练的结果对比以及似然函数值的变化.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">HMM</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, K, M, seed=<span class="number">123</span></span>):</span><br><span class="line">        <span class="variable language_">self</span>.K = K  <span class="comment"># 隐藏状态数</span></span><br><span class="line">        <span class="variable language_">self</span>.M = M  <span class="comment"># 观测符号数</span></span><br><span class="line">        np.random.seed(seed)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 随机初始化参数，并确保行和为1</span></span><br><span class="line">        <span class="variable language_">self</span>.pi = np.random.rand(K)</span><br><span class="line">        <span class="variable language_">self</span>.pi /= <span class="variable language_">self</span>.pi.<span class="built_in">sum</span>()</span><br><span class="line">        </span><br><span class="line">        <span class="variable language_">self</span>.A = np.random.rand(K, K)</span><br><span class="line">        <span class="variable language_">self</span>.A /= <span class="variable language_">self</span>.A.<span class="built_in">sum</span>(axis=<span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="variable language_">self</span>.B = np.random.rand(K, M)</span><br><span class="line">        <span class="variable language_">self</span>.B /= <span class="variable language_">self</span>.B.<span class="built_in">sum</span>(axis=<span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_forward</span>(<span class="params">self, obs</span>):</span><br><span class="line">        T = <span class="built_in">len</span>(obs)</span><br><span class="line">        alpha = np.zeros((T, <span class="variable language_">self</span>.K))</span><br><span class="line">        scales = np.zeros(T)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># t = 0</span></span><br><span class="line">        alpha[<span class="number">0</span>] = <span class="variable language_">self</span>.pi * <span class="variable language_">self</span>.B[:, obs[<span class="number">0</span>]]</span><br><span class="line">        scales[<span class="number">0</span>] = <span class="number">1.0</span> / (np.<span class="built_in">sum</span>(alpha[<span class="number">0</span>]) + <span class="number">1e-16</span>)</span><br><span class="line">        alpha[<span class="number">0</span>] *= scales[<span class="number">0</span>]</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># t = 1...T-1</span></span><br><span class="line">        <span class="keyword">for</span> t <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, T):</span><br><span class="line">            alpha[t] = (alpha[t-<span class="number">1</span>] @ <span class="variable language_">self</span>.A) * <span class="variable language_">self</span>.B[:, obs[t]]</span><br><span class="line">            scales[t] = <span class="number">1.0</span> / (np.<span class="built_in">sum</span>(alpha[t]) + <span class="number">1e-16</span>)</span><br><span class="line">            alpha[t] *= scales[t]</span><br><span class="line">            </span><br><span class="line">        <span class="keyword">return</span> alpha, scales</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_backward</span>(<span class="params">self, obs, scales</span>):</span><br><span class="line">        T = <span class="built_in">len</span>(obs)</span><br><span class="line">        beta = np.zeros((T, <span class="variable language_">self</span>.K))</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># t = T-1</span></span><br><span class="line">        beta[T-<span class="number">1</span>] = np.ones(<span class="variable language_">self</span>.K) * scales[T-<span class="number">1</span>]</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># t = T-2...0</span></span><br><span class="line">        <span class="keyword">for</span> t <span class="keyword">in</span> <span class="built_in">range</span>(T-<span class="number">2</span>, -<span class="number">1</span>, -<span class="number">1</span>):</span><br><span class="line">            beta[t] = (<span class="variable language_">self</span>.A @ (<span class="variable language_">self</span>.B[:, obs[t+<span class="number">1</span>]] * beta[t+<span class="number">1</span>])) * scales[t]</span><br><span class="line">            </span><br><span class="line">        <span class="keyword">return</span> beta</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">fit</span>(<span class="params">self, obs, max_iter=<span class="number">500</span>, tol=<span class="number">1e-6</span></span>):</span><br><span class="line">        T = <span class="built_in">len</span>(obs)</span><br><span class="line">        ll_history = []</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(max_iter):</span><br><span class="line">            <span class="comment"># E-step</span></span><br><span class="line">            alpha, scales = <span class="variable language_">self</span>._forward(obs)</span><br><span class="line">            beta = <span class="variable language_">self</span>._backward(obs, scales)</span><br><span class="line">            </span><br><span class="line">            <span class="comment"># 计算 gamma</span></span><br><span class="line">            <span class="comment"># 由于 alpha 和 beta 都已经缩放过，gamma 直接相乘归一化即可</span></span><br><span class="line">            gamma = alpha * beta</span><br><span class="line">            gamma /= gamma.<span class="built_in">sum</span>(axis=<span class="number">1</span>, keepdims=<span class="literal">True</span>)</span><br><span class="line">            </span><br><span class="line">            <span class="comment"># 计算 xi: P(z_t=i, z_t+1=j | O)</span></span><br><span class="line">            xi = np.zeros((T-<span class="number">1</span>, <span class="variable language_">self</span>.K, <span class="variable language_">self</span>.K))</span><br><span class="line">            <span class="keyword">for</span> t <span class="keyword">in</span> <span class="built_in">range</span>(T-<span class="number">1</span>):</span><br><span class="line">                <span class="comment"># 这里的计算需抵消 scales</span></span><br><span class="line">                numer = alpha[t].reshape(-<span class="number">1</span>, <span class="number">1</span>) * <span class="variable language_">self</span>.A * <span class="variable language_">self</span>.B[:, obs[t+<span class="number">1</span>]] * beta[t+<span class="number">1</span>]</span><br><span class="line">                xi[t] = numer / (np.<span class="built_in">sum</span>(numer) + <span class="number">1e-16</span>)</span><br><span class="line">            </span><br><span class="line">            <span class="comment"># M-step</span></span><br><span class="line">            <span class="comment"># 更新 pi</span></span><br><span class="line">            <span class="variable language_">self</span>.pi = gamma[<span class="number">0</span>] / (np.<span class="built_in">sum</span>(gamma[<span class="number">0</span>]) + <span class="number">1e-16</span>)</span><br><span class="line">            </span><br><span class="line">            <span class="comment"># 更新 A</span></span><br><span class="line">            <span class="variable language_">self</span>.A = np.<span class="built_in">sum</span>(xi, axis=<span class="number">0</span>) / (np.<span class="built_in">sum</span>(gamma[:-<span class="number">1</span>], axis=<span class="number">0</span>).reshape(-<span class="number">1</span>, <span class="number">1</span>) + <span class="number">1e-16</span>)</span><br><span class="line">            </span><br><span class="line">            <span class="comment"># 更新 B</span></span><br><span class="line">            <span class="keyword">for</span> v <span class="keyword">in</span> <span class="built_in">range</span>(<span class="variable language_">self</span>.M):</span><br><span class="line">                mask = (obs == v)</span><br><span class="line">                <span class="variable language_">self</span>.B[:, v] = np.<span class="built_in">sum</span>(gamma[mask], axis=<span class="number">0</span>) / (np.<span class="built_in">sum</span>(gamma, axis=<span class="number">0</span>) + <span class="number">1e-16</span>)</span><br><span class="line">            </span><br><span class="line">            <span class="comment"># 计算当前对数似然</span></span><br><span class="line">            log_likelihood = -np.<span class="built_in">sum</span>(np.log(scales))</span><br><span class="line">            ll_history.append(log_likelihood)</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">if</span> i &gt; <span class="number">0</span> <span class="keyword">and</span> <span class="built_in">abs</span>(ll_history[-<span class="number">1</span>] - ll_history[-<span class="number">2</span>]) &lt; tol:</span><br><span class="line">                <span class="built_in">print</span>(<span class="string">f&quot;Converged at iteration <span class="subst">&#123;i&#125;</span>&quot;</span>)</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">                </span><br><span class="line">        <span class="keyword">return</span> ll_history</span><br><span class="line"></span><br><span class="line"><span class="comment"># --- 测试部分 ---</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 1. 生成模拟数据</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">generate_data</span>(<span class="params">T, pi, A, B</span>):</span><br><span class="line">    K, M = B.shape</span><br><span class="line">    states = [np.random.choice(K, p=pi)]</span><br><span class="line">    obs = [np.random.choice(M, p=B[states[<span class="number">0</span>]])]</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">1</span>, T):</span><br><span class="line">        states.append(np.random.choice(K, p=A[states[-<span class="number">1</span>]]))</span><br><span class="line">        obs.append(np.random.choice(M, p=B[states[-<span class="number">1</span>]]))</span><br><span class="line">    <span class="keyword">return</span> np.array(obs), np.array(states)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 固定一个真实的参数 (3隐藏态, 4观测态)</span></span><br><span class="line">true_pi = np.array([<span class="number">0.1</span>, <span class="number">0.6</span>, <span class="number">0.3</span>])</span><br><span class="line">true_A = np.array([</span><br><span class="line">    [<span class="number">0.7</span>, <span class="number">0.2</span>, <span class="number">0.1</span>],</span><br><span class="line">    [<span class="number">0.1</span>, <span class="number">0.8</span>, <span class="number">0.1</span>],</span><br><span class="line">    [<span class="number">0.2</span>, <span class="number">0.3</span>, <span class="number">0.5</span>]</span><br><span class="line">])</span><br><span class="line">true_B = np.array([</span><br><span class="line">    [<span class="number">0.4</span>, <span class="number">0.3</span>, <span class="number">0.2</span>, <span class="number">0.1</span>],</span><br><span class="line">    [<span class="number">0.1</span>, <span class="number">0.1</span>, <span class="number">0.4</span>, <span class="number">0.4</span>],</span><br><span class="line">    [<span class="number">0.2</span>, <span class="number">0.5</span>, <span class="number">0.1</span>, <span class="number">0.2</span>]</span><br><span class="line">])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 生成模拟序列</span></span><br><span class="line">obs_seq, _ = generate_data(<span class="number">5000</span>, true_pi, true_A, true_B)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 训练模型</span></span><br><span class="line">model = HMM(K=<span class="number">3</span>, M=<span class="number">4</span>, seed=<span class="number">123</span>)</span><br><span class="line">history = model.fit(obs_seq, max_iter=<span class="number">500</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 报告结果</span></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;\n--- Final Results ---&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;Log-Likelihood trend (first 5 and last 5):&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(history[:<span class="number">5</span>], <span class="string">&quot;...&quot;</span>, history[-<span class="number">5</span>:])</span><br><span class="line"></span><br><span class="line">np.set_printoptions(precision=<span class="number">3</span>, suppress=<span class="literal">True</span>)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;\nLearned Transition Matrix A:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(model.A)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;\nTrue Transition Matrix A:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(true_A)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;\nLearned Emission Matrix B:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(model.B)</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;\nTrue Emission Matrix B:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(true_B)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出结果</span></span><br><span class="line">--- Final Results ---</span><br><span class="line">Log-Likelihood trend (first <span class="number">5</span> <span class="keyword">and</span> last <span class="number">5</span>):</span><br><span class="line">[np.float64(-<span class="number">6992.780878169078</span>), np.float64(-<span class="number">6870.557357936086</span>), np.float64(-<span class="number">6866.9806435341</span>), np.float64(-<span class="number">6862.821552993244</span>), np.float64(-<span class="number">6858.055159476695</span>)] ... </span><br><span class="line">[np.float64(-<span class="number">6807.073814597403</span>), np.float64(-<span class="number">6807.073761859025</span>), np.float64(-<span class="number">6807.073709180981</span>), np.float64(-<span class="number">6807.073656561857</span>), np.float64(-<span class="number">6807.07360400037</span>)]</span><br><span class="line"></span><br><span class="line">Learned Transition Matrix A:</span><br><span class="line">[[<span class="number">0.463</span> <span class="number">0.287</span> <span class="number">0.25</span> ]</span><br><span class="line"> [<span class="number">0.391</span> <span class="number">0.52</span>  <span class="number">0.089</span>]</span><br><span class="line"> [<span class="number">0.05</span>  <span class="number">0.145</span> <span class="number">0.804</span>]]</span><br><span class="line"></span><br><span class="line"><span class="literal">True</span> Transition Matrix A:</span><br><span class="line">[[<span class="number">0.7</span> <span class="number">0.2</span> <span class="number">0.1</span>]</span><br><span class="line"> [<span class="number">0.1</span> <span class="number">0.8</span> <span class="number">0.1</span>]</span><br><span class="line"> [<span class="number">0.2</span> <span class="number">0.3</span> <span class="number">0.5</span>]]</span><br><span class="line"></span><br><span class="line">Learned Emission Matrix B:</span><br><span class="line">[[<span class="number">0.164</span> <span class="number">0.029</span> <span class="number">0.254</span> <span class="number">0.553</span>]</span><br><span class="line"> [<span class="number">0.047</span> <span class="number">0.183</span> <span class="number">0.505</span> <span class="number">0.265</span>]</span><br><span class="line"> [<span class="number">0.344</span> <span class="number">0.362</span> <span class="number">0.171</span> <span class="number">0.123</span>]]</span><br><span class="line"></span><br><span class="line"><span class="literal">True</span> Emission Matrix B:</span><br><span class="line">[[<span class="number">0.4</span> <span class="number">0.3</span> <span class="number">0.2</span> <span class="number">0.1</span>]</span><br><span class="line"> [<span class="number">0.1</span> <span class="number">0.1</span> <span class="number">0.4</span> <span class="number">0.4</span>]</span><br><span class="line"> [<span class="number">0.2</span> <span class="number">0.5</span> <span class="number">0.1</span> <span class="number">0.2</span>]]</span><br></pre></td></tr></table></figure>
+<p>从结果上来看，训练的效果似乎并不好. <strong>但要注意，这本质上还是无监督学习问题，最终的转移矩阵实际上可能是通过真实转移概率矩阵的合同变换得到的，转移矩阵的数值受到初始概率的影响会比较大. 因此在实际操作时，可以多次随机初始化，选择使得对数似然最大的那个解作为最终答案.</strong> 对于本模拟例子，效果不好的另一个原因是发射概率矩阵在不同行为间的区分度不够明显，这就导致了多种可能性，进而导致似然函数可能有多个驻点，求解时很有可能是被吸引到局部极大值点上.</p>
+<h3 id="带有错分类标签的逻辑回归"><a class="markdownIt-Anchor" href="#带有错分类标签的逻辑回归"></a> 带有错分类标签的逻辑回归</h3>
+<p>考虑一个逻辑回归任务，我们的观测是带噪声的，即观测到的标签并不一定是真实标签. 于是真实标签就是潜变量. 逻辑回归要求标签只能在 $ \lbrace 0,1\rbrace $ 中取值，现在我们的任务是估计出真实的逻辑回归系数向量 $ \boldsymbol{w} $ 以及两个错分类概率 $ \alpha,\beta $，即参数向量 $ \boldsymbol{\theta}=(\boldsymbol{w},\alpha,\beta) $. 其中在完全数据下应该有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \mathbb{P}…'>\begin{align*}
+    \mathbb{P}(t_n=1|\boldsymbol{x}_n,\boldsymbol{w})=\sigma(\boldsymbol{x}_n&#039;\boldsymbol{w}),\quad\mathbb{P}(t_n=0|\boldsymbol{x}_n,\boldsymbol{w})=1-\sigma(\boldsymbol{x}_n&#039;\boldsymbol{w}),
+\end{align*}
+</p>
+<p>其中 $ \sigma(x)=\dfrac{1}{1+\mathrm{e}^{-x}} $ 为 Sigmoid 函数，以及错分概率</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \mathbb{P}…'>\begin{align*}
+    \mathbb{P}(y_n=0|t_n=1)=\alpha,~~\mathbb{P}(y_n=1|t_n=1)=1-\alpha,\\
+    \mathbb{P}(y_n=1|t_n=0)=\beta,~~\mathbb{P}(y_n=0|t_n=0)=1-\beta.
+\end{align*}
+</p>
+<p>其中 $ \lbrace y_n\rbrace_{n=1}^N,\lbrace t_n\rbrace_{n=1}^N $ 分别是观测标签和真实标签. 那么根据条件概率公式，完全数据的似然函数可以写为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \ell(\bold…'>\begin{align*}
+    \ell(\boldsymbol{w},\alpha,\beta|\boldsymbol{X},\boldsymbol{t},\boldsymbol{y})&amp;=\log p(\boldsymbol{t},\boldsymbol{y}|\boldsymbol{X},\boldsymbol{w},\alpha,\beta)\\
+    &amp;=\log p(\boldsymbol{t}|\boldsymbol{X},\boldsymbol{w})+\log p(\boldsymbol{y}|\boldsymbol{t},\alpha,\beta)\\
+    &amp;=\sum_{n=1}^N[\log p(t_n|\boldsymbol{x}_n,\boldsymbol{w})+\log p(y_n|t_n,\alpha,\beta)].
+\end{align*}
+</p>
+<p>注意，这个条件概率的拆分源于条件独立性. 在给定 $ \boldsymbol{t} $ 时， $ \boldsymbol{y} $ 就不能与原始数据 $ \boldsymbol{X} $ 产生联系了，就是在传导路径 $ \boldsymbol{X}\to\boldsymbol{t}\to\boldsymbol{y} $ 过程中被切断了联系. 现在我们就可以方便地写出两个密度函数的表达式：</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \log p(t_n…'>\begin{align*}
+    \log p(t_n|\boldsymbol{x}_n,\boldsymbol{w})&amp;=t_n\log\sigma(\eta_n)+(1-t_n)\log(1-\sigma(\eta_n))\\
+    &amp;=t_n\eta_n-\log(1+\mathrm{e}^{\eta_n}),~~(\eta_n=\boldsymbol{x}_n&#039;\boldsymbol{w})\\
+    \log p(y_n|t_n,\alpha,\beta)&amp;=y_n[t_n\log(1-\alpha)+(1-t_n)\log\beta]\\&amp;+(1-y_n)[t_n\log\alpha+(1-t_n)\log(1-\beta)].
+\end{align*}
+</p>
+<p>现在我们需要 $ \boldsymbol{t} $ 的后验概率 $ r_n=p(t_n=1|y_n,\boldsymbol{x}_n,\boldsymbol{w}^{(t)},\alpha^{(t)},\beta^{(t)}) $ 来进行 E 步的计算. 首先考虑 $ y_n=1 $ 的情况. 我们有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    p(t_n=1|y_…'>\begin{align*}
+    p(t_n=1|y_n=1,\boldsymbol{x}_n)\propto p(y_n=1|t_n=1,x_n)\cdot p(t_n=1|x_n)=(1-\alpha^{(t)})\pi_n^{(t)},\\
+    p(t_n=0|y_n=1,\boldsymbol{x}_n)\propto p(y_n=1|t_n=0,x_n)\cdot p(t_n=0|x_n)=\beta^{(t)}(1-\pi_n^{(t)}).
+\end{align*}
+</p>
+<p>于是当 $ y_n=1 $ 时，有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    r_{n1}^{(t…'>\begin{equation*}
+    r_{n1}^{(t)}=\frac{(1-\alpha^{(t)})\pi_n^{(t)}}{(1-\alpha^{(t)})\pi_n^{(t)}+\beta^{(t)}(1-\pi_n^{(t)})},
+\end{equation*}
+</p>
+<p>同理可得当 $ y_n=0 $ 时，</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    r_{n0}^{(t…'>\begin{equation*}
+    r_{n0}^{(t)}=\frac{\alpha^{(t)}\pi_n^{(t)}}{\alpha^{(t)}\pi_n^{(t)}+(1-\beta^{(t)})(1-\pi_n^{(t)})}.
+\end{equation*}
+</p>
+<p>我们不必把 $ Q(\boldsymbol{\theta}|\boldsymbol{\theta}^{(t)})=\mathbb{E}_{\boldsymbol{t}}[\ell(\boldsymbol{w},\alpha,\beta|\boldsymbol{X},\boldsymbol{t},\boldsymbol{y})|\boldsymbol{X},\boldsymbol{y},\boldsymbol{\theta}^{(t)}] $ 的整体表达式写出来，后面将会看到可以对三个参数分别优化. 从上面的结果可以看到，实际上对 $ t_n $ 的期望可以写成 $ r_n^{(t)}=y_nr_{n1}^{(t)}+(1-y_n)r_{n0}^{(t)} $，或者 $ y_n $ 的指数幂的形式，<strong>在工程实现中，我们不需要直接写 <code>if-else</code> 语句，而是可以直接利用向量选择的方式进行优化，从而实现硬件级的计算加速，具体见之后的代码</strong>.<br />
+我们首先看关于 $ \boldsymbol{w} $ 的项. 我们有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \frac{\par…'>\begin{equation*}
+    \frac{\partial Q}{\partial\boldsymbol{w}}=\sum_{n=1}^N[r_n^{(t)}-\sigma(\eta_n)]\boldsymbol{x}_n,
+\end{equation*}
+</p>
+<p>这个驻点没有显式解，我们可以通过 Newton-Ralphson 方法来得到最优解. 接下来对于 $ \alpha $ 和 $ \beta $，分别有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \frac{\par…'>\begin{align*}
+    \frac{\partial Q}{\partial\alpha}&amp;=\sum_{n=1}^N\left[\frac{r_n^{(t)}(1-y_n)}{\alpha}-\frac{r_n^{(t)} y_n}{1-\alpha}\right],\\
+    \frac{\partial Q}{\partial\beta}&amp;=\sum_{n=1}^N\left[\frac{(1-r_n^{(t)})y_n}{\beta}-\frac{(1-r_n^{(t)})(1-y_n)}{1-\beta}\right].
+\end{align*}
+</p>
+<p>经过化简合并可以得到</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \alpha^{(t…'>\begin{align*}
+    \alpha^{(t+1)}&amp;=\frac{\sum_{n=1}^Nr_n^{(t)}(1-y_n)}{\sum_{n=1}^Nr_n^{(t)}},\\
+    \beta^{(t+1)}&amp;=\frac{\sum_{n=1}^N(1-r_n^{(t)})y_n}{\sum_{n=1}^N(1-r_n^{(t)})}.
+\end{align*}
+</p>
+<p>接下来给出代码. 代码中的基线模型是传统的逻辑回归，仍然配备了一个数值模拟的案例并给出对比结果.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> scipy.special <span class="keyword">import</span> expit</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">LabelNoiseEM</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, tol=<span class="number">1e-6</span>, max_iter=<span class="number">100</span>, nr_iter=<span class="number">10</span></span>):</span><br><span class="line">        <span class="variable language_">self</span>.tol = tol</span><br><span class="line">        <span class="variable language_">self</span>.max_iter = max_iter</span><br><span class="line">        <span class="variable language_">self</span>.nr_iter = nr_iter</span><br><span class="line">        <span class="variable language_">self</span>.w = <span class="literal">None</span></span><br><span class="line">        <span class="variable language_">self</span>.alpha = <span class="literal">None</span></span><br><span class="line">        <span class="variable language_">self</span>.beta = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_compute_log_likelihood</span>(<span class="params">self, X, y</span>):</span><br><span class="line">        pi = expit(X @ <span class="variable language_">self</span>.w)</span><br><span class="line">        <span class="comment"># 使用统一形式计算 P(y|x)</span></span><br><span class="line">        p_y_cond_t1 = y * (<span class="number">1</span> - <span class="variable language_">self</span>.alpha) + (<span class="number">1</span> - y) * <span class="variable language_">self</span>.alpha</span><br><span class="line">        p_y_cond_t0 = y * <span class="variable language_">self</span>.beta + (<span class="number">1</span> - y) * (<span class="number">1</span> - <span class="variable language_">self</span>.beta)</span><br><span class="line">        p_y_cond_x = p_y_cond_t1 * pi + p_y_cond_t0 * (<span class="number">1</span> - pi)</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> np.<span class="built_in">sum</span>(np.log(np.clip(p_y_cond_x, <span class="number">1e-15</span>, <span class="number">1</span> - <span class="number">1e-15</span>)))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">fit</span>(<span class="params">self, X, y</span>):</span><br><span class="line">        N, D = X.shape</span><br><span class="line">        <span class="variable language_">self</span>.w = np.zeros(D)</span><br><span class="line">        <span class="variable language_">self</span>.alpha = <span class="number">0.1</span></span><br><span class="line">        <span class="variable language_">self</span>.beta = <span class="number">0.1</span></span><br><span class="line">        ll_history = []</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="variable language_">self</span>.max_iter):</span><br><span class="line">            <span class="comment"># --- E 步 ---</span></span><br><span class="line">            pi = expit(X @ <span class="variable language_">self</span>.w)</span><br><span class="line">            </span><br><span class="line">            <span class="comment"># 高效实现 r^(t) 的计算</span></span><br><span class="line">            p_y_cond_t1 = y * (<span class="number">1</span> - <span class="variable language_">self</span>.alpha) + (<span class="number">1</span> - y) * <span class="variable language_">self</span>.alpha</span><br><span class="line">            p_y_cond_t0 = y * <span class="variable language_">self</span>.beta + (<span class="number">1</span> - y) * (<span class="number">1</span> - <span class="variable language_">self</span>.beta)</span><br><span class="line">            </span><br><span class="line">            num = p_y_cond_t1 * pi</span><br><span class="line">            den = num + p_y_cond_t0 * (<span class="number">1</span> - pi)</span><br><span class="line">            r = num / (den + <span class="number">1e-16</span>)</span><br><span class="line"></span><br><span class="line">            <span class="comment"># --- M 步 ---</span></span><br><span class="line">            <span class="comment"># 1. 更新 w (Newton-Raphson)</span></span><br><span class="line">            <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(<span class="variable language_">self</span>.nr_iter):</span><br><span class="line">                p_w = expit(X @ <span class="variable language_">self</span>.w)</span><br><span class="line">                grad_w = X.T @ (r - p_w)</span><br><span class="line">                W = p_w * (<span class="number">1</span> - p_w)</span><br><span class="line">                H = - (X.T * W) @ X - <span class="number">1e-6</span> * np.eye(D)</span><br><span class="line">                <span class="variable language_">self</span>.w -= np.linalg.solve(H, grad_w)</span><br><span class="line"></span><br><span class="line">            <span class="comment"># 2. 更新 alpha 和 beta</span></span><br><span class="line">            sum_r = np.<span class="built_in">sum</span>(r)</span><br><span class="line">            <span class="variable language_">self</span>.alpha = np.<span class="built_in">sum</span>(r * (<span class="number">1</span> - y)) / (sum_r + <span class="number">1e-16</span>)</span><br><span class="line">            <span class="variable language_">self</span>.beta = np.<span class="built_in">sum</span>((<span class="number">1</span> - r) * y) / (np.<span class="built_in">sum</span>(<span class="number">1</span> - r) + <span class="number">1e-16</span>)</span><br><span class="line"></span><br><span class="line">            ll = <span class="variable language_">self</span>._compute_log_likelihood(X, y)</span><br><span class="line">            ll_history.append(ll)</span><br><span class="line">            <span class="keyword">if</span> i &gt; <span class="number">0</span> <span class="keyword">and</span> <span class="built_in">abs</span>(ll_history[-<span class="number">1</span>] - ll_history[-<span class="number">2</span>]) &lt; <span class="variable language_">self</span>.tol:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> ll_history</span><br><span class="line"></span><br><span class="line"><span class="comment"># --- 数值模拟与报告 ---</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">run_simulation</span>():</span><br><span class="line">    np.random.seed(<span class="number">123</span>)</span><br><span class="line">    N, D = <span class="number">50000</span>, <span class="number">5</span>  <span class="comment"># 增加数据量以观察加速效果</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 真实参数</span></span><br><span class="line">    true_w_with_bias = np.array([<span class="number">0.5</span>, <span class="number">1.5</span>, -<span class="number">2.0</span>, <span class="number">0.8</span>, <span class="number">4.0</span>, -<span class="number">3.5</span>])</span><br><span class="line">    true_alpha, true_beta = <span class="number">0.12</span>, <span class="number">0.08</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 生成数据</span></span><br><span class="line">    X = np.hstack([np.ones((N, <span class="number">1</span>)), np.random.randn(N, D)])</span><br><span class="line">    t = (np.random.rand(N) &lt; expit(X @ true_w_with_bias)).astype(<span class="built_in">float</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 注入噪声</span></span><br><span class="line">    y = np.copy(t)</span><br><span class="line">    pos_mask = (t == <span class="number">1</span>)</span><br><span class="line">    neg_mask = (t == <span class="number">0</span>)</span><br><span class="line">    y[pos_mask] = np.where(np.random.rand(np.<span class="built_in">sum</span>(pos_mask)) &lt; true_alpha, <span class="number">0</span>, <span class="number">1</span>)</span><br><span class="line">    y[neg_mask] = np.where(np.random.rand(np.<span class="built_in">sum</span>(neg_mask)) &lt; true_beta, <span class="number">1</span>, <span class="number">0</span>)</span><br><span class="line">            </span><br><span class="line">    <span class="comment"># 训练 EM 模型</span></span><br><span class="line">    model = LabelNoiseEM()</span><br><span class="line">    start_time = time.time()</span><br><span class="line">    history = model.fit(X, y)</span><br><span class="line">    end_time = time.time()</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 训练普通 LR 作为基准</span></span><br><span class="line">    w_naive = np.zeros(X.shape[<span class="number">1</span>])</span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>):</span><br><span class="line">        p = expit(X @ w_naive)</span><br><span class="line">        H = -(X.T * (p * (<span class="number">1</span> - p))) @ X - <span class="number">1e-6</span> * np.eye(X.shape[<span class="number">1</span>])</span><br><span class="line">        w_naive -= np.linalg.solve(H, X.T @ (y - p))</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 报告结果</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;训练完成，耗时: <span class="subst">&#123;end_time - start_time:<span class="number">.4</span>f&#125;</span> 秒&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;\n&quot;</span> + <span class="string">&quot;=&quot;</span>*<span class="number">70</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;<span class="subst">&#123;<span class="string">&#x27;参数项&#x27;</span>:&lt;<span class="number">15</span>&#125;</span> | <span class="subst">&#123;<span class="string">&#x27;真实值&#x27;</span>:&lt;<span class="number">12</span>&#125;</span> | <span class="subst">&#123;<span class="string">&#x27;EM 估计值&#x27;</span>:&lt;<span class="number">12</span>&#125;</span> | <span class="subst">&#123;<span class="string">&#x27;普通 LR (忽略噪声)&#x27;</span>&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;-&quot;</span> * <span class="number">70</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;<span class="subst">&#123;<span class="string">&#x27;alpha&#x27;</span>:&lt;<span class="number">15</span>&#125;</span> | <span class="subst">&#123;true_alpha:&lt;<span class="number">12.4</span>f&#125;</span> | <span class="subst">&#123;model.alpha:&lt;<span class="number">12.4</span>f&#125;</span> | <span class="subst">&#123;<span class="string">&#x27;N/A&#x27;</span>&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;<span class="subst">&#123;<span class="string">&#x27;beta&#x27;</span>:&lt;<span class="number">15</span>&#125;</span> | <span class="subst">&#123;true_beta:&lt;<span class="number">12.4</span>f&#125;</span> | <span class="subst">&#123;model.beta:&lt;<span class="number">12.4</span>f&#125;</span> | <span class="subst">&#123;<span class="string">&#x27;N/A&#x27;</span>&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="keyword">for</span> j, val <span class="keyword">in</span> <span class="built_in">enumerate</span>(true_w_with_bias):</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;<span class="subst">&#123;<span class="string">&#x27;w_&#x27;</span> + <span class="built_in">str</span>(j):&lt;<span class="number">15</span>&#125;</span> | <span class="subst">&#123;val:&lt;<span class="number">12.4</span>f&#125;</span> | <span class="subst">&#123;model.w[j]:&lt;<span class="number">12.4</span>f&#125;</span> | <span class="subst">&#123;w_naive[j]:&lt;<span class="number">12.4</span>f&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;=&quot;</span>*<span class="number">70</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    run_simulation()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出结果</span></span><br><span class="line">训练完成，耗时: <span class="number">1.3146</span> 秒</span><br><span class="line"></span><br><span class="line">======================================================================</span><br><span class="line">参数项             | 真实值          | EM 估计值       | 普通 LR (忽略噪声)</span><br><span class="line">----------------------------------------------------------------------</span><br><span class="line">alpha           | <span class="number">0.1200</span>       | <span class="number">0.1176</span>       | N/A</span><br><span class="line">beta            | <span class="number">0.0800</span>       | <span class="number">0.0811</span>       | N/A</span><br><span class="line">w_0             | <span class="number">0.5000</span>       | <span class="number">0.5116</span>       | <span class="number">0.0515</span>      </span><br><span class="line">w_1             | <span class="number">1.5000</span>       | <span class="number">1.5352</span>       | <span class="number">0.5057</span>      </span><br><span class="line">w_2             | -<span class="number">2.0000</span>      | -<span class="number">2.0453</span>      | -<span class="number">0.7086</span>     </span><br><span class="line">w_3             | <span class="number">0.8000</span>       | <span class="number">0.8399</span>       | <span class="number">0.2836</span>      </span><br><span class="line">w_4             | <span class="number">4.0000</span>       | <span class="number">4.0203</span>       | <span class="number">1.3734</span>      </span><br><span class="line">w_5             | -<span class="number">3.5000</span>      | -<span class="number">3.4866</span>      | -<span class="number">1.1952</span>     </span><br><span class="line">======================================================================</span><br></pre></td></tr></table></figure>
+<p>代码中有些工程实现的细节，比如防止数值下溢、矩阵奇异，以及 $ r_n^{(t)} $ 的高效计算等等. 从结果可以看到，带噪声的情况下，普通的逻辑回归对参数向量的估计产生了严重的偏差，而通过 EM 算法去噪可以得到准确的噪声存在情况及原始参数向量.</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://hzy2024.github.io">Eason</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://hzy2024.github.io/2026/07/10/EM-%E7%AE%97%E6%B3%95/">http://hzy2024.github.io/2026/07/10/EM-%E7%AE%97%E6%B3%95/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://hzy2024.github.io" target="_blank">Eason's page</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%95%B0%E7%90%86%E7%BB%9F%E8%AE%A1/">数理统计</a><a class="post-meta__tags" href="/tags/%E6%9E%81%E5%A4%A7%E4%BC%BC%E7%84%B6%E4%BC%B0%E8%AE%A1/">极大似然估计</a><a class="post-meta__tags" href="/tags/%E7%BB%9F%E8%AE%A1%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/">统计机器学习</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/07/24/%E9%AB%98%E7%AD%89%E4%BB%A3%E6%95%B0%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E5%AE%9A%E4%B9%89%E5%8F%8A%E7%BB%93%E8%AE%BA/" title="高等代数中的一些定义及结论"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">高等代数中的一些定义及结论</div></div><div class="info-2"><div class="info-item-1">本文档历时一年多写成，初衷是为了练习 LaTeX，后面逐渐发展补充为一本小册子的形式. 详细信息请见前言和文章内容.                                全屏阅读 / 下载 PDF                   (如果上方预览无法显示，请点击按钮直接阅读)      </div></div></div></a><a class="pagination-related" href="/2026/06/12/%E5%A4%9A%E5%85%83%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%88%A4%E5%88%AB%E5%88%86%E6%9E%90/" title="多元统计分析——判别分析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">多元统计分析——判别分析</div></div><div class="info-2"><div class="info-item-1">本文内容综合了高惠璇应用多元统计分析的内容以及本人所上课程 PPT 中的部分知识.  判别分析是用于判断样品所属类型的一种统计分析方法，其在医学诊断、气象学、经济学、体育运动中的应用极为广泛. 判别分析主要有两个目标：  目标 1（预测方面）：分类（或分配）. 在已知历史上用某些方法已把研究对象分成若干组（亦称类或总体）的情况下，来判定新的观测样品应归属的组别. 目标 2（描述方面）：分离. 就是用图形（通常二维，有时三维或一维，一般通过降维实现）方法或代数方法描述来自各组的样品之间的差异性，最大限度地分离各组.  一般的判别分析问题都可以这样描述：设有 $ k $ 个 $ m $ 维总体 $ \pi_1,\pi_2,\cdots,\pi_k $，其分布特征已知（如已知分布函数为 $ F_1(x),F_2(x),\cdots,F_k(x) $，或知道来自各个总体的训练样本）. 对给定的一个新样品 $ x $，我们要判断它来自哪个总体. 接下来就对几种常用的判别分析方法进行介绍.  一、距离判别 设有 $ k $ 个组别 $ \pi_1,\pi_2,\cdots,\pi_k $，其...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/04/29/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E6%A8%A1%E5%9E%8B%E5%8F%82%E6%95%B0%E4%BC%B0%E8%AE%A1/" title="时间序列分析——模型参数估计"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-04-29</div><div class="info-item-2">时间序列分析——模型参数估计</div></div><div class="info-2"><div class="info-item-1">本文内容接时间序列分析——非平稳时间序列模型. 在做完模型阶数的选择后，进一步地我们可以进行模型参数的估计，从而真正完全确定模型长什么样. 我们有多种技术来进行参数估计. 我们先前已经验证了，对于 $ \text{ARMA}(p,q) $ 模型的自相关系数，样本自相关系数是其相合估计量. 模型中的系数可以通过 Yule-Walker 方程利用自相关函数反解出来. 这些关系将在后面的估计中使用到. 本文主要介绍矩估计、最小二乘估计和极大似然估计. 均从简单的模型出发推广一般形式.  矩估计  $ \text{MA}(q) $ 模型 我们首先以 $ \text{MA}(1) $ 为例说明矩估计是怎么进行的. 首先在该模型下， $ Y_t=e_t-\theta e_{t-1},\mathbb{E}(Y_t)=0 $. 我们有 ρ1=−θ1+θ2\rho_1=\dfrac{-\theta}{1+\theta^2}ρ1​=1+θ2−θ​，将其视为关于 $ \theta $ 的一元二次方程，就能解得 \begin{equation*}     \theta=\dfrac{-1\pm\sqrt...</div></div></div></a><a class="pagination-related" href="/2026/02/25/%E4%B8%80%E9%81%93%E7%A8%8D%E6%98%BE%E5%A4%8D%E6%9D%82%E7%9A%84%E9%9A%8F%E6%9C%BA%E6%A0%B7%E6%9C%AC%E6%96%B9%E5%B7%AE%E6%80%A7%E8%B4%A8%E7%9A%84%E9%A2%98%E7%9B%AE/" title="一道稍显复杂的随机样本方差性质的题目"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-25</div><div class="info-item-2">一道稍显复杂的随机样本方差性质的题目</div></div><div class="info-2"><div class="info-item-1">设 $ X_1,\cdots,X_n $ 为一随机样本，其均值和方差分别记为 $ \overline{X} $ 和 $ S^2 $. (a) 证明： \begin{equation*}     S^2=\dfrac{1}{2n(n-1)}\sum_{i=1}^n\sum_{j=1}^n(X_i-X_j)^2; \end{equation*}  假设 $ X_i $ 的四阶矩存在且有限，记 $ \theta_1=\mathbb{E}X_i,~\theta_j=\mathbb{E}(X_i-\theta_1)^j,~j=2,3,4. $ (b) 证明 $ \text{Var}S^2=\dfrac{1}{n}\left(\theta_4-\dfrac{n-3}{n-1}\theta_2^2\right) $; (c) 用 $ \theta_1,\cdots,\theta_4 $ 表示 $ \text{Cov}(\overline{X},S^2) $，问 $ \text{Cov}(\overline{X},S^2) $ 何时得 $ 0 $ ?  解答 (a) 只要展开并验证即可. 我们有...</div></div></div></a><a class="pagination-related" href="/2026/02/25/%E5%A4%9A%E5%85%83%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83/" title="多元正态分布"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-25</div><div class="info-item-2">多元正态分布</div></div><div class="info-2"><div class="info-item-1">本文内容参考了 George Casella 所著的统计推断（第二版）及高惠璇应用多元统计分析有关多维随机变量的内容.  本文对多元正态分布的一些基础的结论做了一些总结. 多元正态分布是用相互独立且同 $ N(0,1) $ 分布的随机变量通过线性变换来定义的：设 $ \boldsymbol{U}=(U_1,U_2,\cdots,U_n)'$ 为随机向量，各分量间相互独立且同 $ N(0,1) $ 分布；设 $ \boldsymbol{\mu} $ 为 $ n $ 维常数向量， $ \boldsymbol{A}$ 为 $ n\times p $ 常数矩阵，则称 $ \boldsymbol{X}=\boldsymbol{AU}+\boldsymbol{\mu} $ 的分布为 $ n $ 元正态分布，或称 $ \boldsymbol{X} $ 为 $ n $ 元正态随机向量，记为 $ \boldsymbol{X}\sim N(\boldsymbol{\mu},\boldsymbol{AA}') $.  二元正态分布 一般来说较为熟知的多元正态分布是二元正态分布，其密度函数形式是 \be...</div></div></div></a><a class="pagination-related" href="/2026/05/15/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E6%A8%A1%E5%9E%8B%E8%AF%8A%E6%96%AD%E4%B8%8E%E6%A8%A1%E5%9E%8B%E9%A2%84%E6%B5%8B/" title="时间序列分析——模型诊断与模型预测"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-05-15</div><div class="info-item-2">时间序列分析——模型诊断与模型预测</div></div><div class="info-2"><div class="info-item-1">本文内容接时间序列分析——模型参数估计. 现在我们基本完成了时间序列相关的模型构建、模型性质考察、模型选择、模型参数估计的任务. 接下来一个很重要的问题是：我们拟合的模型是否适当？我们在建立 $ \text{ARMA}(p,q) $ 模型时，实际上假定了 $ e_t $ 之间是独立的，且服从正态分布 $ N(0,\sigma_e^2) $ （当然在没有正态性时，我们仍然可以通过通过最小二乘法获得参数的估计，无需极大似然方法）. 说明模型不适当的一个例子可以看时间序列分析——非平稳时间序列模型一文中有关 $ \text{EACF} $ 的开头内容. 上面对于噪声项的假定实际上就是我们模型诊断的关键. 接下来关于模型诊断的内容主要围绕噪声项正态性及独立性的检验来进行说明.  模型诊断  $ e_t $ 正态性的检验 传统的数据正态性检验可以使用 $ \text{Q-Q} $ 图来看和正态分布的分位数线条的差异，但时间序列的特殊性使得我们不能使用这种方法，因为序列具有相关性. 下面要介绍的 Jarque-Bera 检验就是对时间序列噪声正态性检验的一个工具. 我们先从一般情况说起. 假...</div></div></div></a><a class="pagination-related" href="/2026/01/28/%E9%80%86%E9%AB%98%E6%96%AF%E5%88%86%E5%B8%83%E7%9A%84%E5%88%86%E5%B8%83%E5%87%BD%E6%95%B0%E6%8E%A8%E5%AF%BC/" title="逆高斯分布的分布函数推导"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-01-28</div><div class="info-item-2">逆高斯分布的分布函数推导</div></div><div class="info-2"><div class="info-item-1">本文是从本人的知乎上搬过来的，用 AI 小修了一下. 逆高斯分布 (Inverse Gaussian Distribution) 在生存分析中具有重要地位. 本文参考了 Chhikara (1974) 关于逆高斯分布性质的文章. 鉴于网络上鲜有关于逆高斯分布函数推导过程的详细资料，故整理此文.   1. 证明思路 其实证明的思路非常简单，主要采用 换元法 以及 一元二次方程的求根公式. 虽然计算过程略显繁琐，但逻辑十分清晰.  2. 推导过程  2.1 密度函数变形 首先，逆高斯分布的密度函数为： \begin{equation*} f(t) = \sqrt{\dfrac{1}{2\pi t^3}}\exp\left[-\dfrac{\lambda}{2\mu^2}\dfrac{(t-\mu)^2}{t}\right] \end{equation*}  为了凑出 标准正态分布 $ \mathcal{N}(0,1) $ 的形式，我们需要对指数部分进行变换. 考虑如下换元，并计算其微分： \begin{equation*} v = \sqrt{\lambda}\left(\dfrac...</div></div></div></a><a class="pagination-related" href="/2026/03/18/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%B9%B3%E7%A8%B3%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E6%A8%A1%E5%9E%8B/" title="时间序列分析——平稳时间序列模型"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-03-18</div><div class="info-item-2">时间序列分析——平稳时间序列模型</div></div><div class="info-2"><div class="info-item-1">本文对一般线性过程及其截断——滑动平均过程、自回归过程及两者的结合—— ARMA 模型的模型性质及估计量的一些基本统计性质做了总结，中间涉及到随机变量二次型期望和方差的推导.   一、一般线性过程 一般线性过程$ \lbrace Y_t\rbrace  $ 可以表示成现在和过去白噪声变量的加权线性组合 \begin{equation*}     Y_t=e_t+\psi_1e_{t-1}+\psi_2e_{t-2}+\cdots\quad\left(\sum_{n=1}^{\infty}\psi_n^2&lt;\infty\right) \end{equation*}  其中 $ e_t,\cdots,e_{t-q} $ 都是白噪声, 即均值为 $ 0 $ 且独立同分布的随机变量，并假设方差均为 $ \sigma_e^2 $. 我们现在通过 $ Y_t $ 的截断 \begin{equation*}   Y_{t,m}=\sum_{i=0}^{m}\psi_{i}e_{t-i}\to Y_{t}~~(m\to\infty) \end{equation*}  来说明括号内的条件起到...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Eason</div><div class="author-info-description">SUFE统计学大三本科生一枚~</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">19</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">29</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/hzy2024"><i class="fab fa-github"></i><span>访问我的 GitHub</span></a><div class="card-info-social-icons"><a class="social-icon" href="/img/qq.jpg" target="_blank" title="QQ"><i class="fab fa-qq" style="color: #1e3050;"></i></a><a class="social-icon" href="https://space.bilibili.com/345987732?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #fb7299;"></i></a><a class="social-icon" href="https://www.zhihu.com/people/perplexity-67" target="_blank" title="知乎"><i class="fab fa-zhihu" style="color: #1772f6;"></i></a><a class="social-icon" href="mailto:2023110611@stu.sufe.edu.cn" target="_blank" title="E-mail"><i class="fas fa-envelope" style="color: #0078d7;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">逐步完善网页ing...</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%95%E5%85%A5%E4%BB%A5%E5%A4%9A%E9%A1%B9%E5%88%86%E5%B8%83%E4%B8%BA%E4%BE%8B"><span class="toc-number">1.</span> <span class="toc-text"> 引入：以多项分布为例</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#em-%E7%AE%97%E6%B3%95%E7%9A%84%E4%B8%80%E8%88%AC%E5%BD%A2%E5%BC%8F"><span class="toc-number">2.</span> <span class="toc-text"> EM 算法的一般形式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8C%87%E6%95%B0%E6%97%8F%E5%BD%A2%E5%BC%8F"><span class="toc-number">2.1.</span> <span class="toc-text"> 指数族形式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E8%88%AC%E5%BD%A2%E5%BC%8F"><span class="toc-number">2.2.</span> <span class="toc-text"> 一般形式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8E%E9%AA%8C%E5%BD%A2%E5%BC%8F"><span class="toc-number">2.3.</span> <span class="toc-text"> 后验形式</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#em-%E7%AE%97%E6%B3%95%E7%9A%84%E4%B8%80%E8%88%AC%E7%90%86%E8%AE%BA%E6%80%A7%E8%B4%A8"><span class="toc-number">3.</span> <span class="toc-text"> EM 算法的一般理论性质</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%95%E8%B0%83%E6%80%A7%E7%9B%B8%E5%85%B3%E8%AE%A8%E8%AE%BA"><span class="toc-number">3.1.</span> <span class="toc-text"> 单调性相关讨论</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%B6%E6%95%9B%E6%80%A7%E7%9B%B8%E5%85%B3%E8%AE%A8%E8%AE%BA"><span class="toc-number">3.2.</span> <span class="toc-text"> 收敛性相关讨论</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BA%94%E7%94%A8"><span class="toc-number">4.</span> <span class="toc-text"> 应用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%AB%98%E6%96%AF%E6%B7%B7%E5%90%88%E6%A8%A1%E5%9E%8Bgmm"><span class="toc-number">4.1.</span> <span class="toc-text"> 高斯混合模型（GMM）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%AB%E6%9C%89%E7%BC%BA%E5%A4%B1%E6%95%B0%E6%8D%AE%E7%9A%84%E5%A4%9A%E5%85%83%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83%E7%9A%84%E6%81%A2%E5%A4%8D"><span class="toc-number">4.2.</span> <span class="toc-text"> 含有缺失数据的多元正态分布的恢复</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9A%90%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E6%A8%A1%E5%9E%8Bhmm%E4%B8%8E-baum-welch-%E7%AE%97%E6%B3%95"><span class="toc-number">4.3.</span> <span class="toc-text"> 隐马尔可夫模型（HMM）与 Baum-Welch 算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%B8%A6%E6%9C%89%E9%94%99%E5%88%86%E7%B1%BB%E6%A0%87%E7%AD%BE%E7%9A%84%E9%80%BB%E8%BE%91%E5%9B%9E%E5%BD%92"><span class="toc-number">4.4.</span> <span class="toc-text"> 带有错分类标签的逻辑回归</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/07/31/%E6%95%B0%E5%80%BC%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%87%BD%E6%95%B0%E9%80%BC%E8%BF%91%E4%B8%8E%E5%BF%AB%E9%80%9F%20Fourier%20%E5%8F%98%E6%8D%A2/" title="数值分析——函数逼近与快速 Fourier 变换">数值分析——函数逼近与快速 Fourier 变换</a><time datetime="2026-07-31T01:41:42.000Z" title="发表于 2026-07-31 09:41:42">2026-07-31</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/07/24/%E9%AB%98%E7%AD%89%E4%BB%A3%E6%95%B0%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E5%AE%9A%E4%B9%89%E5%8F%8A%E7%BB%93%E8%AE%BA/" title="高等代数中的一些定义及结论">高等代数中的一些定义及结论</a><time datetime="2026-07-24T15:59:45.000Z" title="发表于 2026-07-24 23:59:45">2026-07-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/07/10/EM-%E7%AE%97%E6%B3%95/" title="EM 算法">EM 算法</a><time datetime="2026-07-10T13:24:41.000Z" title="发表于 2026-07-10 21:24:41">2026-07-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/06/12/%E5%A4%9A%E5%85%83%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%88%A4%E5%88%AB%E5%88%86%E6%9E%90/" title="多元统计分析——判别分析">多元统计分析——判别分析</a><time datetime="2026-06-12T09:41:00.000Z" title="发表于 2026-06-12 17:41:00">2026-06-12</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/18/Riemann%E7%BA%A7%E6%95%B0%E9%87%8D%E6%8E%92%E5%AE%9A%E7%90%86/" title="Riemann级数重排定理">Riemann级数重排定理</a><time datetime="2026-05-18T07:30:16.000Z" title="发表于 2026-05-18 15:30:16">2026-05-18</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Eason</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        loader: {
+          load: [
+            // Four font extension packages (optional)
+            //- '[tex]/bbm',
+            //- '[tex]/bboldx',
+            //- '[tex]/dsfont',
+            '[tex]/mhchem'
+          ],
+          paths: {
+            'mathjax-newcm': '[mathjax]/../@mathjax/mathjax-newcm-font',
+
+            //- // Four font extension packages (optional)
+            //- 'mathjax-bbm-extension': '[mathjax]/../@mathjax/mathjax-bbm-font-extension',
+            //- 'mathjax-bboldx-extension': '[mathjax]/../@mathjax/mathjax-bboldx-font-extension',
+            //- 'mathjax-dsfont-extension': '[mathjax]/../@mathjax/mathjax-dsfont-font-extension',
+            'mathjax-mhchem-extension': '[mathjax]/../@mathjax/mathjax-mhchem-font-extension'
+          }
+        },
+        output: {
+          font: 'mathjax-newcm',
+        },
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+          packages: {
+            '[+]': [
+              'mhchem'
+            ]
+          }
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          menuOptions: {
+            settings: {
+              enrich: false  // Turn off Braille and voice narration text automatic generation
+            }
+          },
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax@4.1.0/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

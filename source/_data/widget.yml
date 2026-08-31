@@ -1,0 +1,7 @@
+bottom:
+  - class_name: user-map
+    id_name: user-map
+    name: 访客地图
+    icon: fas fa-map
+    order:
+    html: <script type="text/javascript" id="mapmyvisitors" src="//mapmyvisitors.com/map.js?d=bTUeFwn7GnW8HpxHJQQp3AwtOGbnQODx3jSpiSiKmcQ&cl=ffffff&w=a"></script>

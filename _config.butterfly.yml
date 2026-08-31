@@ -1,0 +1,64 @@
+# ============================================================
+# Butterfly 主题专用配置文件 (_config.butterfly.yml)
+# ============================================================
+
+# 导航菜单及背景相关
+menu:
+  首页: / || fas fa-home
+  归档: /archives/ || fas fa-archive
+  标签: /tags/ || fas fa-tags
+  分类: /categories/ || fas fa-folder-open
+
+disable_top_img: true
+background: img/background.GIF
+
+# 头像与公告
+avatar:
+  img: img/avatar.jpg
+  effect: true           # 头像旋转特效
+
+# 社交图标
+social:
+  fab fa-qq: img/qq.jpg || QQ || "#1e3050"
+  fab fa-bilibili: https://space.bilibili.com/345987732?spm_id_from=333.1007.0.0 || Bilibili || "#fb7299"
+  fab fa-zhihu: https://www.zhihu.com/people/perplexity-67|| 知乎 || "#1772f6"
+  fas fa-envelope: mailto:2023110611@stu.sufe.edu.cn || E-mail || "#0078d7"
+
+# 数学公式 (MathJax)
+math:
+  use: mathjax
+  per_page: true
+  hide_scrollbar: false
+  packages: ['base', 'ams', 'boldsymbol'] 
+
+# 侧边栏设置
+aside:
+  enable: true
+  position: left
+  card_author:
+    enable: true
+    description: "SUFE统计学大三本科生一枚~" 
+    button:
+      enable: true
+      icon: fab fa-github
+      text: 访问我的 GitHub   # 这里替换 "主题 GitHub"
+      link: https://github.com/hzy2024
+  card_announcement:
+    enable: true
+    content: "逐步完善网页ing..."
+
+# 文章目录
+toc:
+  post: true
+  page: false
+  number: true
+  expand: false
+  # Only for post
+  style_simple: false
+  scroll_percent: true
+
+# 注入自定义 CSS
+inject:
+  head:
+    - <link rel="stylesheet" href="/css/custom.css">
+  bottom:

@@ -1,0 +1,272 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Riemann级数重排定理 | Eason's page</title><meta name="author" content="Eason"><meta name="copyright" content="Eason"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="这篇早在去年暑假就已经写好了，现在仅仅是将其发出来（                                全屏阅读 &#x2F; 下载 PDF                   (如果上方预览无法显示，请点击按钮直接阅读)">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Riemann级数重排定理">
+<meta property="og:url" content="http://hzy2024.github.io/2026/05/18/Riemann%E7%BA%A7%E6%95%B0%E9%87%8D%E6%8E%92%E5%AE%9A%E7%90%86/index.html">
+<meta property="og:site_name" content="Eason&#39;s page">
+<meta property="og:description" content="这篇早在去年暑假就已经写好了，现在仅仅是将其发出来（                                全屏阅读 &#x2F; 下载 PDF                   (如果上方预览无法显示，请点击按钮直接阅读)">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://hzy2024.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2026-05-18T07:30:16.000Z">
+<meta property="article:modified_time" content="2026-05-18T07:33:21.141Z">
+<meta property="article:author" content="Eason">
+<meta property="article:tag" content="数学">
+<meta property="article:tag" content="数学分析">
+<meta property="article:tag" content="数项级数">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://hzy2024.github.io/img/avatar.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Riemann级数重排定理",
+  "url": "http://hzy2024.github.io/2026/05/18/Riemann%E7%BA%A7%E6%95%B0%E9%87%8D%E6%8E%92%E5%AE%9A%E7%90%86/",
+  "image": "http://hzy2024.github.io/img/avatar.jpg",
+  "datePublished": "2026-05-18T07:30:16.000Z",
+  "dateModified": "2026-05-18T07:33:21.141Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Eason",
+      "url": "http://hzy2024.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://hzy2024.github.io/2026/05/18/Riemann%E7%BA%A7%E6%95%B0%E9%87%8D%E6%8E%92%E5%AE%9A%E7%90%86/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Riemann级数重排定理',
+  isHighlightShrink: false,
+  isToc: false,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div class="bg-animation" id="web_bg" style="background-image: url(/img/background.GIF);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">19</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">29</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Eason's page</span></a><a class="nav-page-title" href="/"><span class="site-name">Riemann级数重排定理</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">Riemann级数重排定理</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-05-18T07:30:16.000Z" title="发表于 2026-05-18 15:30:16">2026-05-18</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-05-18T07:33:21.141Z" title="更新于 2026-05-18 15:33:21">2026-05-18</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><div class="note default no-icon flat"><p>这篇早在去年暑假就已经写好了，现在仅仅是将其发出来（</p>
+</div>
+<!-- 1. PDF 预览窗口 (电脑端体验好) -->
+<div style="margin-bottom: 20px;">
+    <iframe 
+        src="/pdf/Riemann.pdf"   
+        width="100%" 
+        height="1024px" 
+        style="border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+    </iframe>
+</div>
+<!-- 2. 下载/全屏阅读按钮 (手机端救星) -->
+<!-- 这是一个美化过的按钮，适配 Butterfly 主题风格 -->
+<div style="text-align: center; margin: 20px 0;">
+    <a href="/pdf/Riemann.pdf" target="_blank" 
+       style="
+           display: inline-block;
+           background-color: #49b1f5; /* 按钮颜色 */
+           color: white;
+           padding: 10px 25px;
+           border-radius: 30px;
+           text-decoration: none;
+           font-weight: bold;
+           transition: all 0.3s;
+           box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+       "
+       onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 7px 14px rgba(50, 50, 93, 0.1), 0 3px 6px rgba(0, 0, 0, 0.08)';"
+       onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08)';"
+    >
+        <i class="fas fa-file-pdf"></i> 全屏阅读 / 下载 PDF
+    </a>
+    <p style="font-size: 13px; color: #999; margin-top: 10px;">
+        (如果上方预览无法显示，请点击按钮直接阅读)
+    </p>
+</div></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://hzy2024.github.io">Eason</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://hzy2024.github.io/2026/05/18/Riemann%E7%BA%A7%E6%95%B0%E9%87%8D%E6%8E%92%E5%AE%9A%E7%90%86/">http://hzy2024.github.io/2026/05/18/Riemann%E7%BA%A7%E6%95%B0%E9%87%8D%E6%8E%92%E5%AE%9A%E7%90%86/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://hzy2024.github.io" target="_blank">Eason's page</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%95%B0%E5%AD%A6/">数学</a><a class="post-meta__tags" href="/tags/%E6%95%B0%E5%AD%A6%E5%88%86%E6%9E%90/">数学分析</a><a class="post-meta__tags" href="/tags/%E6%95%B0%E9%A1%B9%E7%BA%A7%E6%95%B0/">数项级数</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/06/12/%E5%A4%9A%E5%85%83%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%88%A4%E5%88%AB%E5%88%86%E6%9E%90/" title="多元统计分析——判别分析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">多元统计分析——判别分析</div></div><div class="info-2"><div class="info-item-1">本文内容综合了高惠璇应用多元统计分析的内容以及本人所上课程 PPT 中的部分知识.  判别分析是用于判断样品所属类型的一种统计分析方法，其在医学诊断、气象学、经济学、体育运动中的应用极为广泛. 判别分析主要有两个目标：  目标 1（预测方面）：分类（或分配）. 在已知历史上用某些方法已把研究对象分成若干组（亦称类或总体）的情况下，来判定新的观测样品应归属的组别. 目标 2（描述方面）：分离. 就是用图形（通常二维，有时三维或一维，一般通过降维实现）方法或代数方法描述来自各组的样品之间的差异性，最大限度地分离各组.  一般的判别分析问题都可以这样描述：设有 $ k $ 个 $ m $ 维总体 $ \pi_1,\pi_2,\cdots,\pi_k $，其分布特征已知（如已知分布函数为 $ F_1(x),F_2(x),\cdots,F_k(x) $，或知道来自各个总体的训练样本）. 对给定的一个新样品 $ x $，我们要判断它来自哪个总体. 接下来就对几种常用的判别分析方法进行介绍.  一、距离判别 设有 $ k $ 个组别 $ \pi_1,\pi_2,\cdots,\pi_k $，其...</div></div></div></a><a class="pagination-related" href="/2026/05/15/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E6%A8%A1%E5%9E%8B%E8%AF%8A%E6%96%AD%E4%B8%8E%E6%A8%A1%E5%9E%8B%E9%A2%84%E6%B5%8B/" title="时间序列分析——模型诊断与模型预测"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">时间序列分析——模型诊断与模型预测</div></div><div class="info-2"><div class="info-item-1">本文内容接时间序列分析——模型参数估计. 现在我们基本完成了时间序列相关的模型构建、模型性质考察、模型选择、模型参数估计的任务. 接下来一个很重要的问题是：我们拟合的模型是否适当？我们在建立 $ \text{ARMA}(p,q) $ 模型时，实际上假定了 $ e_t $ 之间是独立的，且服从正态分布 $ N(0,\sigma_e^2) $ （当然在没有正态性时，我们仍然可以通过通过最小二乘法获得参数的估计，无需极大似然方法）. 说明模型不适当的一个例子可以看时间序列分析——非平稳时间序列模型一文中有关 $ \text{EACF} $ 的开头内容. 上面对于噪声项的假定实际上就是我们模型诊断的关键. 接下来关于模型诊断的内容主要围绕噪声项正态性及独立性的检验来进行说明.  模型诊断  $ e_t $ 正态性的检验 传统的数据正态性检验可以使用 $ \text{Q-Q} $ 图来看和正态分布的分位数线条的差异，但时间序列的特殊性使得我们不能使用这种方法，因为序列具有相关性. 下面要介绍的 Jarque-Bera 检验就是对时间序列噪声正态性检验的一个工具. 我们先从一般情况说起. 假...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/01/28/%E9%80%86%E9%AB%98%E6%96%AF%E5%88%86%E5%B8%83%E7%9A%84%E5%88%86%E5%B8%83%E5%87%BD%E6%95%B0%E6%8E%A8%E5%AF%BC/" title="逆高斯分布的分布函数推导"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-01-28</div><div class="info-item-2">逆高斯分布的分布函数推导</div></div><div class="info-2"><div class="info-item-1">本文是从本人的知乎上搬过来的，用 AI 小修了一下. 逆高斯分布 (Inverse Gaussian Distribution) 在生存分析中具有重要地位. 本文参考了 Chhikara (1974) 关于逆高斯分布性质的文章. 鉴于网络上鲜有关于逆高斯分布函数推导过程的详细资料，故整理此文.   1. 证明思路 其实证明的思路非常简单，主要采用 换元法 以及 一元二次方程的求根公式. 虽然计算过程略显繁琐，但逻辑十分清晰.  2. 推导过程  2.1 密度函数变形 首先，逆高斯分布的密度函数为： \begin{equation*} f(t) = \sqrt{\dfrac{1}{2\pi t^3}}\exp\left[-\dfrac{\lambda}{2\mu^2}\dfrac{(t-\mu)^2}{t}\right] \end{equation*}  为了凑出 标准正态分布 $ \mathcal{N}(0,1) $ 的形式，我们需要对指数部分进行变换. 考虑如下换元，并计算其微分： \begin{equation*} v = \sqrt{\lambda}\left(\dfrac...</div></div></div></a><a class="pagination-related" href="/2026/04/29/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E6%A8%A1%E5%9E%8B%E5%8F%82%E6%95%B0%E4%BC%B0%E8%AE%A1/" title="时间序列分析——模型参数估计"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-04-29</div><div class="info-item-2">时间序列分析——模型参数估计</div></div><div class="info-2"><div class="info-item-1">本文内容接时间序列分析——非平稳时间序列模型. 在做完模型阶数的选择后，进一步地我们可以进行模型参数的估计，从而真正完全确定模型长什么样. 我们有多种技术来进行参数估计. 我们先前已经验证了，对于 $ \text{ARMA}(p,q) $ 模型的自相关系数，样本自相关系数是其相合估计量. 模型中的系数可以通过 Yule-Walker 方程利用自相关函数反解出来. 这些关系将在后面的估计中使用到. 本文主要介绍矩估计、最小二乘估计和极大似然估计. 均从简单的模型出发推广一般形式.  矩估计  $ \text{MA}(q) $ 模型 我们首先以 $ \text{MA}(1) $ 为例说明矩估计是怎么进行的. 首先在该模型下， $ Y_t=e_t-\theta e_{t-1},\mathbb{E}(Y_t)=0 $. 我们有 ρ1=−θ1+θ2\rho_1=\dfrac{-\theta}{1+\theta^2}ρ1​=1+θ2−θ​，将其视为关于 $ \theta $ 的一元二次方程，就能解得 \begin{equation*}     \theta=\dfrac{-1\pm\sqrt...</div></div></div></a><a class="pagination-related" href="/2026/07/24/%E9%AB%98%E7%AD%89%E4%BB%A3%E6%95%B0%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E5%AE%9A%E4%B9%89%E5%8F%8A%E7%BB%93%E8%AE%BA/" title="高等代数中的一些定义及结论"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-24</div><div class="info-item-2">高等代数中的一些定义及结论</div></div><div class="info-2"><div class="info-item-1">本文档历时一年多写成，初衷是为了练习 LaTeX，后面逐渐发展补充为一本小册子的形式. 详细信息请见前言和文章内容.                                全屏阅读 / 下载 PDF                   (如果上方预览无法显示，请点击按钮直接阅读)      </div></div></div></a><a class="pagination-related" href="/2026/06/12/%E5%A4%9A%E5%85%83%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%88%A4%E5%88%AB%E5%88%86%E6%9E%90/" title="多元统计分析——判别分析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-06-12</div><div class="info-item-2">多元统计分析——判别分析</div></div><div class="info-2"><div class="info-item-1">本文内容综合了高惠璇应用多元统计分析的内容以及本人所上课程 PPT 中的部分知识.  判别分析是用于判断样品所属类型的一种统计分析方法，其在医学诊断、气象学、经济学、体育运动中的应用极为广泛. 判别分析主要有两个目标：  目标 1（预测方面）：分类（或分配）. 在已知历史上用某些方法已把研究对象分成若干组（亦称类或总体）的情况下，来判定新的观测样品应归属的组别. 目标 2（描述方面）：分离. 就是用图形（通常二维，有时三维或一维，一般通过降维实现）方法或代数方法描述来自各组的样品之间的差异性，最大限度地分离各组.  一般的判别分析问题都可以这样描述：设有 $ k $ 个 $ m $ 维总体 $ \pi_1,\pi_2,\cdots,\pi_k $，其分布特征已知（如已知分布函数为 $ F_1(x),F_2(x),\cdots,F_k(x) $，或知道来自各个总体的训练样本）. 对给定的一个新样品 $ x $，我们要判断它来自哪个总体. 接下来就对几种常用的判别分析方法进行介绍.  一、距离判别 设有 $ k $ 个组别 $ \pi_1,\pi_2,\cdots,\pi_k $，其...</div></div></div></a><a class="pagination-related" href="/2026/01/30/%E6%B3%9B%E5%87%BD%E5%88%86%E6%9E%90%E8%AF%BE%E7%A8%8B%E7%AC%94%E8%AE%B0/" title="泛函分析课程笔记"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-01-30</div><div class="info-item-2">泛函分析课程笔记</div></div><div class="info-2"><div class="info-item-1">本 pdf 是本人学习泛函分析时整理的笔记，基本上是对《实变函数与泛函分析基础（第四版）》（程其襄、张奠宙、胡善文、薛以锋著）泛函分析部分的学到的内容的再整理，同时补充了一些老师课程 ppt 上的内容。本科学的泛函分析基于“线性”的观点来看待各种空间，结构可以说相当优美，把很多问题都归纳到了一个抽象的结构下，本人也非常喜欢这门课程。 pdf 中可能有些 typo，如果发现也可发邮件联系我。                               全屏阅读 / 下载 PDF                   (如果上方预览无法显示，请点击按钮直接阅读)      </div></div></div></a><a class="pagination-related" href="/2026/01/30/%E9%92%9F%E5%BC%80%E8%8E%B1%E3%80%8AA-Course-in-Probability-Theory%E3%80%8B%E4%B9%A0%E9%A2%98%E8%A7%A3%E7%AD%94/" title="钟开莱《概率论教程》习题解答"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-01-30</div><div class="info-item-2">钟开莱《概率论教程》习题解答</div></div><div class="info-2"><div class="info-item-1">本文为机械工业出版社出版的《A Course in Probability Theory》英文原书第 3 版的习题解答。 本解答持续更新，习题解答编写实属不易，请尊重本人的劳动成果，任何引用请注明出处。                               全屏阅读 / 下载 PDF                   (如果上方预览无法显示，请点击按钮直接阅读)      </div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Eason</div><div class="author-info-description">SUFE统计学大三本科生一枚~</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">19</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">29</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/hzy2024"><i class="fab fa-github"></i><span>访问我的 GitHub</span></a><div class="card-info-social-icons"><a class="social-icon" href="/img/qq.jpg" target="_blank" title="QQ"><i class="fab fa-qq" style="color: #1e3050;"></i></a><a class="social-icon" href="https://space.bilibili.com/345987732?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #fb7299;"></i></a><a class="social-icon" href="https://www.zhihu.com/people/perplexity-67" target="_blank" title="知乎"><i class="fab fa-zhihu" style="color: #1772f6;"></i></a><a class="social-icon" href="mailto:2023110611@stu.sufe.edu.cn" target="_blank" title="E-mail"><i class="fas fa-envelope" style="color: #0078d7;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">逐步完善网页ing...</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/07/31/%E6%95%B0%E5%80%BC%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%87%BD%E6%95%B0%E9%80%BC%E8%BF%91%E4%B8%8E%E5%BF%AB%E9%80%9F%20Fourier%20%E5%8F%98%E6%8D%A2/" title="数值分析——函数逼近与快速 Fourier 变换">数值分析——函数逼近与快速 Fourier 变换</a><time datetime="2026-07-31T01:41:42.000Z" title="发表于 2026-07-31 09:41:42">2026-07-31</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/07/24/%E9%AB%98%E7%AD%89%E4%BB%A3%E6%95%B0%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E5%AE%9A%E4%B9%89%E5%8F%8A%E7%BB%93%E8%AE%BA/" title="高等代数中的一些定义及结论">高等代数中的一些定义及结论</a><time datetime="2026-07-24T15:59:45.000Z" title="发表于 2026-07-24 23:59:45">2026-07-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/07/10/EM-%E7%AE%97%E6%B3%95/" title="EM 算法">EM 算法</a><time datetime="2026-07-10T13:24:41.000Z" title="发表于 2026-07-10 21:24:41">2026-07-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/06/12/%E5%A4%9A%E5%85%83%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%88%A4%E5%88%AB%E5%88%86%E6%9E%90/" title="多元统计分析——判别分析">多元统计分析——判别分析</a><time datetime="2026-06-12T09:41:00.000Z" title="发表于 2026-06-12 17:41:00">2026-06-12</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/05/18/Riemann%E7%BA%A7%E6%95%B0%E9%87%8D%E6%8E%92%E5%AE%9A%E7%90%86/" title="Riemann级数重排定理">Riemann级数重排定理</a><time datetime="2026-05-18T07:30:16.000Z" title="发表于 2026-05-18 15:30:16">2026-05-18</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Eason</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        loader: {
+          load: [
+            // Four font extension packages (optional)
+            //- '[tex]/bbm',
+            //- '[tex]/bboldx',
+            //- '[tex]/dsfont',
+            '[tex]/mhchem'
+          ],
+          paths: {
+            'mathjax-newcm': '[mathjax]/../@mathjax/mathjax-newcm-font',
+
+            //- // Four font extension packages (optional)
+            //- 'mathjax-bbm-extension': '[mathjax]/../@mathjax/mathjax-bbm-font-extension',
+            //- 'mathjax-bboldx-extension': '[mathjax]/../@mathjax/mathjax-bboldx-font-extension',
+            //- 'mathjax-dsfont-extension': '[mathjax]/../@mathjax/mathjax-dsfont-font-extension',
+            'mathjax-mhchem-extension': '[mathjax]/../@mathjax/mathjax-mhchem-font-extension'
+          }
+        },
+        output: {
+          font: 'mathjax-newcm',
+        },
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+          packages: {
+            '[+]': [
+              'mhchem'
+            ]
+          }
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          menuOptions: {
+            settings: {
+              enrich: false  // Turn off Braille and voice narration text automatic generation
+            }
+          },
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax@4.1.0/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
