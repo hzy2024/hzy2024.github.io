@@ -1,0 +1,605 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>多元正态分布 | Eason's page</title><meta name="author" content="Eason"><meta name="copyright" content="Eason"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="本文内容参考了 George Casella 所著的统计推断（第二版）及高惠璇应用多元统计分析有关多维随机变量的内容.  本文对多元正态分布的一些基础的结论做了一些总结. 多元正态分布是用相互独立且同 $ N(0,1) $ 分布的随机变量通过线性变换来定义的：设 $ \boldsymbol{U}&#x3D;(U_1,U_2,\cdots,U_n)&#39;$ 为随机向量，各分量间相互独立且同 $ N(0,1) $">
+<meta property="og:type" content="article">
+<meta property="og:title" content="多元正态分布">
+<meta property="og:url" content="http://hzy2024.github.io/2026/02/25/%E5%A4%9A%E5%85%83%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83/index.html">
+<meta property="og:site_name" content="Eason&#39;s page">
+<meta property="og:description" content="本文内容参考了 George Casella 所著的统计推断（第二版）及高惠璇应用多元统计分析有关多维随机变量的内容.  本文对多元正态分布的一些基础的结论做了一些总结. 多元正态分布是用相互独立且同 $ N(0,1) $ 分布的随机变量通过线性变换来定义的：设 $ \boldsymbol{U}&#x3D;(U_1,U_2,\cdots,U_n)&#39;$ 为随机向量，各分量间相互独立且同 $ N(0,1) $">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://hzy2024.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2026-02-25T04:53:39.000Z">
+<meta property="article:modified_time" content="2026-08-31T12:56:17.621Z">
+<meta property="article:author" content="Eason">
+<meta property="article:tag" content="数学">
+<meta property="article:tag" content="数理统计">
+<meta property="article:tag" content="正态分布">
+<meta property="article:tag" content="多元统计分析">
+<meta property="article:tag" content="概率论">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://hzy2024.github.io/img/avatar.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "多元正态分布",
+  "url": "http://hzy2024.github.io/2026/02/25/%E5%A4%9A%E5%85%83%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83/",
+  "image": "http://hzy2024.github.io/img/avatar.jpg",
+  "datePublished": "2026-02-25T04:53:39.000Z",
+  "dateModified": "2026-08-31T12:56:17.621Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Eason",
+      "url": "http://hzy2024.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://hzy2024.github.io/2026/02/25/%E5%A4%9A%E5%85%83%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '多元正态分布',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div class="bg-animation" id="web_bg" style="background-image: url(/img/background.GIF);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">32</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Eason's page</span></a><a class="nav-page-title" href="/"><span class="site-name">多元正态分布</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">多元正态分布</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-02-25T04:53:39.000Z" title="发表于 2026-02-25 12:53:39">2026-02-25</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-08-31T12:56:17.621Z" title="更新于 2026-08-31 20:56:17">2026-08-31</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><div class="note flat"><p>本文内容参考了 George Casella 所著的统计推断（第二版）及高惠璇应用多元统计分析有关多维随机变量的内容.</p>
+</div>
+<p>本文对多元正态分布的一些基础的结论做了一些总结. 多元正态分布是用相互独立且同 $ N(0,1) $ 分布的随机变量通过线性变换来定义的：设 $ \boldsymbol{U}=(U_1,U_2,\cdots,U_n)'$ 为随机向量，各分量间相互独立且同 $ N(0,1) $ 分布；设 $ \boldsymbol{\mu} $ 为 $ n $ 维常数向量， $ \boldsymbol{A}$ 为 $ n\times p $ 常数矩阵，则称 $ \boldsymbol{X}=\boldsymbol{AU}+\boldsymbol{\mu} $ 的分布为 $ n $ 元正态分布，或称 $ \boldsymbol{X} $ 为 $ n $ 元正态随机向量，记为 $ \boldsymbol{X}\sim N(\boldsymbol{\mu},\boldsymbol{AA}') $.</p>
+<h2 id="二元正态分布"><a class="markdownIt-Anchor" href="#二元正态分布"></a> 二元正态分布</h2>
+<p>一般来说较为熟知的多元正态分布是二元正态分布，其密度函数形式是</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align at position 7: \begin{̲a̲l̲i̲g̲n̲}̲
+    &amp;f(x,y)=(2…'>\begin{align}
+    &amp;f(x,y)=(2\pi\sigma_X\sigma_Y\sqrt{1-\rho^2})^{-1}\times\\&amp;\exp\left\{-\frac{1}{2(1-\rho^2)}\left[\left(\frac{x-\mu_X}{\sigma_X}\right)^2-2\rho\left(\frac{x-\mu_X}{\sigma_X}\right)\left(\frac{y-\mu_Y}{\sigma_Y}\right)+\left(\frac{y-\mu_Y}{\sigma_Y}\right)^2\right]\right\}
+\end{align}
+</p>
+<p>其中 $\mu_X,\mu_Y\in\mathbb{R},\sigma_X,\sigma_Y\in\mathbb{R}^+, -1&lt;\rho&lt;1 $. 这实际上是 $ n $ 元正态分布的特例. 而 $ n $ 元正态分布 $ N(\boldsymbol{\mu},\boldsymbol{\Sigma}) $ 可以表示为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+   f(\boldsymb…'>\begin{equation*}
+   f(\boldsymbol{x})=\frac{1}{(2\pi)^{n/2}|\boldsymbol{\Sigma}|^{1/2}}\exp\left[-\frac{1}{2}(\boldsymbol{x}-\boldsymbol{\mu})&#039;\boldsymbol{\Sigma}^{-1}(\boldsymbol{x}-\boldsymbol{\mu})\right],
+\end{equation*}
+</p>
+<p>其中 $ \boldsymbol{\Sigma} $ 是 $ n $ 个一维随机变量间的协方差阵，$ \boldsymbol{\mu} $ 是随机向量 $ \boldsymbol{X} $ 的期望. 后续我们会来推导.</p>
+<p>我们先从两个独立的随机变量开始构造二元正态分布. 设 $ Z_1,Z_2 $ 是独立的 $ {N}(0,1) $ 随机变量，定义新的随机变量 $ X,Y $ 为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    X=a_XZ_1+b…'>\begin{equation*}
+    X=a_XZ_1+b_XZ_2+c_X~~\text{且}~~Y=a_YZ_1+b_YZ_2+c_Y,
+\end{equation*}
+</p>
+<p>其中 $ a_X,b_X,c_X,a_Y,b_Y,c_Y $ 均为常数.</p>
+<p>由 $ Z_1,Z_2 $ 的独立性以及它们均服从标准正态分布很容易得到</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align at position 7: \begin{̲a̲l̲i̲g̲n̲}̲
+    \mathbb{E}…'>\begin{align}
+    \mathbb{E}X=c_X,~\text{Var}X=a_X^2+b_X^2,\\
+    \mathbb{E}Y=c_Y,~\text{Var}Y=a_Y^2+b_Y^2,\\
+    \text{Cov}(X,Y)=a_Xa_Y+b_Xb_Y.
+\end{align}
+</p>
+<p>现在令</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    a_X=\sqrt{…'>\begin{align*}
+    a_X=\sqrt{\frac{1+\rho}{2}}\sigma_X,~~b_X=\sqrt{\frac{1-\rho}{2}}\sigma_X,~~c_X=\mu_X,\\
+    a_Y=\sqrt{\frac{1+\rho}{2}}\sigma_Y,~~b_Y=-\sqrt{\frac{1-\rho}{2}}\sigma_Y,~~c_Y=\mu_Y,
+\end{align*}
+</p>
+<p>其中 $ \mu_X,\mu_Y,\sigma_X^2,\sigma_Y^2 $ 和 $ \rho $ 均为常数且 $ -1\le\rho\le1 $，经过简单的计算就得到</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align at position 7: \begin{̲a̲l̲i̲g̲n̲}̲
+    \mathbb{E}…'>\begin{align}
+    \mathbb{E}X=\mu_X,&amp;~\text{Var}X=\sigma_X^2,\\
+    \mathbb{E}Y=\mu_Y,&amp;~\text{Var}Y=\sigma_Y^2,\\
+    \rho_{XY}&amp;=\rho.
+\end{align}
+</p>
+<p>接下来说明 $ (X,Y) $ 服从参数为 $ (\mu_X,\mu_Y,\sigma_X^2,\sigma_Y^2,\rho) $ 的二元正态分布. 实际上通过一开始的变换，利用 Cramer 法则我们可以反解出 $ Z_1,Z_2 $ 关于 $ X,Y $ 的表达式</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    Z_1&amp;=\frac…'>\begin{align*}
+    Z_1&amp;=\frac{\begin{vmatrix}
+        X-c_X &amp; b_X\\
+        Y-c_Y &amp; b_Y
+    \end{vmatrix}}{\begin{vmatrix}
+        a_X &amp; b_X\\
+        a_Y &amp; b_Y
+    \end{vmatrix}}=\frac{b_Y(X-c_X)-b_X(Y-c_Y)}{-\sqrt{1-\rho^2}\sigma_X\sigma_Y},\\
+    Z_2&amp;=\frac{\begin{vmatrix}
+        a_X &amp; X-c_X\\
+        a_Y &amp; Y-c_Y
+    \end{vmatrix}}{\begin{vmatrix}
+        a_X &amp; b_X\\
+        a_Y &amp; b_Y
+    \end{vmatrix}}=\frac{a_X(Y-C_Y)-a_Y(X-c_X)}{-\sqrt{1-\rho^2}\sigma_X\sigma_Y}.
+\end{align*}
+</p>
+<p>注意这里不要把括号打开，后面分解时用处很大. 由 $ Z_1,Z_2 $ 的独立性，我们可以导出新的随机变量的密度函数为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    f_{X,Y}(x,…'>\begin{align*}
+    f_{X,Y}(x,y)&amp;=f_{Z_1,Z_2}\left(Z_1(x,y),Z_2(x,y)\right)|J(Z_1,Z_2)|\\
+    &amp;=\frac{1}{2\pi\sigma_X\sigma_Y\sqrt{1-\rho^2}}\exp\left[-\frac{1}{2}\left(Z_1^2(x,y)+Z_2^2(x,y)\right)\right].
+\end{align*}
+</p>
+<p>重点是指数部分该如何拆解. 为了实现这一点，首先分母的常数项不去动，上面的项使用完全平方公式打开后会得到平方项和交叉项，这里注意平方项合并之后，和定义式中对应的平方项是完全相同的，这点可由两随机变量对应系数确定的方差等式导出. 而对于交叉项，我们有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    a_Xa_Y+b_X…'>\begin{equation*}
+    a_Xa_Y+b_Xb_Y=\left(\frac{1+\rho}{2}-\frac{1-\rho}{2}\right)\sigma_X\sigma_Y=\rho\sigma_X\sigma_Y,
+\end{equation*}
+</p>
+<p>再与定义式比较即知两者一致. 当 $ \rho=\pm1 $ 时，上面的式子没有意义，此时 $ X,Y $ 是 $ Z_1 $ 或 $ Z_2 $ 的线性函数，两者是完全线性相关的，这种情况不考虑.</p>
+<p>二元正态分布有些良好的性质：</p>
+<ul>
+<li>$ X $ 的边缘分布是 $ N(\mu_X,\sigma_X^2) $， $ Y $ 的边缘分布是 $ N(\mu_Y,\sigma_Y^2) $；</li>
+<li>$ X $ 和 $ Y $ 的相关系数为 $ \rho_{XY}=\rho $，从而正态随机变量的独立性和不相关性等价；</li>
+<li>对任意常量 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>a</mi><mo separator="true">,</mo><mi>b</mi><mo separator="true">,</mo><mi>a</mi><mi>X</mi><mo>+</mo><mi>b</mi><mi>Y</mi></mrow><annotation encoding="application/x-tex">a,b,aX+bY</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">b</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.16666666666666666em;"></span><span class="mord mathdefault">a</span><span class="mord mathdefault" style="margin-right:0.07847em;">X</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222222222222222em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault">b</span><span class="mord mathdefault" style="margin-right:0.22222em;">Y</span></span></span></span> 的分布为 $ N(a\mu_Y+b\mu_Y,a^2\sigma_X^2+b^2\sigma^2_Y+2ab\rho\sigma_X\sigma_Y) $.</li>
+<li>$ Y $ 在条件 $ X=x $ 下的条件分布为 $ N(\mu_Y+\rho(\sigma_Y/\sigma_X)(x-\mu_X),\sigma_Y^2(1-\rho^2)) $，对 $ X $ 同理.</li>
+</ul>
+<p>现在我们来逐一证明. 第一条性质对 $ X $ 证明即可， $ Y $ 类似. 对密度函数中的指数部分关于 $ y $ 配方，有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    &amp;\left(\fr…'>\begin{align*}
+    &amp;\left(\frac{x-\mu_X}{\sigma_X}\right)^2-2\rho\left(\frac{x-\mu_X}{\sigma_X}\right)\left(\frac{y-\mu_Y}{\sigma_Y}\right)+\left(\frac{y-\mu_Y}{\sigma_Y}\right)^2\\
+    &amp;=\left(\frac{y-\mu_Y}{\sigma_Y}-\rho\cdot\frac{x-\mu_X}{\sigma_X}\right)^2+(1-\rho^2)\left(\frac{x-\mu_X}{\sigma_X}\right)^2.
+\end{align*}
+</p>
+<p>令 $ s=(y-\mu_Y)/\sigma_Y,t=(x-\mu_X)/\sigma_X $ （注意这里后者是常量），则 $  \mathrm{d}y=\sigma_Y\mathrm{d}t $. 边缘分布即</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    f_X(x)&amp;=\i…'>\begin{align*}
+    f_X(x)&amp;=\int_{-\infty}^{\infty}\frac{1}{2\pi\sigma_X\sqrt{1-\rho^2}}\exp\left[-\frac{1}{2}\left(\frac{s-\rho t}{\sqrt{1-\rho^2}}\right)^2-\frac{1}{2}t^2\right]\mathrm{d}s\\
+    &amp;=\int_{-\infty}^{\infty}\frac{1}{2\pi\sigma_X}\mathrm{e}^{-\frac{1}{2}t^2}\mathrm{e}^{-\frac{1}{2}v^2}\mathrm{d}v\quad\left(v=\frac{s-\rho t}{\sqrt{1-\rho^2}}\right)\\&amp;=\frac{1}{\sqrt{2\pi}\sigma_X}\mathrm{e}^{-(x-\mu_X)^2/2\sigma_X^2}.
+\end{align*}
+</p>
+<p>即参数为 $ (\mu_X,\sigma_X^2) $ 的正态分布. 第二条证明略，书上已给出证明，不相关性和独立性的等价只要注意到当 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>ρ</mi><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\rho=0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">ρ</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">0</span></span></span></span> 时可以把密度函数拆成仅含 $ x $ 和仅含 $ y $ 的两项，且是两个正态分布密度函数的形式. 第三条，当 $ b=0 $ 或 $ a=0 $ 时显然，现设 $ b\ne0 $，我们可以利用一对一变换 $ U=aX+bY,V=X $ 说明 $ U $ 仍然服从正态分布，而两个参数即</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \mu=a\math…'>\begin{equation*}
+    \mu=a\mathbb{E}X+b\mathbb{E}Y,~~\sigma^2=a^2\text{Var}X+b^2\text{Var}Y+2ab\text{Cov}(X,Y).
+\end{equation*}
+</p>
+<p>最后的条件分布，注意如下关系即可：</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \frac{f_{X…'>\begin{align*}
+    \frac{f_{X,Y}(x,y)}{f_X(x)}&amp;=\frac{1}{\sqrt{2\pi}\cdot\sigma_Y\sqrt{1-\rho^2}}\exp\left[-\frac{1}{2(1-\rho^2)}\left(t^2-2\rho st+s^2-(1-\rho^2)t^2\right)\right]\\
+    &amp;=\frac{1}{\sqrt{2\pi}\sigma_Y\sqrt{1-\rho^2}}\exp\left[-\frac{(s-\rho t)^2}{2(1-\rho^2)}\right]\\
+    &amp;=\frac{1}{\sqrt{2\pi}\sigma_Y\sqrt{1-\rho^2}}\exp\left\{-\frac{[y-(\mu_Y+\rho(\sigma_Y/\sigma_X)(x-\mu_X))]^2}{2(1-\rho^2)\sigma_Y^2}\right\}.
+\end{align*}
+</p>
+<p>这里要注意第二点并不是显然的，因为前面在推导二元正态分布时，<strong>人为规定了一种变换系数</strong>，因此并不普适. 此外，<strong>边缘正态性不蕴含二元正态性</strong>. 设 $ X,Y $ 是独立的 $ N(0,1) $ 随机变量，定义</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    Z=\begin{c…'>\begin{equation*}
+    Z=\begin{cases}
+        X, &amp;\text{若 }XY&gt;0,\\
+        -X, &amp;\text{若 }XY&lt;0,
+    \end{cases}
+\end{equation*}
+</p>
+<p>由对称性可知 $ XY&gt;0 $ 的概率和 $ XY&lt;0 $ 的概率相同，均为 $ 1/2 $. 由于 $ -X $ 和 $ X $ 有相同的分布，我们有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \mathbb{P}…'>\begin{align*}
+    \mathbb{P}(Z\le z)=\frac{1}{2}\mathbb{P}(X\le z)+\frac{1}{2}\mathbb{P}(-X\le z)=\mathbb{P}(X\le z),
+\end{align*}
+</p>
+<p>即 $ Z\sim N(0,1) $. 然而， $ (Z,Y) $ 的分布不是二元正态分布. 这是因为 $ YZ=XY\cdot(-1)^{\mathbb{I}(XY&lt;0)} $，这点只要将 $ Z $ 改写一下就显而易见.</p>
+<p>来看一道综合运用条件期望，二元正态分布以及矩的计算技巧的题目：</p>
+<div class="note info no-icon flat"><p>设 $ (X,Y) $ 具有二元正态概率密度函数</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    f(x,y)=\fr…'>\begin{equation*}
+    f(x,y)=\frac{1}{2\pi(1-\rho^2)^{1/2}}\exp\left(\frac{-1}{2(1-\rho^2)}(x^2-2\rho xy+y^2)\right)
+\end{equation*}
+</p>
+<p>证明：$ \text{Corr}(X,Y)=\rho~\text{且}~\text{Corr}(X^2,Y^2)=\rho^2 $.</p>
+</div>
+<p><strong>证</strong>  第一个结果虽然已经在前面得到了，但是这里尝试用一种不同的方法获得结果. 直接计算二重积分会使得计算量非常大且相当困难，这里的关键在于使用了条件期望. 首先观察参数可知 $ X,Y\sim N(0,1) $ 且 $ X|Y=y\sim N(\rho y,1-\rho^2) $. 于是</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \mathbb{E}…'>\begin{align*}
+    \mathbb{E}X=\mathbb{E}Y=0,&amp;~\text{Var}X=\text{Var}Y=1\\
+    \mathbb{E}X^2=\mathbb{E}Y^2=1,&amp;~\text{Var}X^2=\text{Var}Y^2=\mathbb{E}X^4-1.
+\end{align*}
+</p>
+<p>对于 $ \mathbb{E}X^4 $，使用 Stein 引理可得 $ \mathbb{E}X^4=\mathbb{E}(X^3(X-0))=3\mathbb{E}X^2=3 $，从而 $ \text{Var}X^2=2 $. 接下来计算 $ \mathbb{E}(XY),\mathbb{E}(X^2Y^2) $. 先对 $ Y $ 取条件，然后使用前面得到的条件分布，即 $ X|Y=y\sim N(\mu_X+\rho(\sigma_X/\sigma_Y)(y-\mu_Y),\sigma_X^2(1-\rho^2)) $，我们有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \mathbb{E}…'>\begin{align*}
+    \mathbb{E}(XY)&amp;=\mathbb{E}[\mathbb{E}(XY|Y)]=\mathbb{E}[Y\mathbb{E}(X|Y)]\\&amp;=\rho\mathbb{E}Y^2=\rho,\\
+    \mathbb{E}(X^2Y^2)&amp;=\mathbb{E}[\mathbb{E}(X^2Y^2|Y)]=\mathbb{E}[Y^2\mathbb{E}(X^2|Y)]\\&amp;=\mathbb{E}[Y^2(\rho^2Y^2+(1-\rho^2))]=2\rho^2+1.
+\end{align*}
+</p>
+<p>从而</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \text{Corr…'>\begin{align*}
+    \text{Corr}(X,Y)&amp;=\frac{\text{Cov}(X,Y)}{\sqrt{\text{Var}X\text{Var}Y}}=\mathbb{E}(XY)=\rho,\\
+    \text{Corr}(X^2,Y^2)&amp;=\frac{\text{Cov}(X^2,Y^2)}{\sqrt{\text{Var}X^2\text{Var}Y^2}}=\frac{\mathbb{E}(X^2Y^2)-1}{2}=\rho^2.
+\end{align*}
+</p>
+<h2 id="n-元正态分布"><a class="markdownIt-Anchor" href="#n-元正态分布"></a> $ n $ 元正态分布</h2>
+<p>二元正态分布的结果还可推广至一般的多元正态分布，这需要用到一些矩阵代数的知识. 首先我们仍然可以通过对一组独立随机变量的线性变换得到期望的 $ n $ 元正态分布的形式： $ N(\boldsymbol{\mu},\boldsymbol{\Sigma}) $. 为了实现这一点，注意我们这里假设 $ \boldsymbol{\Sigma} $ 是一个正定矩阵（相较于半正定更强），因而存在非异阵 $ \boldsymbol{A} $ 使得 $ \boldsymbol{AA}'=\boldsymbol{\Sigma} $. 设 $ \boldsymbol{U}=(U_1,U_2,\cdots,U_n) $ 为一分量相互独立的随机向量，且分量均服从标准正态分布. 作线性变换 $ \boldsymbol{X}=\boldsymbol{AU}+\boldsymbol{\mu} $ 就得到</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+f_{\boldsymbol…'>\begin{align*}
+f_{\boldsymbol{X}}(\boldsymbol{x})&amp;=f_{\boldsymbol{U}}(\boldsymbol{u})|J(\boldsymbol{u}\to\boldsymbol{x})|=\frac{1}{(2\pi)^{n/2}}\exp\left[-\frac{1}{2}\boldsymbol{u}&#039;\boldsymbol{u}\right]|\boldsymbol{\Sigma}|^{-1/2}\\
+&amp;=\frac{1}{(2\pi)^{n/2}}\exp\left\{-\frac{1}{2}[\boldsymbol{A}^{-1}(\boldsymbol{x}-\boldsymbol{\mu})]&#039;[\boldsymbol{A}^{-1}(\boldsymbol{x}-\boldsymbol{\mu})]\right\}|\boldsymbol{\Sigma}|^{-1/2}\\
+&amp;=\frac{1}{(2\pi)^{n/2}|\boldsymbol{\Sigma}|^{1/2}}\exp\left[-\frac{1}{2}(\boldsymbol{x}-\boldsymbol{\mu})&#039;\boldsymbol{\Sigma}^{-1}(\boldsymbol{x}-\boldsymbol{\mu})\right].
+\end{align*}
+</p>
+<p>注意这里</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    |J(\boldsy…'>\begin{equation*}
+    |J(\boldsymbol{u}\to\boldsymbol{x})|=\frac{1}{|J(\boldsymbol{x}\to\boldsymbol{u})|}=\frac{1}{|\boldsymbol{A}&#039;|}=|\boldsymbol{AA}&#039;|^{-1/2}=\boldsymbol{\Sigma}^{-1/2}.
+\end{equation*}
+</p>
+<p>现在仍然假定 $ \boldsymbol{X}\sim N(\boldsymbol{\mu},\boldsymbol{\Sigma}) $. 对随机向量、均值向量和协方差阵作分块，保持分块对角矩阵的维数和随机向量分块维数对应：</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{X}=(\boldsymbol{X}^{(1)}~\boldsymbol{X}^{(2)}),\quad\boldsymbol{\mu}=(\boldsymbol{\mu}^{(1)},\boldsymbol{\mu}^{(2)}),\quad
+    \boldsymbol{\Sigma}=\begin{pmatrix}
+        \boldsymbol{\Sigma}_{11} &amp; \boldsymbol{\Sigma}_{12} \\
+        \boldsymbol{\Sigma}_{21} &amp; \boldsymbol{\Sigma}_{22}
+    \end{pmatrix},
+\end{equation*}
+</p>
+<p>则我们有类似于二元正态分布的结论：</p>
+<ol>
+<li>设 $ \boldsymbol{A} $ 是 $ s\times n $ 常数矩阵， $ \boldsymbol{b} $ 是 $ s $ 维常向量，则 $ \boldsymbol{Z}=\boldsymbol{AX}+\boldsymbol{b}\sim N(\boldsymbol{A\mu}+\boldsymbol{b},\boldsymbol{A\Sigma A}') $ （注意这里的维数从 $ n $ 维变成了 $ s $ 维）；</li>
+<li>$ \boldsymbol{X}^{(1)}\sim N(\boldsymbol{\mu}^{(1)},\boldsymbol{\Sigma}_{11}),\boldsymbol{X}^{(2)}\sim N(\boldsymbol{\mu}^{(2)},\boldsymbol{\Sigma}_{22}) $ ；</li>
+<li>多元正态随机向量的独立性和不相关性等价，即 $ \boldsymbol{X}^{(1)} $ 与 $ \boldsymbol{X}^{(2)} $ 相互独立 $ \Longleftrightarrow\boldsymbol{\Sigma}_{12}=\boldsymbol{O} $ ；</li>
+<li>$ \boldsymbol{X}^{(1)}|\boldsymbol{X}^{(2)}\sim N(\boldsymbol{\mu}_{1\cdot 2},\boldsymbol{\Sigma}_{11\cdot 2}), \boldsymbol{X}^{(2)}|\boldsymbol{X}^{(1)}\sim N(\boldsymbol{\mu}_{2\cdot 1},\boldsymbol{\Sigma}_{22\cdot 1}) $，其中</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \boldsymbo…'>\begin{align*}
+    \boldsymbol{\mu}_{1\cdot2}&amp;=\boldsymbol{\mu}^{(1)}+\boldsymbol{\Sigma}_{12}\boldsymbol{\Sigma}_{22}^{-1}(\boldsymbol{x}^{(2)}-\boldsymbol{\mu}^{(2)}),\\
+    \boldsymbol{\mu}_{2\cdot1}&amp;=\boldsymbol{\mu}^{(2)}+\boldsymbol{\Sigma}_{21}\boldsymbol{\Sigma}_{11}^{-1}(\boldsymbol{x}^{(1)}-\boldsymbol{\mu}^{(1)}),\\
+    \boldsymbol{\Sigma}_{11\cdot 2}&amp;=\boldsymbol{\Sigma}_{11}-\boldsymbol{\Sigma}_{12}\boldsymbol{\Sigma}_{22}^{-1}\boldsymbol{\Sigma}_{21},\\
+    \boldsymbol{\Sigma}_{22\cdot 1}&amp;=\boldsymbol{\Sigma}_{22}-\boldsymbol{\Sigma}_{21}\boldsymbol{\Sigma}_{11}^{-1}\boldsymbol{\Sigma}_{12}.
+\end{align*}
+</p>
+<p>我们来逐一证明上述结论：</p>
+<ol>
+<li>我们先把 $ \boldsymbol{X} $ 还原到若干独立随机变量的线性变换的形式，由于 $ \boldsymbol{\Sigma}\succeq 0 $，因此可写作 $ \boldsymbol{\Sigma}=\boldsymbol{LL'} $ 的形式，从而由定义知 $ \boldsymbol{X}=\boldsymbol{LU}+\boldsymbol{\mu} $，而 $ \boldsymbol{Z}=\boldsymbol{AX}+\boldsymbol{b}=\boldsymbol{ALU}+(\boldsymbol{A\mu}+\boldsymbol{b}) $，由定义马上可知 $ \boldsymbol{Z}\sim N(\boldsymbol{A\mu}+\boldsymbol{b},(\boldsymbol{AL})(\boldsymbol{AL})') $，而 $ \boldsymbol{LL}'=\boldsymbol{\Sigma} $ , 从而得证.</li>
+<li>假设 $ \boldsymbol{X}^{(1)} $ 有 $ r $ 维，在第一条中取 $ \boldsymbol{A}=(\boldsymbol{I}_r~\boldsymbol{O}), \boldsymbol{d}=\boldsymbol{0} $ 即得，这里 $ \boldsymbol{d} $ 是 $ r $ 维的；类似地取 $ \boldsymbol{A}=(\boldsymbol{O}~\boldsymbol{I}_{n-r}),\boldsymbol{d}=\boldsymbol{0} $ 就得到第二个式子.</li>
+<li>独立性推得不相关性是显然的. 现在设 $ \boldsymbol{\Sigma}_{12}=\boldsymbol{O} $，利用分块矩阵乘法很容易得到联合密度函数的分解式，这里不再写出.</li>
+<li>我们仍然假定 $ \boldsymbol{X}^{(1)} $ 是 $ r $ 维的，作非奇异线性变换</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{Z}=\begin{pmatrix}
+        \boldsymbol{Z}^{(1)}\\ \boldsymbol{Z}^{(2)}
+    \end{pmatrix}=\begin{pmatrix}
+        \boldsymbol{X}^{(1)}-\boldsymbol{\Sigma}_{12}\boldsymbol{\Sigma}_{22}^{-1}\boldsymbol{X}^{(2)}\\
+        \boldsymbol{X}^{(2)}
+    \end{pmatrix}=\begin{pmatrix}
+        \boldsymbol{I}_r &amp; -\boldsymbol{\Sigma}_{12}\boldsymbol{\Sigma}_{22}^{-1}\\
+        \boldsymbol{O} &amp; \boldsymbol{I}_{n-r}
+    \end{pmatrix}\begin{pmatrix}
+        \boldsymbol{X}^{(1)}\\
+        \boldsymbol{X}^{(2)}
+    \end{pmatrix}=\boldsymbol{BX},
+\end{equation*}
+</p>
+<p>由第一条马上得到</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{Z}\sim N\left(\boldsymbol{B\mu},\boldsymbol{B\Sigma\boldsymbol{B}&#039;}\right)=N\left(\begin{pmatrix}
+        \boldsymbol{\mu}^{(1)}-\boldsymbol{\Sigma}_{12}\boldsymbol{\Sigma}_{22}^{-1}\boldsymbol{\mu}^{(2)}\\ \boldsymbol{\mu}^{(2)}
+    \end{pmatrix},\begin{pmatrix}
+        \boldsymbol{\Sigma}_{11\cdot2} &amp; \boldsymbol{O}\\
+        \boldsymbol{O} &amp; \boldsymbol{\Sigma}_{22}
+    \end{pmatrix}\right),
+\end{equation*}
+</p>
+<p>后面的等式是由矩阵分块乘法得到的，这点不难验证. 并且由新的协方差阵的形式可知 $ \boldsymbol{Z}^{(1)} $ 和 $ \boldsymbol{Z}^{(2)} $ 是独立的，从而 $ \boldsymbol{Z} $ 的联合密度函数为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    g(\boldsym…'>\begin{equation*}
+    g(\boldsymbol{z}^{(1)},\boldsymbol{z}^{(2)})=g_1(\boldsymbol{z}^{(1)})\cdot g_2(\boldsymbol{z}^{(2)})=g_1(\boldsymbol{z}^{(1)})\cdot f_2(\boldsymbol{z}^{(2)}).
+\end{equation*}
+</p>
+<p>这里 $ g_1,g_2 $ 分别是 $ \boldsymbol{z}^{(1)},\boldsymbol{z}^{(2)} $ 的密度函数，其形式从上面 $ \boldsymbol{Z} $ 的分布中观察就可以确定. 利用变换公式可知</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    f(\boldsym…'>\begin{align*}
+    f(\boldsymbol{x}^{(1)},\boldsymbol{x}^{(2)})&amp;=g(\boldsymbol{Bx})\cdot J(\boldsymbol{z}\to\boldsymbol{x})\\
+    &amp;=g_1(\boldsymbol{x}^{(1)}-\boldsymbol{\Sigma}_{12}\boldsymbol{\Sigma}_{22}^{-1}\boldsymbol{x}^{(2)})\cdot g(\boldsymbol{x}^{(2)})\cdot\left|\frac{\partial\boldsymbol{Z}}{\partial\boldsymbol{X}}\right|\\
+    &amp;=g_1(\boldsymbol{x}^{(1)}-\boldsymbol{\Sigma}_{12}\boldsymbol{\Sigma}_{22}^{-1}\boldsymbol{x}^{(2)})\cdot f_2(\boldsymbol{x}^{(2)}).
+\end{align*}
+</p>
+<p>从而</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    f_1(\bolds…'>\begin{align*}
+    f_1(\boldsymbol{x}^{(1)}|\boldsymbol{x}^{(2)})&amp;=\frac{f(\boldsymbol{x}^{(1)},\boldsymbol{x}^{(2)})}{f_2(\boldsymbol{x}^{(2)})}=g_1(\boldsymbol{x}^{(1)}-\boldsymbol{\Sigma}_{12}\boldsymbol{\Sigma}_{22}^{-1}\boldsymbol{x}^{(2)}).
+\end{align*}
+</p>
+<p>注意由于 $ \boldsymbol{x}^{(2)} $ 是给定的，所以上面的条件密度实际上是关于 $ g_1 $ 的位置族里 $ \boldsymbol{\mu}'=\boldsymbol{\Sigma}_{12}\boldsymbol{\Sigma}_{22}^{-1}\boldsymbol{x}^{(2)} $ 的情形，再根据 $ \boldsymbol{Z}^{(1)}\sim N(\boldsymbol{\mu}^{(1)}-\boldsymbol{\Sigma}_{12}\boldsymbol{\Sigma}_{22}^{-1}\boldsymbol{\mu}^{(2)},\boldsymbol{\Sigma}_{11\cdot 2}) $，很容易得到 $ \boldsymbol{X}^{(1)}|\boldsymbol{X}^{(2)}\sim N(\boldsymbol{\mu}_{1\cdot 2},\boldsymbol{\Sigma}_{11\cdot 2}) $，另一情况是完全类似的.</p>
+<p>多元正态分布还有一些其他性质，其中一条是 $ \boldsymbol{X} $ 服从 $ n $ 元正态分布等价于对任意 $ n $ 维实向量 $ \boldsymbol{a} $， $ \xi=\boldsymbol{a}'\boldsymbol{X} $ 是一维正态随机变量. 必要性由上面的第一条就可以得到，充分性需要用到多元正态分布的特征函数</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \Phi_{\bol…'>\begin{equation*}
+    \Phi_{\boldsymbol{X}}(\boldsymbol{t})=\exp\left[\mathrm{i}\boldsymbol{t}&#039;\boldsymbol{\mu}-\frac{1}{2}\boldsymbol{t}&#039;\boldsymbol{AA}&#039;\boldsymbol{t}\right],
+\end{equation*}
+</p>
+<p>其推导仍然是从独立的正态随机变量出发的，较为直观，这里不再详述.下面关于矩阵的 Cholesky 分解在上面的证明中被反复用到，这里用归纳法给出证明.</p>
+<div class="note primary no-icon flat"><p>（矩阵的 Cholesky 分解）设 $ \boldsymbol{A} $ 是一个 $ n $ 阶实对称正定矩阵，则存在唯一一个对角元均为正数的下三角实矩阵 $ \boldsymbol{L} $ 使得 $ \boldsymbol{A}=\boldsymbol{LL}' $. 若 $ \boldsymbol{A} $ 半正定，仍有上述分解但分解不唯一.</p>
+</div>
+<p><strong>证明</strong> 我们使用归纳法. 当 $ n=1 $ 时，直接取 $ \boldsymbol{L}=(\sqrt{a_{11}}) $ 即可，且由平方根性质保证了唯一性. 现假设对 $ n-1 $ 阶矩阵结论成立，对 $ n $ 阶矩阵做分块，并写成我们期望的下三角矩阵乘上其转置形式：</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{A}=\begin{pmatrix}
+        a_{11} &amp; \boldsymbol{b}&#039;\\
+        \boldsymbol{b} &amp; \boldsymbol{B}
+    \end{pmatrix}=
+    \begin{pmatrix}
+        \sqrt{a_{11}} &amp; \boldsymbol{0}&#039;\\
+        \boldsymbol{l} &amp; \boldsymbol{L}_{n-1}
+    \end{pmatrix}\begin{pmatrix}
+        \sqrt{a_{11}} &amp; \boldsymbol{l}&#039;\\
+        \boldsymbol{0} &amp; \boldsymbol{L}_{n-1}&#039;
+    \end{pmatrix}
+\end{equation*}
+</p>
+<p>可以验证确实能够这样分解. 由于 $ \boldsymbol{A} $ 正定，因而 $ a_{11}&gt;0 $，直接开根即可，对 $ \boldsymbol{b} $ 有 $ \boldsymbol{b}=\sqrt{a_{11}}\boldsymbol{l} $，从而 $ \boldsymbol{l}=\boldsymbol{b}/\sqrt{a_{11}} $. 另外可以解得 $ \boldsymbol{B}=\boldsymbol{bb}'/a_{11}+\boldsymbol{L}_{n-1}\boldsymbol{L}_{n-1}' $. 现在的问题是分块的 $ \boldsymbol{L}_{n-1}\boldsymbol{L}_{n-1}' $ 是否正定，如果是那么分解的确唯一. 事实上令 $ \boldsymbol{x}= (-\boldsymbol{b}'\boldsymbol{v}/a_{11}~~\boldsymbol{v}')' $ （这可以用待定系数法来确定，把 $ \boldsymbol{x} $ 作分块即可），其中 $ \boldsymbol{v} $ 是任意非零 $ n-1$ 维向量，经过简单的运算可得到</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{x}&#039;\boldsymbol{Ax}=\boldsymbol{v}&#039;\left(\boldsymbol{B}-\frac{\boldsymbol{bb}&#039;}{a_{11}}\right)\boldsymbol{v}&gt;0.
+\end{equation*}
+</p>
+<p>从而 $ \boldsymbol{L}_{n-1}\boldsymbol{L}_{n-1}' $ 是正定的，于是唯一分解就被确定了. 这就完成了数学归纳法. 当 $ \boldsymbol{A} $ 半正定时，若某一对角元为 $ 0 $，那么所在行和列全为零，通过正交分解可以把 $ \boldsymbol{A} $ 变成如下形式:</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \boldsymbo…'>\begin{align*}
+    \boldsymbol{P}&#039;\boldsymbol{A}\boldsymbol{P}=\begin{pmatrix}
+        \boldsymbol{\Lambda} &amp; \boldsymbol{O} \\
+        \boldsymbol{O} &amp; \boldsymbol{O}
+    \end{pmatrix},
+\end{align*}
+</p>
+<p>其中 $ \boldsymbol{\Lambda} $ 是一个对角矩阵，包含了 $ \boldsymbol{A} $ 的所有正特征值，进一步可以做 Cholesky 分解.</p>
+<h2 id="多元正态总体样本的数字特征与极大似然估计"><a class="markdownIt-Anchor" href="#多元正态总体样本的数字特征与极大似然估计"></a> 多元正态总体样本的数字特征与极大似然估计</h2>
+<p>为了做关于多元正态总体的统计推断，我们需要样本的数字特征. 主要为均值、样本离差阵、协方差阵及样本相关阵. 现在我们考虑 $ p $ 元正态总体 $ \boldsymbol{X}\sim N_p(\boldsymbol{\mu},\boldsymbol{\Sigma}),\boldsymbol{X}_{(i)}=(x_{i1},\cdots,x_{ip})'(i=1,\cdots,n) $.</p>
+<ol>
+<li>定义<strong>样本均值向量 $ \overline{X} $</strong> 为</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \overline{…'>\begin{equation*}
+    \overline{X}=\frac{1}{n}\sum_{i=1}^n\boldsymbol{X}_{(i)}=(\overline{x}_1,\cdots,\overline{x}_p)&#039;=\frac{1}{n}\boldsymbol{X}&#039;\boldsymbol{1}_n,
+\end{equation*}
+</p>
+<p>其中</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \overline{…'>\begin{equation*}
+    \overline{x}_i=\frac{1}{n}\sum_{\alpha=1}^{n}x_{\alpha i}~~(i=1,2,\cdots,p).
+\end{equation*}
+</p>
+<ol start="2">
+<li>样本离差阵</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{A}=\sum_{\alpha=1}^n(\boldsymbol{X}_{\alpha}-\overline{X})(\boldsymbol{X}_{\alpha}-\overline{X})&#039;=\boldsymbol{X}&#039;\left[\boldsymbol{I}_n-\frac{1}{n}\boldsymbol{1}_n\boldsymbol{1}_n&#039;\right]\boldsymbol{X}:=(a_{ij})_{p\times p},
+\end{equation*}
+</p>
+<p>其中</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    a_{ij}=\su…'>\begin{equation*}
+    a_{ij}=\sum_{\alpha=1}^n(x_{\alpha i}-\overline{x}_i)(x_{\alpha j}-\overline{x}_j)~~(i,j=1,2,\cdots,p).
+\end{equation*}
+</p>
+<p>相应地定义样本协方差阵</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{S}=\frac{1}{n-1}\boldsymbol{A}:=(s_{ij})_{p\times p},
+\end{equation*}
+</p>
+<p>样本相关阵</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{R}=\left(\frac{s_{ij}}{\sqrt{s_{ii}}\sqrt{s_{jj}}}\right)_{p\times p}~~(i,j=1,2,\cdots,p).
+\end{equation*}
+</p>
+<p>现在我们经过一些计算可以得到样本的似然函数为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    L(\boldsym…'>\begin{align*}
+    L(\boldsymbol{\mu},\boldsymbol{\Sigma})&amp;=\prod_{i=1}^n\frac{1}{(2\pi)^{p/2}|\boldsymbol{\Sigma}|^{1/2}}\exp\left[-\frac{1}{2}(\boldsymbol{x}_{(i)}-\boldsymbol{\mu})&#039;\boldsymbol{\Sigma}^{-1}(\boldsymbol{x}_{(i)}-\boldsymbol{\mu})\right]\\
+    &amp;=\frac{1}{(2\pi)^{np/2}|\boldsymbol{\Sigma}|^{n/2}}\exp\left\lbrace-\frac{1}{2}\mathrm{tr}\left(\boldsymbol{\Sigma}^{-1}[\boldsymbol{A}+n(\overline{X}-\boldsymbol{\mu})(\overline{X}-\boldsymbol{\mu})&#039;]\right)\right\rbrace.
+\end{align*}
+</p>
+<p>通过矩阵求导或者不等式 $ \mathrm{tr}(\boldsymbol{B})-\ln|\boldsymbol{B}|\ge p $（其中 $ \boldsymbol{B} $ 为 $ p $ 阶正定阵）都可以证明参数 $ \boldsymbol{\mu},\boldsymbol{\Sigma} $ 的极大似然估计为 $ \hat{\boldsymbol{\mu}}=\overline{X},\hat{\boldsymbol{\Sigma}}=\dfrac{1}{n}\boldsymbol{A}=\dfrac{n-1}{n}\boldsymbol{S} $. 并且似然函数在该点处取得最大值</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    L\left(\ov…'>\begin{equation*}
+    L\left(\overline{X},\frac{1}{n}\bm{A}\right)=\left(\frac{n}{2\pi\mathrm{e}}\right)^{np/2}|\bm{A}|^{-n/2}.
+\end{equation*}
+</p>
+<p>这一结论我们将在多元正态总体的似然比统计量推导中用到. 现在我们可以考察一下估计量的性质. 我们有如下定理：</p>
+<div class="note info no-icon flat"><p>设 $ \overline{X} $ 和 $ \boldsymbol{A} $ 分别为 $ p $ 元正态总体 $N_p(\boldsymbol{\mu},\boldsymbol{\Sigma}) $ 的样本均值向量和离差阵，则</p>
+<ol>
+<li>$ \overline{X}\sim N_{p}\left(\boldsymbol{\mu},\dfrac{1}{n}\boldsymbol{\Sigma}\right) $；</li>
+<li>$ \boldsymbol{A} $ 和 $ \sum_{t=1}^{n-1}\boldsymbol{Z}_t\boldsymbol{Z}_t' $ 同分布，其中 $ \boldsymbol{Z}_1,\cdots,\boldsymbol{Z}_{n-1} $ 独立同 $ N_p(\boldsymbol{0},\boldsymbol{\Sigma}) $ 分布；</li>
+<li>$ \overline{X} $ 和 $ \boldsymbol{A} $ 相互独立；</li>
+<li>$ \mathbb{P}\lbrace\boldsymbol{A}&gt;0\rbrace=1\Longleftrightarrow n&gt;p $.</li>
+</ol>
+</div>
+<p>证明这里不再给出，具体内容请参考多元统计分析具体书目. 第 4 条说明只要我们获得了足够多的样本，那么就能保证样本离差阵可逆.<br />
+容易证明 $ \overline{X},\boldsymbol{S} $ 是 $ \boldsymbol{\mu},\boldsymbol{\Sigma} $ 的无偏估计量，并且还可证明是 $ \text{UMVUE} $ 以及强相合估计. 利用极大似然估计的不变性，还可以证明真实相关系数的极大似然估计量就是样本相关系数.</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://hzy2024.github.io">Eason</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://hzy2024.github.io/2026/02/25/%E5%A4%9A%E5%85%83%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83/">http://hzy2024.github.io/2026/02/25/%E5%A4%9A%E5%85%83%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://hzy2024.github.io" target="_blank">Eason's page</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%95%B0%E5%AD%A6/">数学</a><a class="post-meta__tags" href="/tags/%E6%95%B0%E7%90%86%E7%BB%9F%E8%AE%A1/">数理统计</a><a class="post-meta__tags" href="/tags/%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83/">正态分布</a><a class="post-meta__tags" href="/tags/%E5%A4%9A%E5%85%83%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/">多元统计分析</a><a class="post-meta__tags" href="/tags/%E6%A6%82%E7%8E%87%E8%AE%BA/">概率论</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/02/25/%E4%B8%80%E9%81%93%E7%A8%8D%E6%98%BE%E5%A4%8D%E6%9D%82%E7%9A%84%E9%9A%8F%E6%9C%BA%E6%A0%B7%E6%9C%AC%E6%96%B9%E5%B7%AE%E6%80%A7%E8%B4%A8%E7%9A%84%E9%A2%98%E7%9B%AE/" title="一道稍显复杂的随机样本方差性质的题目"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">一道稍显复杂的随机样本方差性质的题目</div></div><div class="info-2"><div class="info-item-1">设 $ X_1,\cdots,X_n $ 为一随机样本，其均值和方差分别记为 $ \overline{X} $ 和 $ S^2 $. (a) 证明： \begin{equation*}     S^2=\dfrac{1}{2n(n-1)}\sum_{i=1}^n\sum_{j=1}^n(X_i-X_j)^2; \end{equation*}  假设 $ X_i $ 的四阶矩存在且有限，记 $ \theta_1=\mathbb{E}X_i,~\theta_j=\mathbb{E}(X_i-\theta_1)^j,~j=2,3,4. $ (b) 证明 $ \text{Var}S^2=\dfrac{1}{n}\left(\theta_4-\dfrac{n-3}{n-1}\theta_2^2\right) $; (c) 用 $ \theta_1,\cdots,\theta_4 $ 表示 $ \text{Cov}(\overline{X},S^2) $，问 $ \text{Cov}(\overline{X},S^2) $ 何时得 $ 0 $ ?  解答 (a) 只要展开并验证即可. 我们有...</div></div></div></a><a class="pagination-related" href="/2026/02/11/2026%E5%B9%B4%E5%BA%A6MIT%E7%A7%AF%E5%88%86%E5%A4%A7%E8%B5%9BRegular-Season%E8%A7%A3%E7%AD%94/" title="2026年度 MIT 积分大赛 Regular Season 解答"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">2026年度 MIT 积分大赛 Regular Season 解答</div></div><div class="info-2"><div class="info-item-1">基本是自己做的，有两三道题的思路其实自己已经想到了但莫名其妙做不出来，于是翻了一下官方的录像回放...  Problem 1 \begin{align*}     \int_{0}^{2026}\left(\sum_{k=0}^{\infty}\frac{x^{2026k+2025}}{k!}\right)\mathrm{d}x&amp;=\int_{0}^{2026}x^{2025}\left(\sum_{k=0}^\infty\frac{(x^{2026})^k}{k!}\right)\mathrm{d}x\\     &amp;=\int_{0}^{2026}x^{2025}\mathrm{e}^{x^2026}\mathrm{d}x\\     &amp;=\left.\frac{\mathrm{e}^{x^{2026}}}{2026}\right|_{0}^{2026}=\frac{\mathrm{e}^{2026^{2026}}-1}{2026}. \end{align*}   Problem 2 \begin{align*}     \int_{0}^{\log(3...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/03/15/%E4%B8%89%E5%A4%A7%E6%8A%BD%E6%A0%B7%E5%88%86%E5%B8%83%E5%9C%A8%E5%A4%9A%E5%85%83%E6%AD%A3%E6%80%81%E6%80%BB%E4%BD%93%E6%83%85%E5%BD%A2%E4%B8%8B%E7%9A%84%E6%8E%A8%E5%B9%BF/" title="三大抽样分布在多元正态总体情形下的推广"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-03-15</div><div class="info-item-2">三大抽样分布在多元正态总体情形下的推广</div></div><div class="info-2"><div class="info-item-1">本文内容参考了应用多元统计分析（高惠璇著）一书.  一维情形下的三大抽样分布，即 $ \chi^2 $ 分布、 $ t $ 分布和 $ F $ 分布已为人所熟知，但在多元场合下也有对应的非常重要的分布：Wishart 分布、Hotelling $ T^2 $ 分布以及 Wilks $ \Lambda $ 分布. 它们构成了多元正态总体参数假设检验的重要基石. 本文将一步步构建这三种分布.  各分量独立的正态随机向量的二次型 设 $ n $ 维正态随机向量 $ \boldsymbol{X}=(X_1~X_2~\cdots~X_n)'\sim N(\boldsymbol{\mu},\sigma^2\boldsymbol{I}_n) $，其中 $ \boldsymbol{\mu}=(\mu_1,\cdots,\mu_n)' $. 当 $ \boldsymbol{\mu}=\boldsymbol{0} $ 时， \begin{equation*}     \xi=\dfrac{1}{\sigma^2}\boldsymbol{X}&#039;\boldsymbol{X}=\sum_{i=1...</div></div></div></a><a class="pagination-related" href="/2026/02/25/%E4%B8%80%E9%81%93%E7%A8%8D%E6%98%BE%E5%A4%8D%E6%9D%82%E7%9A%84%E9%9A%8F%E6%9C%BA%E6%A0%B7%E6%9C%AC%E6%96%B9%E5%B7%AE%E6%80%A7%E8%B4%A8%E7%9A%84%E9%A2%98%E7%9B%AE/" title="一道稍显复杂的随机样本方差性质的题目"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-25</div><div class="info-item-2">一道稍显复杂的随机样本方差性质的题目</div></div><div class="info-2"><div class="info-item-1">设 $ X_1,\cdots,X_n $ 为一随机样本，其均值和方差分别记为 $ \overline{X} $ 和 $ S^2 $. (a) 证明： \begin{equation*}     S^2=\dfrac{1}{2n(n-1)}\sum_{i=1}^n\sum_{j=1}^n(X_i-X_j)^2; \end{equation*}  假设 $ X_i $ 的四阶矩存在且有限，记 $ \theta_1=\mathbb{E}X_i,~\theta_j=\mathbb{E}(X_i-\theta_1)^j,~j=2,3,4. $ (b) 证明 $ \text{Var}S^2=\dfrac{1}{n}\left(\theta_4-\dfrac{n-3}{n-1}\theta_2^2\right) $; (c) 用 $ \theta_1,\cdots,\theta_4 $ 表示 $ \text{Cov}(\overline{X},S^2) $，问 $ \text{Cov}(\overline{X},S^2) $ 何时得 $ 0 $ ?  解答 (a) 只要展开并验证即可. 我们有...</div></div></div></a><a class="pagination-related" href="/2026/04/29/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E6%A8%A1%E5%9E%8B%E5%8F%82%E6%95%B0%E4%BC%B0%E8%AE%A1/" title="时间序列分析——模型参数估计"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-04-29</div><div class="info-item-2">时间序列分析——模型参数估计</div></div><div class="info-2"><div class="info-item-1">本文内容接时间序列分析——非平稳时间序列模型. 在做完模型阶数的选择后，进一步地我们可以进行模型参数的估计，从而真正完全确定模型长什么样. 我们有多种技术来进行参数估计. 我们先前已经验证了，对于 $ \text{ARMA}(p,q) $ 模型的自相关系数，样本自相关系数是其相合估计量. 模型中的系数可以通过 Yule-Walker 方程利用自相关函数反解出来. 这些关系将在后面的估计中使用到. 本文主要介绍矩估计、最小二乘估计和极大似然估计. 均从简单的模型出发推广一般形式.  矩估计  $ \text{MA}(q) $ 模型 我们首先以 $ \text{MA}(1) $ 为例说明矩估计是怎么进行的. 首先在该模型下， $ Y_t=e_t-\theta e_{t-1},\mathbb{E}(Y_t)=0 $. 我们有 ρ1=−θ1+θ2\rho_1=\dfrac{-\theta}{1+\theta^2}ρ1​=1+θ2−θ​，将其视为关于 $ \theta $ 的一元二次方程，就能解得 \begin{equation*}     \theta=\dfrac{-1\pm\sqrt...</div></div></div></a><a class="pagination-related" href="/2026/03/18/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%B9%B3%E7%A8%B3%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E6%A8%A1%E5%9E%8B/" title="时间序列分析——平稳时间序列模型"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-03-18</div><div class="info-item-2">时间序列分析——平稳时间序列模型</div></div><div class="info-2"><div class="info-item-1">本文对一般线性过程及其截断——滑动平均过程、自回归过程及两者的结合—— ARMA 模型的模型性质及估计量的一些基本统计性质做了总结，中间涉及到随机变量二次型期望和方差的推导.   一、一般线性过程 一般线性过程$ \lbrace Y_t\rbrace  $ 可以表示成现在和过去白噪声变量的加权线性组合 \begin{equation*}     Y_t=e_t+\psi_1e_{t-1}+\psi_2e_{t-2}+\cdots\quad\left(\sum_{n=1}^{\infty}\psi_n^2&lt;\infty\right) \end{equation*}  其中 $ e_t,\cdots,e_{t-q} $ 都是白噪声, 即均值为 $ 0 $ 且独立同分布的随机变量，并假设方差均为 $ \sigma_e^2 $. 我们现在通过 $ Y_t $ 的截断 \begin{equation*}   Y_{t,m}=\sum_{i=0}^{m}\psi_{i}e_{t-i}\to Y_{t}~~(m\to\infty) \end{equation*}  来说明括号内的条件起到...</div></div></div></a><a class="pagination-related" href="/2026/06/12/%E5%A4%9A%E5%85%83%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%88%A4%E5%88%AB%E5%88%86%E6%9E%90/" title="多元统计分析——判别分析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-06-12</div><div class="info-item-2">多元统计分析——判别分析</div></div><div class="info-2"><div class="info-item-1">本文内容综合了高惠璇应用多元统计分析的内容以及本人所上课程 PPT 中的部分知识.  判别分析是用于判断样品所属类型的一种统计分析方法，其在医学诊断、气象学、经济学、体育运动中的应用极为广泛. 判别分析主要有两个目标：  目标 1（预测方面）：分类（或分配）. 在已知历史上用某些方法已把研究对象分成若干组（亦称类或总体）的情况下，来判定新的观测样品应归属的组别. 目标 2（描述方面）：分离. 就是用图形（通常二维，有时三维或一维，一般通过降维实现）方法或代数方法描述来自各组的样品之间的差异性，最大限度地分离各组.  一般的判别分析问题都可以这样描述：设有 $ k $ 个 $ m $ 维总体 $ \pi_1,\pi_2,\cdots,\pi_k $，其分布特征已知（如已知分布函数为 $ F_1(x),F_2(x),\cdots,F_k(x) $，或知道来自各个总体的训练样本）. 对给定的一个新样品 $ x $，我们要判断它来自哪个总体. 接下来就对几种常用的判别分析方法进行介绍.  一、距离判别 设有 $ k $ 个组别 $ \pi_1,\pi_2,\cdots,\pi_k $，其...</div></div></div></a><a class="pagination-related" href="/2026/04/04/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E9%9D%9E%E5%B9%B3%E7%A8%B3%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E6%A8%A1%E5%9E%8B/" title="时间序列分析——非平稳时间序列模型"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-04-04</div><div class="info-item-2">时间序列分析——非平稳时间序列模型</div></div><div class="info-2"><div class="info-item-1">平稳时间序列模型的建模已经可以对一些实际场景建模，但是平稳性实际是一个很强的条件，有更多的数据是不能以 $ \text{ARMA}(p,q) $ 模型建模的. 一个典型的非平稳的时间序列模型可以从均值上反映，即均值非常数，随时间 $ t $ 变化而变化，可以写为 $ \mu_t=g(t) $. 在季节性趋势和余弦趋势的时间序列模型比较一文中关于余弦趋势模型的建模就是一个典型的例子. 如果序列的自协方差函数和 $ t $ 有关，那么也是非平稳的. 事实上，我们可以从 $ \text{AR}(p) $ 模型的表达式出发，让其不满足平稳性条件来一窥非平稳时间序列. 我们考虑 $ \text{AR}(1) $ 模型，令 $ \phi=3 $，即 \begin{equation*}     Y_t=3Y_{t-1}+e_t, \end{equation*}  那么经过 $ t-1 $ 步迭代我们有 \begin{equation*}     Y_t=e_t+3e_{t-1}+\cdots+3^{t-1}e_1+3^tY_0, \end{equation*}  其中令 $ Y_0=0 $ 是...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Eason</div><div class="author-info-description">SUFE统计学大四本科生一枚~
+（已保研至FDU）
+</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">32</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/hzy2024"><i class="fab fa-github"></i><span>访问我的 GitHub</span></a><div class="card-info-social-icons"><a class="social-icon" href="/img/qq.jpg" target="_blank" title="QQ"><i class="fab fa-qq" style="color: #1e3050;"></i></a><a class="social-icon" href="https://space.bilibili.com/345987732?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #fb7299;"></i></a><a class="social-icon" href="https://www.zhihu.com/people/perplexity-67" target="_blank" title="知乎"><i class="fab fa-zhihu" style="color: #1772f6;"></i></a><a class="social-icon" href="mailto:2023110611@stu.sufe.edu.cn" target="_blank" title="E-mail"><i class="fas fa-envelope" style="color: #0078d7;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">佛系更新ing...</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E5%85%83%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83"><span class="toc-number">1.</span> <span class="toc-text"> 二元正态分布</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#n-%E5%85%83%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83"><span class="toc-number">2.</span> <span class="toc-text"> $ n $ 元正态分布</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%9A%E5%85%83%E6%AD%A3%E6%80%81%E6%80%BB%E4%BD%93%E6%A0%B7%E6%9C%AC%E7%9A%84%E6%95%B0%E5%AD%97%E7%89%B9%E5%BE%81%E4%B8%8E%E6%9E%81%E5%A4%A7%E4%BC%BC%E7%84%B6%E4%BC%B0%E8%AE%A1"><span class="toc-number">3.</span> <span class="toc-text"> 多元正态总体样本的数字特征与极大似然估计</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/08/06/%E6%95%B0%E5%80%BC%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E8%A7%A3%E7%BA%BF%E6%80%A7%E6%96%B9%E7%A8%8B%E7%BB%84%E7%9A%84%E7%9B%B4%E6%8E%A5%E6%B3%95%E4%B8%8E%E8%BF%AD%E4%BB%A3%E6%B3%95/" title="数值分析——解线性方程组的直接法与迭代法">数值分析——解线性方程组的直接法与迭代法</a><time datetime="2026-08-06T02:01:31.000Z" title="发表于 2026-08-06 10:01:31">2026-08-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/07/31/%E6%95%B0%E5%80%BC%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%87%BD%E6%95%B0%E9%80%BC%E8%BF%91%E4%B8%8E%E5%BF%AB%E9%80%9F%20Fourier%20%E5%8F%98%E6%8D%A2/" title="数值分析——函数逼近与快速 Fourier 变换">数值分析——函数逼近与快速 Fourier 变换</a><time datetime="2026-07-31T01:41:42.000Z" title="发表于 2026-07-31 09:41:42">2026-07-31</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/07/24/%E9%AB%98%E7%AD%89%E4%BB%A3%E6%95%B0%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E5%AE%9A%E4%B9%89%E5%8F%8A%E7%BB%93%E8%AE%BA/" title="高等代数中的一些定义及结论">高等代数中的一些定义及结论</a><time datetime="2026-07-24T15:59:45.000Z" title="发表于 2026-07-24 23:59:45">2026-07-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/07/10/EM-%E7%AE%97%E6%B3%95/" title="EM 算法">EM 算法</a><time datetime="2026-07-10T13:24:41.000Z" title="发表于 2026-07-10 21:24:41">2026-07-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/06/12/%E5%A4%9A%E5%85%83%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%88%A4%E5%88%AB%E5%88%86%E6%9E%90/" title="多元统计分析——判别分析">多元统计分析——判别分析</a><time datetime="2026-06-12T09:41:00.000Z" title="发表于 2026-06-12 17:41:00">2026-06-12</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Eason</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        loader: {
+          load: [
+            // Four font extension packages (optional)
+            //- '[tex]/bbm',
+            //- '[tex]/bboldx',
+            //- '[tex]/dsfont',
+            '[tex]/mhchem'
+          ],
+          paths: {
+            'mathjax-newcm': '[mathjax]/../@mathjax/mathjax-newcm-font',
+
+            //- // Four font extension packages (optional)
+            //- 'mathjax-bbm-extension': '[mathjax]/../@mathjax/mathjax-bbm-font-extension',
+            //- 'mathjax-bboldx-extension': '[mathjax]/../@mathjax/mathjax-bboldx-font-extension',
+            //- 'mathjax-dsfont-extension': '[mathjax]/../@mathjax/mathjax-dsfont-font-extension',
+            'mathjax-mhchem-extension': '[mathjax]/../@mathjax/mathjax-mhchem-font-extension'
+          }
+        },
+        output: {
+          font: 'mathjax-newcm',
+        },
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+          packages: {
+            '[+]': [
+              'mhchem'
+            ]
+          }
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          menuOptions: {
+            settings: {
+              enrich: false  // Turn off Braille and voice narration text automatic generation
+            }
+          },
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax@4.1.0/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

@@ -1,0 +1,960 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>三大抽样分布在多元正态总体情形下的推广 | Eason's page</title><meta name="author" content="Eason"><meta name="copyright" content="Eason"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="本文内容参考了应用多元统计分析（高惠璇著）一书.  一维情形下的三大抽样分布，即 $ \chi^2 $ 分布、 $ t $ 分布和 $ F $ 分布已为人所熟知，但在多元场合下也有对应的非常重要的分布：Wishart 分布、Hotelling $ T^2 $ 分布以及 Wilks $ \Lambda $ 分布. 它们构成了多元正态总体参数假设检验的重要基石. 本文将一步步构建这三种分布.  各分量">
+<meta property="og:type" content="article">
+<meta property="og:title" content="三大抽样分布在多元正态总体情形下的推广">
+<meta property="og:url" content="http://hzy2024.github.io/2026/03/15/%E4%B8%89%E5%A4%A7%E6%8A%BD%E6%A0%B7%E5%88%86%E5%B8%83%E5%9C%A8%E5%A4%9A%E5%85%83%E6%AD%A3%E6%80%81%E6%80%BB%E4%BD%93%E6%83%85%E5%BD%A2%E4%B8%8B%E7%9A%84%E6%8E%A8%E5%B9%BF/index.html">
+<meta property="og:site_name" content="Eason&#39;s page">
+<meta property="og:description" content="本文内容参考了应用多元统计分析（高惠璇著）一书.  一维情形下的三大抽样分布，即 $ \chi^2 $ 分布、 $ t $ 分布和 $ F $ 分布已为人所熟知，但在多元场合下也有对应的非常重要的分布：Wishart 分布、Hotelling $ T^2 $ 分布以及 Wilks $ \Lambda $ 分布. 它们构成了多元正态总体参数假设检验的重要基石. 本文将一步步构建这三种分布.  各分量">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://hzy2024.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2026-03-15T13:18:17.000Z">
+<meta property="article:modified_time" content="2026-08-31T12:56:17.621Z">
+<meta property="article:author" content="Eason">
+<meta property="article:tag" content="数学">
+<meta property="article:tag" content="数理统计">
+<meta property="article:tag" content="正态分布">
+<meta property="article:tag" content="多元统计分析">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://hzy2024.github.io/img/avatar.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "三大抽样分布在多元正态总体情形下的推广",
+  "url": "http://hzy2024.github.io/2026/03/15/%E4%B8%89%E5%A4%A7%E6%8A%BD%E6%A0%B7%E5%88%86%E5%B8%83%E5%9C%A8%E5%A4%9A%E5%85%83%E6%AD%A3%E6%80%81%E6%80%BB%E4%BD%93%E6%83%85%E5%BD%A2%E4%B8%8B%E7%9A%84%E6%8E%A8%E5%B9%BF/",
+  "image": "http://hzy2024.github.io/img/avatar.jpg",
+  "datePublished": "2026-03-15T13:18:17.000Z",
+  "dateModified": "2026-08-31T12:56:17.621Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Eason",
+      "url": "http://hzy2024.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://hzy2024.github.io/2026/03/15/%E4%B8%89%E5%A4%A7%E6%8A%BD%E6%A0%B7%E5%88%86%E5%B8%83%E5%9C%A8%E5%A4%9A%E5%85%83%E6%AD%A3%E6%80%81%E6%80%BB%E4%BD%93%E6%83%85%E5%BD%A2%E4%B8%8B%E7%9A%84%E6%8E%A8%E5%B9%BF/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.5.4"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.1.0/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '三大抽样分布在多元正态总体情形下的推广',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div class="bg-animation" id="web_bg" style="background-image: url(/img/background.GIF);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">32</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Eason's page</span></a><a class="nav-page-title" href="/"><span class="site-name">三大抽样分布在多元正态总体情形下的推广</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">三大抽样分布在多元正态总体情形下的推广</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-03-15T13:18:17.000Z" title="发表于 2026-03-15 21:18:17">2026-03-15</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-08-31T12:56:17.621Z" title="更新于 2026-08-31 20:56:17">2026-08-31</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><div class="note info no-icon flat"><p>本文内容参考了应用多元统计分析（高惠璇著）一书.</p>
+</div>
+<p>一维情形下的三大抽样分布，即 $ \chi^2 $ 分布、 $ t $ 分布和 $ F $ 分布已为人所熟知，但在多元场合下也有对应的非常重要的分布：Wishart 分布、Hotelling $ T^2 $ 分布以及 Wilks $ \Lambda $ 分布. 它们构成了多元正态总体参数假设检验的重要基石. 本文将一步步构建这三种分布.</p>
+<h2 id="各分量独立的正态随机向量的二次型"><a class="markdownIt-Anchor" href="#各分量独立的正态随机向量的二次型"></a> 各分量独立的正态随机向量的二次型</h2>
+<p>设 $ n $ 维正态随机向量 $ \boldsymbol{X}=(X_1~X_2~\cdots~X_n)'\sim N(\boldsymbol{\mu},\sigma^2\boldsymbol{I}_n) $，其中 $ \boldsymbol{\mu}=(\mu_1,\cdots,\mu_n)' $. 当 $ \boldsymbol{\mu}=\boldsymbol{0} $ 时，</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \xi=\dfrac…'>\begin{equation*}
+    \xi=\dfrac{1}{\sigma^2}\boldsymbol{X}&#039;\boldsymbol{X}=\sum_{i=1}^{n}X_i^2\sim\chi^2(n),
+\end{equation*}
+</p>
+<p>也记为 $ \boldsymbol{X}'\boldsymbol{X}\sim\sigma^2\chi^2(n) $. 这一结论的证明很简单，只要使用标准正态分布的平方服从自由度为 $ 1 $ 的 $ \chi^2 $ 分布以及 $ \chi^2 $ 分布的可加性. 当 $ \boldsymbol{\mu}\ne\boldsymbol{0} $ 时， $ \boldsymbol{X}'\boldsymbol{X} $ 的分布称为<strong>非中心 $ \chi^2 $ 分布</strong>. 若 $ \boldsymbol{X}\sim N(\boldsymbol{\mu},\boldsymbol{I}_n)(\boldsymbol{\mu}\ne\boldsymbol{0}) $，则称 $ \xi=\boldsymbol{X}'\boldsymbol{X} $ 服从 $ n $ 个自由度、非中心参数 $ \delta=\boldsymbol{\mu}'\boldsymbol{\mu} $ 的 $ \chi^2 $ 分布，记为 $ \xi\sim\chi^2(n,\delta) $ 或 $ \xi\sim\chi^2_n(\delta) $. 同样地，如果方差参数不为 $ 1 $，我们仍然可作变换 $ Y_i=X_i/\sigma $ 得到标准化的随机向量. 此时对应的非中心参数就需要除以 $ \sigma^2 $. 现在我们有关于正态随机向量的二次型的一些结论：</p>
+<ol>
+<li>设 $ \boldsymbol{X}\sim N(\boldsymbol{0},\sigma^2\boldsymbol{I}_n) $， $ \boldsymbol{A} $ 为对称矩阵，且 $ \mathrm{rank}(\boldsymbol{A})=r $，则二次型 $ \boldsymbol{X}'\boldsymbol{AX}/\sigma^2\sim\chi^2(r)\Longleftrightarrow\boldsymbol{A}^2=\boldsymbol{A} $ （称 $ \boldsymbol{A} $ 为对称幂等阵）;</li>
+</ol>
+<p><strong>证明</strong>  若前者成立，因 $ \boldsymbol{A} $ 为对称矩阵，因此存在正交阵 $ \boldsymbol{\Gamma} $ 使得</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{\Gamma}&#039;\boldsymbol{A\Gamma}=\mathrm{diag}(\lambda_1,\cdots,\lambda_r,0,\cdots,0).
+\end{equation*}
+</p>
+<p>令</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{Y}=\boldsymbol{\Gamma}&#039;\boldsymbol{X}\sim N(\boldsymbol{0},\sigma^2\boldsymbol{I}_n),~~\boldsymbol{X}=\boldsymbol{\Gamma Y},
+\end{equation*}
+</p>
+<p>则</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \xi=\bolds…'>\begin{equation*}
+    \xi=\boldsymbol{X}&#039;\boldsymbol{AX}/\sigma^2=\boldsymbol{Y}&#039;\boldsymbol{\Gamma}&#039;\boldsymbol{A\Gamma Y}/\sigma^2=\sum_{i=1}^{r}\lambda_i Y_i^2/\sigma^2,
+\end{equation*}
+</p>
+<p>且 $ Y_i,\cdots,Y_r $ 相互独立同 $ N(0,\sigma^2) $ 分布. 故 $ Y_i^2/\sigma^2\sim\chi^2(1)~(i=1,\cdots,r) $ 且相互独立， $ \xi $ 的特征函数为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \prod_{i=1…'>\begin{equation*}
+    \prod_{i=1}^{r}(1-2\mathrm{i}\lambda_i t)^{-1/2}=(1-2\mathrm{i}t)^{-r/2},
+\end{equation*}
+</p>
+<p>比较可知只能是 $ \lambda_1=\cdots=\lambda_r=1 $，从而</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \mathrm{di…'>\begin{equation*}
+    \mathrm{diag}(1,\cdots,1,0,\cdots,0)=\boldsymbol{\Gamma}&#039;\boldsymbol{A\Gamma}=\boldsymbol{\Gamma}&#039;\boldsymbol{A\Gamma}\boldsymbol{\Gamma}&#039;\boldsymbol{A\Gamma}=\boldsymbol{\Gamma}&#039;\boldsymbol{A}^2\boldsymbol{\Gamma},
+\end{equation*}
+</p>
+<p>即 $ \boldsymbol{A}^2=\boldsymbol{A} $. 反之，可以对 $ \boldsymbol{A} $ 用正交矩阵 $ \boldsymbol{\Gamma} $ 对角化，令 $ \boldsymbol{Y}=\boldsymbol{\Gamma}'\boldsymbol{X} $，经过简单的计算就得到相应的结论.</p>
+<ol start="2">
+<li>设 $ \boldsymbol{X}\sim N(\boldsymbol{\mu},\sigma^2\boldsymbol{I}_n),\boldsymbol{A}=\boldsymbol{A}' $，则</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \dfrac{1}{…'>\begin{equation*}
+    \dfrac{1}{\sigma^2}\boldsymbol{X}&#039;\boldsymbol{AX}\sim\chi^2(r,\delta),
+\end{equation*}
+</p>
+<p>其中</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \delta=\df…'>\begin{equation*}
+    \delta=\dfrac{1}{\sigma^2}\boldsymbol{\mu}&#039;\boldsymbol{A\mu}\Longleftrightarrow\boldsymbol{A}=\boldsymbol{A}^2,
+\end{equation*}
+</p>
+<p>且 $ \mathrm{rank}(\boldsymbol{A})=r~(r\le n) $;<br />
+3. （ 二次型与线性函数的独立性）设 $ \boldsymbol{X}\sim N(\boldsymbol{\mu},\sigma^2\boldsymbol{I}_n),\boldsymbol{A} $ 为 $ n $ 阶对称矩阵， $ \boldsymbol{B} $ 为 $ m\times n $ 矩阵，令 $ \xi=\boldsymbol{X}'\boldsymbol{AX},\boldsymbol{Z}=\boldsymbol{BX} $，则 $ \boldsymbol{BA}=\boldsymbol{O} \Longleftrightarrow \boldsymbol{BX} $ 和 $ \boldsymbol{X}'\boldsymbol{AX} $ 相互独立;</p>
+<p><strong>证明</strong> 设 $ \mathrm{rank}(\boldsymbol{A})=r&gt;0 $（ $ r=0 $ 时结论显然成立），则存在正交矩阵 $ \boldsymbol{\Gamma} $ 使得</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{\Gamma}&#039;\boldsymbol{A\Gamma}=\begin{pmatrix}
+        \boldsymbol{D}_r &amp; \boldsymbol{O} \\
+        \boldsymbol{O} &amp; \boldsymbol{O}
+    \end{pmatrix},~\boldsymbol{D}_r=\begin{pmatrix}
+        \lambda_1 &amp; &amp; \\
+        &amp; \ddots &amp;\\
+        &amp; &amp; \lambda_r
+    \end{pmatrix},
+\end{equation*}
+</p>
+<p>其中 $ \lambda_i(i=1,\cdots,r) $ 为 $ \boldsymbol{A} $  的非零特征值. 而</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \boldsymbo…'>\begin{align*}
+    \boldsymbol{BA}=\boldsymbol{B\Gamma}\begin{pmatrix}
+        \boldsymbol{D}_r &amp; \boldsymbol{O} \\
+        \boldsymbol{O} &amp; \boldsymbol{O}
+    \end{pmatrix}\boldsymbol{\Gamma}&#039;=(\boldsymbol{C}_1~\boldsymbol{C}_2)\begin{pmatrix}
+        \boldsymbol{D}_r &amp; \boldsymbol{O} \\
+        \boldsymbol{O} &amp; \boldsymbol{O}
+    \end{pmatrix}\boldsymbol{\Gamma}&#039;=(\boldsymbol{C}_1\boldsymbol{D}_r~\boldsymbol{O})\boldsymbol{\Gamma}&#039;=\boldsymbol{O},
+\end{align*}
+</p>
+<p>从而 $ \boldsymbol{C}_1\boldsymbol{D}_r=\boldsymbol{O} $. 又 $ \boldsymbol{D}_r $ 为对角元非零的对角阵，从而 $ \boldsymbol{C}_1=\boldsymbol{O} $. 现令 $ \boldsymbol{Y}=(Y_1~\cdots~Y_n)'=\boldsymbol{\Gamma}'\boldsymbol{X} $，易知 $ \boldsymbol{Y}\sim N(\boldsymbol{\Gamma}'\boldsymbol{\mu},\sigma^2\boldsymbol{I}_n) $. 因</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{X}&#039;\boldsymbol{AX}=\boldsymbol{Y}&#039;\boldsymbol{\Gamma}&#039;\boldsymbol{A\Gamma Y}=\sum_{i=1}^r\lambda_i Y_i^2,
+\end{equation*}
+</p>
+<p>而</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{BX}=\boldsymbol{B\Gamma Y}=(\boldsymbol{C}_1~\boldsymbol{C}_2)\begin{pmatrix}
+        Y_1\\ \vdots \\ Y_n
+    \end{pmatrix}=\boldsymbol{C}_2\begin{pmatrix}
+        Y_{r+1} \\ \vdots \\ Y_n
+    \end{pmatrix},
+\end{equation*}
+</p>
+<p>由于 $ Y_1,\cdots,Y_r $ 与 $ Y_{r+1},\cdots,Y_n $ 相互独立，因此 $ \boldsymbol{X}'\boldsymbol{AX} $ 与 $ \boldsymbol{BX} $ 相互独立. 反过来，必然有 $ \text{Cov}(\boldsymbol{X}'\boldsymbol{AX},\boldsymbol{BX})=\boldsymbol{O} $. 为了计算协方差，我们令 $ \boldsymbol{Y}=\boldsymbol{X}+\boldsymbol{\mu} $，那么问题实际上变为求</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \text{Cov}…'>\begin{equation*}
+    \text{Cov}(\boldsymbol{Y}&#039;\boldsymbol{AY}+2\boldsymbol{\mu}&#039;\boldsymbol{AY},\boldsymbol{BY}).
+\end{equation*}
+</p>
+<p>对于三次项，由独立性及 $ \mathbb{E}(\boldsymbol{Y})=\boldsymbol{0} $ 可知展开后只包含 $ \mathbb{E}(y_i^3) $ 的项，但是由正态分布的对称性，其三阶矩为零，因此被消掉了. 对于剩下的部分，直接计算得到 $ \text{Cov}(2\boldsymbol{\mu}'\boldsymbol{AY},\boldsymbol{BY})=2\sigma^2\boldsymbol{\mu}'\boldsymbol{AB}'=2\sigma^2(\boldsymbol{BA\mu})'=\boldsymbol{O} $. 由于需要对任意 $ \boldsymbol{\mu} $ 都成立，因此只能是 $ \boldsymbol{BA}=\boldsymbol{O} $.</p>
+<ol start="4">
+<li>（两个二次型相互独立的条件）设 $ \boldsymbol{X}\sim N(\boldsymbol{\mu},\sigma^2\boldsymbol{I}_n),\boldsymbol{A},\boldsymbol{B} $ 为 $ n $ 阶对称矩阵，则</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{AB}=\boldsymbol{O}\Longleftrightarrow\boldsymbol{X}&#039;\boldsymbol{AX}\text{ 与 }\boldsymbol{X}&#039;\boldsymbol{BX}\text{ 相互独立}.
+\end{equation*}
+</p>
+<p>该定理的证明较为复杂，这里不做证明.</p>
+<h2 id="一般正态随机向量的二次型"><a class="markdownIt-Anchor" href="#一般正态随机向量的二次型"></a> 一般正态随机向量的二次型</h2>
+<p>我们可以很自然地把独立场合下的结论推广至一般情形：</p>
+<ol>
+<li>设 $ \boldsymbol{X}\sim N_n(\boldsymbol{\mu},\boldsymbol{\Sigma}),\boldsymbol{\Sigma}\succ\boldsymbol{O} $，则 $ \boldsymbol{X}'\boldsymbol{\Sigma}^{-1}\boldsymbol{X}\sim\chi^2(n,\delta) $，其中 $ \delta=\boldsymbol{\mu}'\boldsymbol{\Sigma}^{-1}\boldsymbol{\mu} $；</li>
+</ol>
+<p><strong>证明</strong> 由于 $ \boldsymbol{\Sigma}\succ\boldsymbol{O} $，因此由 Cholesky 分解知 $ \boldsymbol{\Sigma}=\boldsymbol{CC}' $，其中 $ \boldsymbol{C} $ 可逆. 令 $ \boldsymbol{Y}=\boldsymbol{C}^{-1}\boldsymbol{X} $，则</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{Y}\sim N_n(\boldsymbol{C}^{-1}\boldsymbol{\mu},\boldsymbol{I}_n).
+\end{equation*}
+</p>
+<p>且</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{X}&#039;\boldsymbol{\Sigma}^{-1}\boldsymbol{X}=\boldsymbol{Y}&#039;\boldsymbol{C}&#039;\boldsymbol{\Sigma}^{-1}\boldsymbol{CY}=\boldsymbol{Y}&#039;\boldsymbol{Y}\sim\chi^2(n,\delta).
+\end{equation*}
+</p>
+<p>其中</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \delta=\bo…'>\begin{equation*}
+    \delta=\boldsymbol{\mu}&#039;(\boldsymbol{C}^{-1})&#039;\boldsymbol{C}^{-1}\boldsymbol{\mu}=\boldsymbol{\mu}&#039;\boldsymbol{\Sigma}^{-1}\boldsymbol{\mu}.
+\end{equation*}
+</p>
+<ol start="2">
+<li>设 $ \boldsymbol{X}\sim N_n(\boldsymbol{\mu},\boldsymbol{\Sigma}),\boldsymbol{\Sigma}\succ\boldsymbol{O},\boldsymbol{A} $ 为对称矩阵， $ \mathrm{rank}(\boldsymbol{A})=r $. 则</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    (\boldsymb…'>\begin{equation*}
+    (\boldsymbol{X}-\boldsymbol{\mu})&#039;\boldsymbol{A}(\boldsymbol{X}-\boldsymbol{\mu})\sim\chi^2(r)\Longleftrightarrow\boldsymbol{\Sigma A\Sigma A\Sigma}=\boldsymbol{\Sigma A\Sigma};
+\end{equation*}
+</p>
+<p><strong>证明</strong> 由 $ \boldsymbol{\Sigma}\succ\boldsymbol{O} $ 可知存在正交阵 $ \boldsymbol{\Gamma} $ 和 $ \lambda_i&gt;0 (i=1,2,\cdots,n) $ 使得 $ \boldsymbol{\Sigma}=\boldsymbol{\Sigma}^{1/2}\boldsymbol{\Sigma}^{1/2} $，其中 $ \boldsymbol{\Sigma}^{1/2}=\boldsymbol{\Gamma}\mathrm{diag}(\sqrt{\lambda_1},\cdots,\sqrt{\lambda_n})\boldsymbol{\Gamma}' $ 为平方根矩阵. 记</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{\Sigma}^{-1/2}=\boldsymbol{\Gamma}&#039;\mathrm{diag}\begin{pmatrix}
+        \dfrac{1}{\sqrt{\lambda_1}},\cdots,\dfrac{1}{\sqrt{\lambda_{n}}}
+    \end{pmatrix}\boldsymbol{\Gamma}&#039;,
+\end{equation*}
+</p>
+<p>令</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \boldsymbo…'>\begin{align*}
+    \boldsymbol{Y}=\boldsymbol{\Sigma}^{-1/2}&amp;(\boldsymbol{X}-\boldsymbol{\mu})\sim N_n(\boldsymbol{0},\boldsymbol{I}_n),\\
+    (\boldsymbol{X}-\boldsymbol{\mu})&#039;\boldsymbol{A}(\boldsymbol{X}-\boldsymbol{\mu})&amp;=\boldsymbol{Y}&#039;\boldsymbol{\Sigma}^{1/2}\boldsymbol{A}\boldsymbol{\Sigma}^{1/2}\boldsymbol{Y}:=\boldsymbol{Y}&#039;\boldsymbol{CY},
+\end{align*}
+</p>
+<p>由独立场合下的情况可知</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+   \boldsymbol…'>\begin{equation*}
+   \boldsymbol{Y}&#039;\boldsymbol{C}\boldsymbol{Y}\sim\chi^2(r)\Longleftrightarrow \boldsymbol{C}^2=\boldsymbol{C},
+\end{equation*}
+</p>
+<p>即 $ \boldsymbol{\Sigma}^{1/2}\boldsymbol{A}\boldsymbol{\Sigma}^{1/2}\boldsymbol{\Sigma}^{1/2}\boldsymbol{A}\boldsymbol{\Sigma}^{1/2}=\boldsymbol{\Sigma}^{1/2}\boldsymbol{A}\boldsymbol{\Sigma}^{1/2} $，两端左右同乘 $ \boldsymbol{\Sigma}^{1/2} $ 即得结论.</p>
+<ol start="3">
+<li>设 $ \boldsymbol{X}\sim N(\boldsymbol{\mu},\boldsymbol{\Sigma}),\boldsymbol{\Sigma}\succ\boldsymbol{O},\boldsymbol{A} $ 和 $ \boldsymbol{B} $ 为 $ n $ 阶对称阵，则</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    (\boldsymb…'>\begin{equation*}
+    (\boldsymbol{X}-\boldsymbol{\mu})&#039;\boldsymbol{A}(\boldsymbol{X}-\boldsymbol{\mu})\text{ 与 }(\boldsymbol{X}-\boldsymbol{\mu})&#039;\boldsymbol{B}(\boldsymbol{X}-\boldsymbol{\mu})\text{ 独立}\Longleftrightarrow\boldsymbol{\Sigma A\Sigma B\Sigma}=\boldsymbol{O}.
+\end{equation*}
+</p>
+<p>该结论可直接从独立场合中的第 4 条定理直接得到.</p>
+<h2 id="非中心-t-分布和非中心-f-分布"><a class="markdownIt-Anchor" href="#非中心-t-分布和非中心-f-分布"></a> 非中心 $ t $ 分布和非中心 $ F $ 分布</h2>
+<p>由于我们定义了非中心 $ \chi^2 $ 分布， $ t $ 分布和 $ F $ 分布又可由 $ \chi^2 $ 分布导出，因此我们自然可以给出<strong>非中心 $ t $ 分布</strong>和<strong>非中心 $ F $ 分布</strong>的定义：</p>
+<ul>
+<li>设 $ X\sim N(\delta,1),Y\sim\chi^2(n) $ 且两者相互独立，令</li>
+</ul>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+T=\dfrac{X}{\s…'>\begin{equation*}
+T=\dfrac{X}{\sqrt{Y/n}},
+\end{equation*}
+</p>
+<p>则称 $ T $ 的分布为具有 $ n $ 个自由度、非中心参数为 $ \delta $ 的非中心 $ T $ 分布，记为 $ T\sim t(n,\delta) $.</p>
+<ul>
+<li>设 $ X\sim\chi^2(m,\delta),Y\sim\chi^2(n) $ 相互独立，令</li>
+</ul>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    F=\dfrac{X…'>\begin{equation*}
+    F=\dfrac{X/m}{Y/n},
+\end{equation*}
+</p>
+<p>则称 $ F $ 的分布为具有自由度 $ m,n $ 和非中心参数 $ \delta $ 的 $ F $ 分布，记为 $ F\sim F(m,n,\delta) $.<br />
+在假设检验中，一般的 $ \chi^2,t,F $ 分布可以用来控制第一类错误发生的概率，即显著性水平 $ \alpha $，而非中心的三大分布可以用来控制第二类错误发生的概率，即 $ \beta=\mathbb{P}(\text{拒绝 }H_1|H_1\text{ 为真}) $. 检验的功效函数就是 $ 1-\beta $. 以正态总体的均值检验为例，假设样本服从 $ N(\mu,\sigma^2) $，那么</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \beta=\mat…'>\begin{equation*}
+    \beta=\mathbb{P}\lbrace |T|\le\lambda|\mu\ne\mu_0\rbrace =\sup_{\substack{\mu_1\in\mathbb{R}\\\mu_1\ne\mu_0}}\mathbb{P}\left\lbrace\left|\dfrac{\overline{X}-\mu_1+(\mu_1-\mu_0)}{\sqrt{s^2/n}}\right|\le\lambda|\mu=\mu_1\right\rbrace.
+\end{equation*}
+</p>
+<p>此时 $ T\sim t(n-1,\delta) $. 这里的非中心参数 $ \delta $ 可以这么确定：由于 $ \sqrt{n}(\overline{X}-\mu_1)/\sigma\sim N(0,1) $，而 $ (n-1)s^2/\sigma^2\sim\chi^2(n-1) $，对上式变形就可知 $ \delta=\sqrt{n}(\mu_1-\mu_0)/\sigma $.</p>
+<h2 id="多元正态情形下的三大抽样分布"><a class="markdownIt-Anchor" href="#多元正态情形下的三大抽样分布"></a> 多元正态情形下的三大抽样分布</h2>
+<p>有了上面得到的定理和性质以及补充的概念，我们现在可以给出多元正态总体的分布. 分布的性质证明这里不再给出，但部分性质将在后续的假设检验构造统计量中反复用到.</p>
+<h3 id="wishart-分布"><a class="markdownIt-Anchor" href="#wishart-分布"></a> Wishart 分布</h3>
+<p>Wishart 分布是对 $ \chi^2 $ 分布的推广. 设 $ \boldsymbol{X}_{(\alpha)}\sim N_p(\boldsymbol{0},\boldsymbol{\Sigma}) $（ $ \alpha=1,\cdots,n $ ）相互独立，记 $ \boldsymbol{X}=(\boldsymbol{X}_{(1)},\cdots,\boldsymbol{X}_{(n)})' $ 为 $ n\times p $ 矩阵，则称随机阵</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{W}=\sum_{\alpha=1}^{n}\boldsymbol{X}_{(\alpha)}\boldsymbol{X}_{(\alpha)}&#039;=\boldsymbol{X}&#039;\boldsymbol{X}
+\end{equation*}
+</p>
+<p>的分布为 Wishart 分布（<strong>注意 $ \boldsymbol{X}'\boldsymbol{X} $ 和回归分析中的设计矩阵有区别，回归分析是对随机项做分布假定而非样本数据</strong>），记为 $ \boldsymbol{W}\sim W_p(n,\boldsymbol{\Sigma}) $. 当 $ p=1 $ 时，分布退化为 $ \sigma^2\chi^2(n) $，再令 $ \sigma^2=1 $ 就是 $ \chi^2(n) $. 一般地，令 $ \boldsymbol{X}_{(\alpha)}\sim N_p(\boldsymbol{\mu},\boldsymbol{\Sigma})(\alpha=1,\cdots,n) $ 相互独立，记</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{M}=\begin{pmatrix}
+        \mu_1 &amp; \cdots &amp; \mu_p \\
+        \vdots &amp; &amp; \vdots\\
+        \mu_1 &amp; \cdots &amp; \mu_p 
+    \end{pmatrix}=\boldsymbol{1}_n\boldsymbol{\mu}&#039;,
+\end{equation*}
+</p>
+<p>那么称 $ \boldsymbol{W}=\boldsymbol{X}'\boldsymbol{X} $ 服从非中心参数为 $ \boldsymbol{\Delta} $ 的非中心 Wishart 分布，记为 $ \boldsymbol{W}\sim W_p(n,\boldsymbol{\Sigma},\boldsymbol{\Delta}) $，其中</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{\Delta}=\boldsymbol{M}&#039;\boldsymbol{M}=n\boldsymbol{\mu\mu}&#039;.
+\end{equation*}
+</p>
+<p>如果 $ \boldsymbol{X}_{(\alpha)} $ 有不同的均值向量，非中心参数记为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{\Delta}=\sum_{\alpha=1}^{n}\boldsymbol{\mu}_{\alpha}\boldsymbol{\mu}_\alpha&#039;=(\boldsymbol{\mu}_1,\cdots,\boldsymbol{\mu}_n)\begin{pmatrix}
+        \boldsymbol{\mu}_1&#039;\\ \vdots \\ \boldsymbol{\mu}_n&#039;
+    \end{pmatrix}:=\boldsymbol{M}&#039;\boldsymbol{M}.
+\end{equation*}
+</p>
+<p>Wishart 分布有一些性质如下：</p>
+<div class="note info no-icon flat"><ol>
+<li>设 $ \boldsymbol{X}_{(\alpha)}\sim N_p(\boldsymbol{\mu},\boldsymbol{\Sigma})(\alpha=1,\cdots,n) $ 相互独立, 则样本离差阵 $ \boldsymbol{A} $ 服从 Wishart 分布，即</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{A}=\sum_{\alpha=1}^{n}(\boldsymbol{X}_{(\alpha)}-\overline{\boldsymbol{X}})(\boldsymbol{X}_{(\alpha)}-\overline{\boldsymbol{X}})&#039;\sim W_p(n-1,\boldsymbol{\Sigma});
+\end{equation*}
+</p>
+<ol start="2">
+<li>Wishart 分布关于自由度 $ n $ 具有可加性：设 $ \boldsymbol{W}_i\sim W_p(n_i,\boldsymbol{\Sigma})(i=1,\cdots,n_k) $ 相互独立，则</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \sum_{i=1}…'>\begin{equation*}
+    \sum_{i=1}^{k}\boldsymbol{W}_i\sim W_p(n,\boldsymbol{\Sigma}),\quad n=n_1+\cdots+n_k.
+\end{equation*}
+</p>
+<ol start="3">
+<li>
+<p>设 $ p $ 阶随机阵 $ \boldsymbol{W}\sim W_p(n,\boldsymbol{\Sigma}), \boldsymbol{C} $ 是 $ m\times p $ 常数矩阵，则 $ m $ 阶随机阵 $ \boldsymbol{CWC}'\sim W_m(n,\boldsymbol{C\Sigma C}') $. 特别地， $ a\boldsymbol{W}\sim W_p(n,a\boldsymbol{\Sigma})(a&gt;0),\boldsymbol{l}'\boldsymbol{Wl}\sim\sigma^2\chi^2(n) $，其中 $ \boldsymbol{l}'=(l_1,\cdots,l_p),\sigma^2=\boldsymbol{l}'\boldsymbol{\Sigma l} $;</p>
+</li>
+<li>
+<p>设 $ \boldsymbol{X}_{(\alpha)}\sim N_p(\boldsymbol{0},\boldsymbol{\Sigma})(\alpha=1,\cdots,n) $ 相互独立，其中</p>
+</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{\Sigma}=\begin{pmatrix}
+        \boldsymbol{\Sigma}_{11} &amp; \boldsymbol{\Sigma}_{12} \\
+        \boldsymbol{\Sigma}_{21} &amp; \boldsymbol{\Sigma}_{22}
+    \end{pmatrix},
+\end{equation*}
+</p>
+<p>且 $ \boldsymbol{\Sigma}_{11} $ 是 $ r\times r $ 大小的. 又已知随机阵</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{W}=\sum_{\alpha=1}^{n}\boldsymbol{X_{(\alpha)}}\boldsymbol{X_{(\alpha)}}&#039;=\begin{pmatrix}
+        \boldsymbol{W}_{11} &amp; \boldsymbol{W}_{12} \\
+        \boldsymbol{W}_{21} &amp; \boldsymbol{W}_{22}
+    \end{pmatrix}\sim W_p(n,\boldsymbol{\Sigma}),
+\end{equation*}
+</p>
+<p>则（1） $ \boldsymbol{W}_{11}\sim W_r(n,\boldsymbol{\Sigma}_{11}),\boldsymbol{W}_{22}\sim W_{p-r}(n,\boldsymbol{\Sigma}_{22}); $ (2) 当 $ \boldsymbol{\Sigma}_{12}=\boldsymbol{O} $ 时， $ \boldsymbol{W}_{11} $ 和 $ \boldsymbol{W}_{22} $ 相互独立；</p>
+<ol start="5">
+<li>设 $\boldsymbol{W}\sim W_p(n,\boldsymbol{\Sigma}) $，记 $ \boldsymbol{W}_{22\cdot1}=\boldsymbol{W}_{22}-\boldsymbol{W}_{21}\boldsymbol{W}_{11}^{-1}\boldsymbol{W}_{12} $，则</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{W}_{22\cdot1}\sim W_{p-r}(n-r,\boldsymbol{\Sigma}_{22\cdot1}),
+\end{equation*}
+</p>
+<p>其中 $ \boldsymbol{\Sigma}_{22\cdot1}=\boldsymbol{\Sigma}_{22}-\boldsymbol{\Sigma}_{21}\boldsymbol{\Sigma}_{11}^{-1}\boldsymbol{\Sigma}_{12} $，且 $ \boldsymbol{W}_{22\cdot1} $ 与 $ \boldsymbol{W}_{11} $ 独立；</p>
+<ol start="6">
+<li>设随机阵 $ \boldsymbol{W}\sim W_p(n,\boldsymbol{\Sigma}) $，则 $ \mathbb{E}(\boldsymbol{W})=n\boldsymbol{\Sigma} $；</li>
+<li>设 $ \boldsymbol{X}\sim N_{n\times p}(\boldsymbol{M},\boldsymbol{I}_n\otimes\boldsymbol{\Sigma}) $， $ \boldsymbol{A} $ 为 $ n $ 阶对称矩阵，则</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{X}&#039;\boldsymbol{AX}\sim W_p(r,\boldsymbol{\Sigma},\boldsymbol{\Delta}),
+\end{equation*}
+</p>
+<p>其中 $ \boldsymbol{\Delta}=\boldsymbol{M}'\boldsymbol{AM}\Longleftrightarrow\boldsymbol{A}^2=\boldsymbol{A} $，且 $ \mathrm{rank}(\boldsymbol{A})=r $；</p>
+<ol start="8">
+<li>设 $ \boldsymbol{X}\sim N_{n\times p}(\boldsymbol{M},\boldsymbol{I}_n\otimes\boldsymbol{\Sigma}) $， $ \boldsymbol{A} $ 和 $ \boldsymbol{B} $ 均为 $ n $ 阶对称幂等矩阵，则</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{X}&#039;\boldsymbol{AX}\text{ 和 }\boldsymbol{X}&#039;\boldsymbol{BX}\text{ 相互独立}\Longleftrightarrow\boldsymbol{AB}=\boldsymbol{O}.
+\end{equation*}
+</p>
+</div>
+<h3 id="hotelling-t2-分布"><a class="markdownIt-Anchor" href="#hotelling-t2-分布"></a> Hotelling $ T^2 $ 分布</h3>
+<p>在一元统计中， $ t $ 分布是由一个标准正态随机变量和卡方分布定义的. 设 $ X\sim N(0,1),\xi\sim\chi^2(n) $，那么</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    t=\dfrac{X…'>\begin{equation*}
+    t=\dfrac{X}{\sqrt{\xi/n}}\sim t(n).
+\end{equation*}
+</p>
+<p>而 $ t^2=nX^2/\xi=nX'\xi^{-1}X $，我们可以将该形式推广至 $ p $ 元正态总体. 设 $ \boldsymbol{X}\sim N_p(\boldsymbol{0},\boldsymbol{\Sigma}) $，随机阵 $ \boldsymbol{W}\sim W_p(n,\boldsymbol{\Sigma})(\boldsymbol{\Sigma}\succ0,n\ge p) $，且 $ \boldsymbol{X} $ 和 $ \boldsymbol{W} $ 相互独立，则称统计量 $ T^2=n\boldsymbol{X}'\boldsymbol{W}^{-1}\boldsymbol{X} $ 为 Hotelling $ T^2 $ 统计量，其分布称为服从 $ n $ 个自由度的 $ T^2 $ 分布，记为 $ T^2\sim T^2(p,n) $. 更一般地，若 $ \boldsymbol{X}\sim N_p(\boldsymbol{\mu},\boldsymbol{\Sigma}) $，则称 $ T^2 $ 的分布为非中心 Hotelling $ T^2 $ 分布，记为 $ T^2\sim T^2(p,n,\boldsymbol{\mu}) $.<br />
+Hotelling $ T^2 $ 的性质如下：</p>
+<div class="note info no-icon flat"><ol>
+<li>设 $ \boldsymbol{X}_{(\alpha)}(\alpha=1,\cdots,n) $ 是来自 $ p $ 元总体 $ N_p(\boldsymbol{\mu},\boldsymbol{\Sigma}) $ 的随机样本， $ \overline{X} $ 和 $ \boldsymbol{A} $ 分别是正态总体的样本均值向量和样本离差阵，则统计量</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    T^2&amp;=(n-1)…'>\begin{align*}
+    T^2&amp;=(n-1)[\sqrt{n}(\overline{X}-\boldsymbol{\mu})]&#039;\boldsymbol{A}^{-1}[\sqrt{n}(\overline{X}-\boldsymbol{\mu})]\\
+    &amp;=n(n-1)(\overline{X}-\boldsymbol{\mu})&#039;\boldsymbol{A}^{-1}(\overline{X}-\boldsymbol{\mu})\sim T^2(p,n-1);
+\end{align*}
+</p>
+<ol start="2">
+<li>$ T^2 $ 分布和 $ F $ 分布的关系：设 $ T^2\sim T^2(p,n) $，则</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \dfrac{n-p…'>\begin{equation*}
+    \dfrac{n-p+1}{np}T^2\sim F(p,n-p+1);
+\end{equation*}
+</p>
+<ol start="3">
+<li>设 $ \boldsymbol{X}_{(\alpha)}(\alpha=1,\cdots,n) $ 为来自 $ p $ 元总体 $ N_p(\boldsymbol{\mu},\boldsymbol{\Sigma}) $ 的随机样本. $ \overline{X},\boldsymbol{A} $ 分别为样本均值向量和样本离差阵. 记</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    T^2=n(n-1)…'>\begin{equation*}
+    T^2=n(n-1)\overline{X}&#039;\boldsymbol{A}^{-1}\overline{X},
+\end{equation*}
+</p>
+<p>则</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \dfrac{n-p…'>\begin{equation*}
+    \dfrac{n-p}{p}\dfrac{T^2}{n-1}\sim F(p,n-p,\delta),
+\end{equation*}
+</p>
+<p>其中 $ \delta=n\boldsymbol{\mu}'\boldsymbol{\Sigma}^{-1}\boldsymbol{\mu} $;</p>
+<ol start="4">
+<li>$ T^2 $ 统计量的分布只与 $ p,n $ 有关，而与 $ \boldsymbol{\Sigma} $ 无关;</li>
+<li>$ T^2 $ 统计量对非退化变换（作用在原样本上）保持不变.</li>
+</ol>
+</div>
+<h3 id="wilks-lambda-分布"><a class="markdownIt-Anchor" href="#wilks-lambda-分布"></a> Wilks $ \Lambda $ 分布</h3>
+<p>首先介绍<strong>广义方差</strong>的概念. 设 $ \boldsymbol{X}\sim N_p(\boldsymbol{\mu},\boldsymbol{\Sigma}) $，则称协方差阵的行列式 $ |\boldsymbol{\Sigma}| $ 为 $ \boldsymbol{X} $ 的广义方差. 若 $ \boldsymbol{X}_{(\alpha)}(\alpha=1,\cdots,n) $ 为 $ p $ 元总体 $ \boldsymbol{X} $ 的随机样本， $ \boldsymbol{A} $ 为样本离差阵，则称 $ |\boldsymbol{A}/n| $ 或 $ |\boldsymbol{A}/(n-1)| $ 为样本广义方差.<br />
+现在我们可以定义 Wilks $ \Lambda $ 统计量. 设 $ \boldsymbol{A}_1\sim W_p(n_1,\boldsymbol{\Sigma}),\boldsymbol{A}_2\sim W_p(n_2,\boldsymbol{\Sigma})(\boldsymbol{\Sigma}\succ0,n_1\ge p) $，且 $ \boldsymbol{A}_1 $ 和 $ \boldsymbol{A}_2 $ 独立，则称广义方差之比</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \Lambda=\d…'>\begin{equation*}
+    \Lambda=\dfrac{|\boldsymbol{A_1}|}{|\boldsymbol{A_1}+\boldsymbol{A_2}|}
+\end{equation*}
+</p>
+<p>为 Wilks 统计量或 $ \Lambda $ 统计量，其分布称为 Wilks 分布，记为 $ \Lambda\sim\Lambda(p,n_1,n_2) $.<br />
+在使用 $ \Lambda $ 分布时，往往先转化为 $ T^2 $ 统计量或 $ F $ 统计量再进行假设检验：</p>
+<div class="note info no-icon flat"><p>（Wilks 统计量和 $ T^2$ 统计量及 $ F $ 统计量的联系）</p>
+<ol>
+<li>当 $ n_2=1 $ 时，设 $ n_1=n&gt;p $，则</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \Lambda(p,…'>\begin{equation*}
+    \Lambda(p,n,1)=\dfrac{1}{1+\dfrac{1}{n}T^2(p,n)},
+\end{equation*}
+</p>
+<p>等价地可写为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    T^2(p,n)&amp;=…'>\begin{align*}
+    T^2(p,n)&amp;=n\cdot\dfrac{1-\Lambda(p,n,1)}{\Lambda(p,n,1)},\\
+    \dfrac{n-p+1}{np}T^2&amp;=\dfrac{n-p+1}{p}\dfrac{1-\Lambda}{\Lambda}\sim F(p,n-p+1);
+\end{align*}
+</p>
+<ol start="2">
+<li>当 $ n_2=2 $ 时，设 $ n_1=n&gt;p $，则</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \dfrac{n-p…'>\begin{equation*}
+    \dfrac{n-p+1}{p}\dfrac{1-\sqrt{\Lambda(p,n,2)}}{\sqrt{\Lambda(p,n,2)}}\sim F(2p,2(n-p+1));
+\end{equation*}
+</p>
+<ol start="3">
+<li>当 $ p=1 $ 时，则</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \dfrac{n_1…'>\begin{equation*}
+    \dfrac{n_1}{n_2}\dfrac{1-\Lambda(1,n_1,n_2)}{\Lambda(1,n_1,n_2)}\sim F(n_2,n_1);
+\end{equation*}
+</p>
+<ol start="4">
+<li>当 $ p=2 $ 时，则</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \dfrac{n_1…'>\begin{equation*}
+    \dfrac{n_1-1}{n_2}\cdot\dfrac{1-\sqrt{\Lambda(2,n_1,n_2)}}{\sqrt{\Lambda(2,n_1,n_2)}}\sim F(2n_2,2(n_1-1));
+\end{equation*}
+</p>
+<ol start="5">
+<li>当 $ n_2&gt;2,p&gt;2 $ 时，有近似分布. 设 $ \Lambda\sim\Lambda(p,n_1,n_2) $，则当 $ n_1\to\infty $ 时，</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    -r\log\Lam…'>\begin{equation*}
+    -r\log\Lambda\stackrel{d}{\longrightarrow}\chi^2(pn_2),
+\end{equation*}
+</p>
+<p>其中 $ r=n_1-\dfrac{1}{2}(p-n_2+1) $.</p>
+<ol start="6">
+<li>若 $ \Lambda\sim\Lambda(p,n_1,n_2) $，则存在 $ B_k\sim\beta\left(\dfrac{n_1-p+k}{2},\dfrac{n_2}{2}\right)(k=1,\cdots,p) $ 相互独立，使得</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \Lambda=B_…'>\begin{equation*}
+    \Lambda=B_1B_2\cdots B_p;
+\end{equation*}
+</p>
+<ol start="7">
+<li>若 $ n_2&lt;p $，则</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \Lambda(p,…'>\begin{equation*}
+    \Lambda(p,n_1,n_2)=\Lambda(n_2,p,n_1+n_2-p).
+\end{equation*}
+</p>
+</div>
+<h2 id="利用抽样分布进行假设检验"><a class="markdownIt-Anchor" href="#利用抽样分布进行假设检验"></a> 利用抽样分布进行假设检验</h2>
+<h3 id="均值向量的检验"><a class="markdownIt-Anchor" href="#均值向量的检验"></a> 均值向量的检验</h3>
+<h4 id="单一总体下的均值向量检验"><a class="markdownIt-Anchor" href="#单一总体下的均值向量检验"></a> 单一总体下的均值向量检验</h4>
+<p>首先我们假设总体 $ \boldsymbol{X}\sim N_p(\boldsymbol{\mu},\boldsymbol{\Sigma}) $，随机样本为 $ \boldsymbol{X}_{(\alpha)},\alpha=1,\cdots,n $. 现在我们要检验</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    H_0:\bolds…'>\begin{equation*}
+    H_0:\boldsymbol{\mu}=\boldsymbol{\mu}_0,\qquad H_1:\boldsymbol{\mu}\ne\boldsymbol{\mu}_0.
+\end{equation*}
+</p>
+<p>其中 $ \boldsymbol{\mu}_0 $ 是已知量. 记 $ \overline{X},\boldsymbol{S} $ 分别是样本均值和协方差阵，（相关性质见文章<a href="/2026/02/25/%E5%A4%9A%E5%85%83%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83/" title="多元正态分布">多元正态分布</a>）对于协方差阵我们分两种情况考虑：</p>
+<p><strong>协方差阵 $ \boldsymbol{\Sigma}=\boldsymbol{\Sigma}_0 $ 已知时</strong></p>
+<p>利用前面二次型相关结论，此时我们很容易知道检验统计量为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    T_0^2=n(\o…'>\begin{equation*}
+    T_0^2=n(\overline{X}-\boldsymbol{\mu}_0)&#039;\boldsymbol{\Sigma}_0^{-1}(\overline{X}-\boldsymbol{\mu}_0)\sim\chi^2(p),
+\end{equation*}
+</p>
+<p>相对应地我们可以得到拒绝域的形式为 $ \lbrace T_0^2&gt;\chi^2_{\alpha}(p) \rbrace $，其中 $ \alpha $ 是显著性水平. 当然我们也可以通过给定的统计量计算 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>p</mi></mrow><annotation encoding="application/x-tex">p</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">p</span></span></span></span> 值，来得到和显著性水平的关系.</p>
+<div class="note warning flat"><p>从这个地方本人想强调一下<strong>符号的释义问题</strong>. 此处 $ \chi^2_{\alpha} $ 实际上是给定自由度 $ \chi^2 $ 分布的 <strong>$ 1-\alpha $ 分位数，是右尾概率为 $ \alpha $</strong>. 但是我们一般在写分位数的时候，一般下标就代表左尾概率. 这些小细节很可能在查临界值表时让人疑惑. 因此<strong>一定要搞清楚不同符号在特定场景下表示的含义</strong>，否则极有可能会闹笑话.</p>
+</div>
+<p><strong>协方差阵 $ \boldsymbol{\Sigma}=\boldsymbol{\Sigma}_0 $ 未知时</strong></p>
+<p>直接利用前文得到的关于 $ T^2 $ 分布和样本均值及协方差阵的关系，马上知道统计量形式为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    T^2=n(\ove…'>\begin{equation*}
+    T^2=n(\overline{X}-\boldsymbol{\mu}_0)&#039;\boldsymbol{S}^{-1}(\overline{X}-\boldsymbol{\mu}_0),
+\end{equation*}
+</p>
+<p>在原假设下，</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \frac{n-p}…'>\begin{equation*}
+    \frac{n-p}{p(n-1)}T^2\sim F(p,n-p),
+\end{equation*}
+</p>
+<p>于是据此我们很容易可以得到拒绝域的形式并计算对应 $ p $ 值. 当维数 $ p=2 $ 时，上面的置信域形式实际上是一个椭圆.<br />
+然而，上述方法看似不错，<strong>我们通过假设检验得到的结论却相对比较弱</strong>. 其原因是我只知道整体均值参数符不符合预期，<strong>但当其不符合预期时，我们并不知道问题到底出在哪一个维度上</strong>. 此外，我们得到的上述检验统计量在 $ p $ 接近 $ n $ 时，临界值迅速膨胀，超椭球体在某些维度上很窄而某些维度很宽，我们不能做出有效的推断. 于是我们要考察在超椭球在某些方向上的投影，这就引出了<strong>联合置信区间</strong>的想法. 在原样本下，对任意 $ p $ 维向量 $ \boldsymbol{a} $，显然我们有 $ y_i=\boldsymbol{a}'\boldsymbol{X}_{(i)}\sim N(\boldsymbol{a}'\boldsymbol{\mu},\boldsymbol{a}'\boldsymbol{\Sigma a}),i=1,\cdots,n $. 据此我们可以定义样本 $ y_1,\cdots y_n $ 的样本均值和方差 $ \overline{y}=\boldsymbol{a}'\overline{X},S_{\boldsymbol{a}}^2=\boldsymbol{a}'\boldsymbol{Sa} $. 而这些统计量的性质我们在一元情形里就相当熟悉了，我们可以对每一个 $ y_i $ 都构造一个显著性水平为 $ \alpha $ 的置信区间，这里不再赘述. 但回过来想我们现在的假设，只要有一个对应的统计量值落入拒绝域，那么我们就会拒绝原假设，因此如果我们对 $ n $ 个新的样本都独立地做假设检验，那么实际上接受原假设的概率就是 $ (1-\alpha)^n $. 当 $ n $ 很大时，显然我们基本肯定会拒绝原假设，这就导致我们的假设检验不可信. 因此，我们希望的是若干组不同的 $ \boldsymbol{a} $ 分别导出的<strong>接受原假设事件的交的概率为 $ 1-\alpha $</strong>. 对于线性变换后均值的检验问题，每个检验都是 $ t $ 检验. 对于一般的不可数情形，我们可以把联合置信区间写作</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \bigcap_{\…'>\begin{equation*}
+    \bigcap_{\boldsymbol{a}}\left\lbrace|\boldsymbol{a}&#039;(\overline{X}-\boldsymbol{\mu})|\le t_{\alpha/2}(n-1)\sqrt{\boldsymbol{a}&#039;\boldsymbol{Sa}}/\sqrt{n}\right\rbrace.
+\end{equation*}
+</p>
+<p>为了让上述事件的概率增大到 $ 1-\alpha $，我们需要调整系数的值，将调整后的值记为 $ T_{\alpha}(p,n-1) $. 对 $ \boldsymbol{a} $ 个数有限的情形（记为 $ \boldsymbol{a}_1,\cdots,\boldsymbol{a}_k $），上述联合区间的置信度会因为样本量太少导致其交显得过宽. 此时我们可以采用 <strong>Bonferroni 联合置信区间</strong></p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{a}_i&#039;\overline{X}\pm t_{\alpha/2k}(n-1)\sqrt{\boldsymbol{a}&#039;\boldsymbol{Sa}}/\sqrt{n},i=1,\cdots,k.
+\end{equation*}
+</p>
+<p>在实际使用时，如果 $ t_{\alpha/2k}(n-1)\le T_{\alpha}(p,n-1) $，那么 Bonferroni 联合置信区间会更窄，因此应采用此置信区间，否则使用 $ T_{\alpha}(p,n-1) $ 作为系数. 当 $ k\le p $ 时，Bonferroni 联合置信区间的效果好，因此采用此置信区间.</p>
+<p>实际上 $ T^2 $ 统计量是检验该问题的<strong>似然比统计量</strong>. 对样本可以定义似然函数</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    L(\boldsym…'>\begin{equation*}
+    L(\boldsymbol{x}_{(1)},\cdots,\boldsymbol{x}_{(n)};\boldsymbol{\theta})=\prod_{t=1}^nf(\boldsymbol{x}_{(t)};\boldsymbol{\theta}),
+\end{equation*}
+</p>
+<p>现在我们要做假设检验</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    H_0:\bolds…'>\begin{equation*}
+    H_0:\boldsymbol{\theta}\in\Theta_0,\qquad H_1:\boldsymbol{\theta}\notin\Theta_0.
+\end{equation*}
+</p>
+<p>其中 $ \boldsymbol{\theta}\in\Theta,\Theta_0\subseteq\Theta $. 定义似然比统计量为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \lambda=\f…'>\begin{equation*}
+    \lambda=\frac{\sup\limits_{\theta\in\Theta_0}L(\boldsymbol{X};\boldsymbol{\theta})}{\sup\limits_{\theta\in\Theta}L(\boldsymbol{X};\boldsymbol{\theta})}\in[0,1],
+\end{equation*}
+</p>
+<p>如果似然比太小，则意味着参数 $ \boldsymbol{\theta} $ 更有可能落在 $ \Theta\backslash\Theta_0 $ 中，于是可以拒绝原假设. 在一些正则条件下，似然比统计量的自然对数是渐近服从卡方分布的，即</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    -2\log\lam…'>\begin{equation*}
+    -2\log\lambda\stackrel{d}{\longrightarrow}\chi^2(f),
+\end{equation*}
+</p>
+<p>这里 $ f=\dim\Theta-\dim\Theta_0 $. 该结论是由 Wilks 在 1938 年证明的，原文链接在这 <a target="_blank" rel="noopener" href="https://doi.org/10.1214%2Faoms%2F1177732360">https://doi.org/10.1214%2Faoms%2F1177732360</a>. 多元正态总体情形下，分母的全空间似然函数最大值已经在多元正态分布一文中给出，我们直接使用其结论，最大值为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \sup_{\bol…'>\begin{equation*}
+    \sup_{\boldsymbol{\mu},\boldsymbol{\Sigma}\succ0}L(\boldsymbol{\mu},\boldsymbol{\Sigma})=(2\pi)^{-np/2}\left|\frac{1}{n}\boldsymbol{A}\right|^{-n/2}\mathrm{e}^{-np/2}.
+\end{equation*}
+</p>
+<p>这里 $ \boldsymbol{A} $ 是样本离差阵. 对于分子部分，经过一些推导可得当</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{\Sigma}=\sum_{i=1}^n(\boldsymbol{X}_{(i)}-\boldsymbol{\mu}_0)(\boldsymbol{X}_{(i)}-\boldsymbol{\mu}_0)&#039;:=\frac{1}{n}\boldsymbol{A}_0
+\end{equation*}
+</p>
+<p>时取得最大值，且最大值为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \sup_{\bol…'>\begin{equation*}
+    \sup_{\boldsymbol{\Sigma}\succ0}L(\boldsymbol{\mu}_0,\boldsymbol{\Sigma})=(2\pi)^{-np/2}\left|\frac{1}{n}\boldsymbol{A}_0\right|^{-n/2}\mathrm{e}^{-np/2}.
+\end{equation*}
+</p>
+<p>现在我们考察 $ \boldsymbol{A}_0 $ 和 $ \boldsymbol{A} $ 的关系. 我们有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \boldsymbo…'>\begin{align*}
+    \boldsymbol{A}_0&amp;=\sum_{i=1}^n(\boldsymbol{X}_{(i)}-\overline{X}+\overline{X}-\boldsymbol{\mu}_0)(\boldsymbol{X}_{(i)}-\overline{X}+\overline{X}-\boldsymbol{\mu}_0)&#039;\\&amp;=\boldsymbol{A}+n(\overline{X}-\boldsymbol{\mu}_0)(\overline{X}-\boldsymbol{\mu}_0)&#039;.
+\end{align*}
+</p>
+<p>利用行列式的降阶公式，我们可得</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    |\boldsymb…'>\begin{align*}
+    |\boldsymbol{A}_0|&amp;=\begin{vmatrix}
+        \boldsymbol{A} &amp; -\sqrt{n}(\overline{X}-\boldsymbol{\mu}_0)\\
+        \sqrt{n}(\overline{X}-\boldsymbol{\mu}_0)&#039; &amp; 1
+    \end{vmatrix}\\
+    &amp;=|\boldsymbol{A}|(1+n(\overline{X}-\boldsymbol{\mu}_0)&#039;\boldsymbol{A}^{-1}(\overline{X}-\boldsymbol{\mu}_0))\\
+    &amp;=|\boldsymbol{A}|\cdot\left(1+\frac{1}{n-1}T^2\right).
+\end{align*}
+</p>
+<p>因此似然比统计量就显而易见了. 实际上，我们还可以注意到似然比统计量</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \frac{|\bo…'>\begin{equation*}
+    \frac{|\boldsymbol{A}_0|}{|\boldsymbol{A}|}=\frac{1}{1+\dfrac{1}{n-1}T^2}\sim\Lambda(p,n-1,1).
+\end{equation*}
+</p>
+<p>这实际上就是 Wilks 统计量.</p>
+<p><strong>总体不服从多元正态分布时</strong></p>
+<p>如果总体不是多元正态分布，那么检验统计量在 $ n $ 很大且 $ n\gg p $ 时，有近似分布</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+n(\overline{X}…'>\begin{align*}
+n(\overline{X}-\boldsymbol{\mu})&#039;\boldsymbol{\Sigma}^{-1}(\overline{X}-\boldsymbol{\mu})\stackrel{d}{\longrightarrow}\chi^2(p),\\
+    n(\overline{X}-\boldsymbol{\mu})&#039;\boldsymbol{S}^{-1}(\overline{X}-\boldsymbol{\mu})\stackrel{d}{\longrightarrow}\chi^2(p).
+\end{align*}
+</p>
+<p>利用两个渐近分布就可以做统计推断.</p>
+<h4 id="两个总体的均值比较检验"><a class="markdownIt-Anchor" href="#两个总体的均值比较检验"></a> 两个总体的均值比较检验</h4>
+<p>假设我们有来自总体 $ \boldsymbol{X}\sim N_p(\boldsymbol{\mu}_1,\boldsymbol{\Sigma}) $ 的样本 $ \boldsymbol{X}_{(1)},\cdots,\boldsymbol{X}_{(n_1)} $ 以及来自总体 $ \boldsymbol{Y}\sim N_p(\boldsymbol{\mu}_2,\boldsymbol{\Sigma}) $ 的总体 $ \boldsymbol{Y}_{(1)},\cdots,\boldsymbol{Y}_{(n_2)} $ 且两样本相互独立. 注意我们这里不考虑协方差阵不等的情况，不等时没有较好的检验办法. 由于此时为两样本，我们记 $ \overline{X},\overline{Y} $ 为各自的样本均值， $ \boldsymbol{A}_1,\boldsymbol{A}_2 $ 为各自的样本离差阵， $ \boldsymbol{S}_1,\boldsymbol{S}_2 $ 为各自的样本协方差阵. 现在我们要检验</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    H_0:\bolds…'>\begin{equation*}
+    H_0:\boldsymbol{\mu}_1=\boldsymbol{\mu}_2,\qquad H_2:\boldsymbol{\mu}_1\ne\boldsymbol{\mu}_2.
+\end{equation*}
+</p>
+<p>延续一元情形的思路，我们知道当原假设成立时，有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \sqrt{\dfr…'>\begin{align*}
+    \sqrt{\dfrac{1}{\dfrac{1}{n_1}+\dfrac{1}{n_2}}}(\overline{X}-\overline{Y})&amp;\sim N_p(\boldsymbol{0},\boldsymbol{\Sigma}),\\
+    \boldsymbol{A}_1\sim W_p(n_1-1,\boldsymbol{\Sigma})&amp;,\boldsymbol{A}_2\sim W_p(n_2-1,\boldsymbol{\Sigma}).
+\end{align*}
+</p>
+<p>由 Wishart 分布的可加性可知 $ \boldsymbol{A}_1+\boldsymbol{A}_2\sim W_p(n_1+n_2-2,\boldsymbol{\Sigma}) $. 因此再由独立性和 $ T^2 $ 统计量的定义我们可以得到 $ T^2 $ 统计量为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    T^2=\frac{…'>\begin{equation*}
+    T^2=\frac{n_1n_2}{n_1+n_2}(\overline{X}-\overline{Y})&#039;\boldsymbol{S}^{-1}(\overline{X}-\overline{Y})\sim T^2(p,n_1+n_2-2),
+\end{equation*}
+</p>
+<p>其中</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{S}=\frac{\boldsymbol{A}_1+\boldsymbol{A}_2}{n_1+n_2-2}=\frac{(n_1-1)\boldsymbol{S}_1+(n_2-1)\boldsymbol{S}_2}{n_1+n_2-2}.
+\end{equation*}
+</p>
+<p>再由 $ T^2 $ 分布和 $ F $ 分布间的关系显然有 $ \dfrac{n_1+n_2-p-1}{(n_1+n_2-2)p}T^2\sim F(p,n_1+n_2-p-1) $. 同样地，我们可以构造一般的联合置信区间为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{a}&#039;(\overline{X}-\overline{Y})\pm T_{\alpha}(p,n_1+n_2-2)\sqrt{\frac{1}{n_1}+\frac{1}{n_2}}\sqrt{\boldsymbol{a}&#039;\boldsymbol{Sa}},
+\end{equation*}
+</p>
+<p>Bonferroni 联合置信区间为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{a}&#039;(\overline{X}-\overline{Y})\pm t_{\alpha/2k}(n_1+n_2-2)\sqrt{\frac{1}{n_1}+\frac{1}{n_2}}\sqrt{\boldsymbol{a}&#039;\boldsymbol{Sa}}.
+\end{equation*}
+</p>
+<p>当 $ n_1=n_2=n&gt;p $ 时，如果我们将两个总体的样本一一配对构成二元组 $ (\boldsymbol{X}_{(i)},\boldsymbol{Y}_{i})(i=1,\cdots,n) $，那么这时就变成<strong>成对数据的检验问题</strong>. 如果将一对数据前后作差，上面的检验就等价于单一总体均值是否为零的检验，检验统计量及检验方法是完全相同的，这里不再赘述.</p>
+<h4 id="多个总体的均值比较检验"><a class="markdownIt-Anchor" href="#多个总体的均值比较检验"></a> 多个总体的均值比较检验</h4>
+<p>现在我们有 $ k $ 个 $ p $ 元正态总体 $ N_p(\boldsymbol{\mu}_i,\boldsymbol{\Sigma})(i=1,\cdots,k) $, 来自第 $ i $ 个总体的样本为 $ \boldsymbol{X}_{(1)}^{(i)},\cdots,\boldsymbol{X}_{(n_i)}^{(i)} $. 现在我们想要检验</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    H_0:\bolds…'>\begin{equation*}
+    H_0:\boldsymbol{\mu}_1=\cdots=\boldsymbol{\mu}_k,\qquad H_1:\text{至少存在一对}i\ne j,\text{ 使得}\boldsymbol{\mu}_i\ne\boldsymbol{\mu}_j.
+\end{equation*}
+</p>
+<p>现在记 $ \overline{X} $ 为所有总体的样本汇总得到的数据的均值， $ \overline{X}^{(i)} $ 为来自第 $ i $ 个总体的样本均值. 定义<strong>总离差阵</strong></p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{T}=\sum_{i=1}^{k}\sum_{j=1}^{n_i}(\boldsymbol{X}_{(j)}^{(i)}-\overline{X})(\boldsymbol{X}_{(j)}^{(i)}-\overline{X})&#039;,
+\end{equation*}
+</p>
+<p><strong>组内离差阵（误差平方和及叉积和矩阵）</strong> 为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{E}=\sum_{i=1}^{k}\sum_{j=1}^{n_i}(\boldsymbol{X}_{(j)}^{(i)}-\overline{X}^{(i)})(\boldsymbol{X}_{(j)}^{(i)}-\overline{X}^{(i)})&#039;,
+\end{equation*}
+</p>
+<p><strong>组间离差阵（处理平方和及叉积和矩阵）</strong> 为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{H}=\sum_{i=1}^{k}n_i(\overline{X}^{(i)}-\overline{X})(\overline{X}^{(i)}-\overline{X})&#039;,
+\end{equation*}
+</p>
+<p>则易证明 $ \boldsymbol{T}=\boldsymbol{E}+\boldsymbol{H} $，相应自由度 $ n-1=(n-k)+(k-1),n=n_1+\cdots+n_k$. 利用似然比原理可以得到 Wilks 统计量为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \Lambda=\f…'>\begin{equation*}
+    \Lambda=\frac{|\boldsymbol{E}|}{|\boldsymbol{E+H}|}=\frac{|\boldsymbol{E}|}{|\boldsymbol{T}|}.
+\end{equation*}
+</p>
+<p>通过上面的形式，可以得到</p>
+<ol>
+<li>$ \boldsymbol{E}\sim W_p(n-k,\boldsymbol{\Sigma}) $;</li>
+<li>在 $ H_0 $ 下， $ \boldsymbol{T}\sim W_p(n-1,\boldsymbol{\Sigma}) $;</li>
+<li>在 $ H_0 $ 下， $ \boldsymbol{H}\sim W_p(k-1,\boldsymbol{\Sigma}) $，且 $ \boldsymbol{H} $ 与 $ \boldsymbol{E} $ 相互独立.</li>
+</ol>
+<p>因此根据 Wilks 分布的定义马上得到在原假设下 $ \Lambda\sim\Lambda(p,n-k,k-1) $. 获得其临界值需要查表或者使用渐近分布. 当 $ k=2,3 $ 时的情况可以直接用先前陈述过的 Wilks 分布的性质来建立和 $ F $ 分布的关系从而得到统计量.</p>
+<h3 id="协方差阵的检验"><a class="markdownIt-Anchor" href="#协方差阵的检验"></a> 协方差阵的检验</h3>
+<h4 id="单个总体协方差阵的检验"><a class="markdownIt-Anchor" href="#单个总体协方差阵的检验"></a> 单个总体协方差阵的检验</h4>
+<p>现在我们假设 $ \boldsymbol{X}_{(\alpha)}(\alpha=1,\cdots,n) $ 是来自 $ N_p(\boldsymbol{\mu},\boldsymbol{\Sigma}) $ 的随机样本但 $ \boldsymbol{\Sigma}\succ\boldsymbol{O} $ 未知. 我们现在要检验</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    H_0:\bolds…'>\begin{equation*}
+    H_0:\boldsymbol{\Sigma}=\boldsymbol{\Sigma}_0(\boldsymbol{\Sigma}_0\succ\boldsymbol{O}\text{ 已知}),\quad H_1:\boldsymbol{\Sigma}\ne\boldsymbol{\Sigma}_0.
+\end{equation*}
+</p>
+<p>我们先考察 $ \boldsymbol{\Sigma}_0=\boldsymbol{I}_p $ 的情况. 我们利用似然比原理来导出统计量 $ \lambda_1 $. 在 $ \boldsymbol{\Sigma}_0 $ 给定时，约束空间上似然函数在 $ \boldsymbol{\mu}=\overline{X} $ 处取得极大值. 再利用先前无条件时似然函数的最大值，可以写出</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \lambda_1=…'>\begin{equation*}
+    \lambda_1=\exp\left\lbrace-\frac{1}{2}\mathrm{tr}(\boldsymbol{A})\right\rbrace|\boldsymbol{A}|^{n/2}\left(\frac{\mathrm{e}}{n}\right)^{np/2},
+\end{equation*}
+</p>
+<p>其中 $ \boldsymbol{A} $ 是样本离差阵. 利用似然比统计量的渐近分布可以得到 $ \xi=-2\log\lambda_1 $ 在大样本及原假设成立下的近似分布为 $ \chi^2\left(\dfrac{p(p+1)}{2}\right) $. 从而可以得到检验方法.<br />
+当 $ \boldsymbol{\Sigma}_0\ne\boldsymbol{I}_p $ 时，由于其正定，因此存在非异阵 $ \boldsymbol{D}_{p\times p} $ 使得 $ \boldsymbol{D\Sigma}_0\boldsymbol{D}'=\boldsymbol{I}_p $. 令 $ \boldsymbol{Y}_{(\alpha)}=\boldsymbol{DX}_{(\alpha)}(\alpha=1,\cdots,n) $, 那么易知</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{Y}_{(\alpha)}\sim N_p(\boldsymbol{D\mu},\boldsymbol{D\Sigma D}&#039;):=N_p(\boldsymbol{\mu}^*,\boldsymbol{\Sigma}^*).
+\end{equation*}
+</p>
+<p>因此检验等价于检验新的协方差阵是否等于单位阵. 并且新的检验统计量</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \lambda_2=…'>\begin{equation*}
+    \lambda_2=\exp\left[-\frac{1}{2}\mathrm{tr}(\boldsymbol{A\Sigma}_0^{-1})\right]|\boldsymbol{A\Sigma}_0^{-1}|^{n/2}\left(\frac{\mathrm{e}}{n}\right)^{np/2}.
+\end{equation*}
+</p>
+<p>其渐近分布同单位阵的情况.<br />
+现在来考虑另一个检验 $ H_0:\boldsymbol{\Sigma}=\sigma^2\boldsymbol{\Sigma}_0 $，其中 $ \sigma^2 $ 未知. 当 $ \boldsymbol{\Sigma}_0=\boldsymbol{I}_p $ 时常被称作<strong>球性检验</strong>. 事实上 $ \sigma^2 $ 是一尺度参数，所以该检验能囊括更多的信息，检验更加普适. 经过一些计算可以得到似然比统计量 $ \lambda_3 $ 及等价统计量</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    W=(\lambda…'>\begin{equation*}
+    W=(\lambda_3)^{2/n}=\frac{p^p|\boldsymbol{\Sigma}_0^{-1}\boldsymbol{A}|}{[\mathrm{tr}(\boldsymbol{\Sigma}_0^{-1}\boldsymbol{A})]^p}.
+\end{equation*}
+</p>
+<p>大样本场合下 $ W $ 有近似分布 $ -\left((n-1)-\dfrac{2p^2+p+2}{6p}\right)\log W\sim\chi^2\left(\dfrac{p(p+1)}{2}-1\right) $.</p>
+<h4 id="多总体协方差阵检验"><a class="markdownIt-Anchor" href="#多总体协方差阵检验"></a> 多总体协方差阵检验</h4>
+<p>现在假设有 $ k $ 个总体 $ N_p(\boldsymbol{\mu}_t,\boldsymbol{\Sigma}_t)(t=1,\cdots,k) $ 以及来自这些总体的样本 $ \boldsymbol{X}_{(\alpha)}^{(t)}(t=1,\cdots,k,\alpha=1,\cdots,n_t) $，记 $ n=\sum_{i=1}^{k}n_i $. 现在我们要检验</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    H_0:\bolds…'>\begin{equation*}
+    H_0:\boldsymbol{\Sigma}_1=\cdots=\boldsymbol{\Sigma}_k=\boldsymbol{\Sigma},\quad H_1:\boldsymbol{\Sigma}_1,\cdots,\boldsymbol{\Sigma}_k\text{ 不全相等}.
+\end{equation*}
+</p>
+<p>我们仍然利用似然比统计量，不难算得</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \lambda_4=…'>\begin{equation*}
+    \lambda_4=\left.\left|\frac{\boldsymbol{A}}{n}\right|^{-n/2}\right/\prod_{i=1}^k\left|\frac{\boldsymbol{A_i}}{n_i}\right|^{-n_i/2}.
+\end{equation*}
+</p>
+<p>其中 $ \boldsymbol{A}=\boldsymbol{A}_1+\cdots+\boldsymbol{A}_k $. 根据无偏性要求进行修正可得统计量</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    M=-2\log\l…'>\begin{equation*}
+    M=-2\log\lambda_4^*=(n-k)\log\left|\frac{\boldsymbol{A}}{n-k}\right|-\sum_{i=1}^k(n_i-1)\log\left|\frac{\boldsymbol{A}_i}{n_i-1}\right|.
+\end{equation*}
+</p>
+<p>在大样本且原假设为真时， $ M $ 有渐近分布 $ (1-d)M\sim\chi^2(f) $，其中</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    f&amp;=\frac{1…'>\begin{align*}
+    f&amp;=\frac{1}{2}p(p+1)(k-1),\\
+    d&amp;=\begin{cases}
+        \dfrac{2p^2+3p-1}{6(p+1)(k-1)}\left[\displaystyle{\sum\limits_{i=1}^k}\dfrac{1}{n_i-1}-\dfrac{1}{n-k}\right],&amp;\text{当 }n_i\text{ 不全相等},\\
+        \dfrac{(2p^2+3p-1)(k+1)}{6(p+1)(n-k)},&amp;\text{当 }n_i\text{ 全相等}.
+    \end{cases}
+\end{align*}
+</p>
+<p>其实上面 $ n_i $ 全相等的情况可以直接由不全相等得到，无需分类.</p>
+<div class="note info no-icon flat"><p><strong>注</strong> 实际上还有同时对多总体的均值和协方差阵进行的假设检验，这里略去.</p>
+</div>
+<h3 id="独立性检验"><a class="markdownIt-Anchor" href="#独立性检验"></a> 独立性检验</h3>
+<p>设总体 $ \boldsymbol{X}\sim N_p(\boldsymbol{\mu},\boldsymbol{\Sigma}) $，如果我们将其剖分成 $ k $ 个子向量， $ \boldsymbol{\mu},\boldsymbol{\Sigma} $ 也做相应剖分（注意这里是将 $ p $ 维向量降维而非多个样本分组），并设维度分别为 $ p_1,\cdots,p_k $. 如果这些子向相互独立，那么我们可以将高维问题转化为低维问题<strong>独立地处理</strong>，这给分析带来了极大的方便，甚至一定程度上能减缓维度灾难，因为高维场合下假设检验的效果可能会大打折扣. 由于多元正态分布的独立性和不相关性等价，因此要检验两个向量的独立性，只需要检验两者的协方差阵是否为零矩阵. 即</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    H_0:\bolds…'>\begin{equation*}
+    H_0:\boldsymbol{\Sigma}_{ij}=\boldsymbol{O},\forall i\ne j,\quad H_1:\boldsymbol{\Sigma}_{ij}=\boldsymbol{O},\exists i\ne j.
+\end{equation*}
+</p>
+<p>我们还是使用似然比统计量. 其形式几乎和多总体协方差阵检验统计量 $ \lambda_4 $ 是一致的，推导不再赘述，形式为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \lambda=\l…'>\begin{equation*}
+    \lambda=\left(\frac{|\boldsymbol{A}|}{\prod_{i=1}^k|\boldsymbol{A}_{ii}|}\right)^{n/2}:=V^{n/2}.
+\end{equation*}
+</p>
+<p>这里 $ \boldsymbol{A} $ 是未剖分样本的样本离差阵， $ \boldsymbol{A}_{ii} $ 是剖分后第 $ i $ 个低维样本的样本离差阵（即 $ \boldsymbol{A} $ 的分块对角元）. 在原假设成立且 $ n\to\infty $ 时，有 $ -b\log V\sim\chi^2(f) $，其中</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    b&amp;=n-\frac…'>\begin{align*}
+    b&amp;=n-\frac{3}{2}-\frac{p^3-\displaystyle{\sum_{i=1}^kp_i^3}}{3\left(p^2-\displaystyle{\sum_{i=1}^kp_i^2}\right)},\\
+    f&amp;=\frac{1}{2}\left[p(p+1)-\sum_{i=1}^kp_{i}(p_i+1)\right].
+\end{align*}
+</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://hzy2024.github.io">Eason</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://hzy2024.github.io/2026/03/15/%E4%B8%89%E5%A4%A7%E6%8A%BD%E6%A0%B7%E5%88%86%E5%B8%83%E5%9C%A8%E5%A4%9A%E5%85%83%E6%AD%A3%E6%80%81%E6%80%BB%E4%BD%93%E6%83%85%E5%BD%A2%E4%B8%8B%E7%9A%84%E6%8E%A8%E5%B9%BF/">http://hzy2024.github.io/2026/03/15/%E4%B8%89%E5%A4%A7%E6%8A%BD%E6%A0%B7%E5%88%86%E5%B8%83%E5%9C%A8%E5%A4%9A%E5%85%83%E6%AD%A3%E6%80%81%E6%80%BB%E4%BD%93%E6%83%85%E5%BD%A2%E4%B8%8B%E7%9A%84%E6%8E%A8%E5%B9%BF/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://hzy2024.github.io" target="_blank">Eason's page</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%95%B0%E5%AD%A6/">数学</a><a class="post-meta__tags" href="/tags/%E6%95%B0%E7%90%86%E7%BB%9F%E8%AE%A1/">数理统计</a><a class="post-meta__tags" href="/tags/%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83/">正态分布</a><a class="post-meta__tags" href="/tags/%E5%A4%9A%E5%85%83%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90/">多元统计分析</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/03/18/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%B9%B3%E7%A8%B3%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E6%A8%A1%E5%9E%8B/" title="时间序列分析——平稳时间序列模型"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">时间序列分析——平稳时间序列模型</div></div><div class="info-2"><div class="info-item-1">本文对一般线性过程及其截断——滑动平均过程、自回归过程及两者的结合—— ARMA 模型的模型性质及估计量的一些基本统计性质做了总结，中间涉及到随机变量二次型期望和方差的推导.   一、一般线性过程 一般线性过程$ \lbrace Y_t\rbrace  $ 可以表示成现在和过去白噪声变量的加权线性组合 \begin{equation*}     Y_t=e_t+\psi_1e_{t-1}+\psi_2e_{t-2}+\cdots\quad\left(\sum_{n=1}^{\infty}\psi_n^2&lt;\infty\right) \end{equation*}  其中 $ e_t,\cdots,e_{t-q} $ 都是白噪声, 即均值为 $ 0 $ 且独立同分布的随机变量，并假设方差均为 $ \sigma_e^2 $. 我们现在通过 $ Y_t $ 的截断 \begin{equation*}   Y_{t,m}=\sum_{i=0}^{m}\psi_{i}e_{t-i}\to Y_{t}~~(m\to\infty) \end{equation*}  来说明括号内的条件起到...</div></div></div></a><a class="pagination-related" href="/2026/03/12/%E5%AD%A3%E8%8A%82%E6%80%A7%E8%B6%8B%E5%8A%BF%E5%92%8C%E4%BD%99%E5%BC%A6%E8%B6%8B%E5%8A%BF%E7%9A%84%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E6%A8%A1%E5%9E%8B%E6%AF%94%E8%BE%83/" title="季节性趋势和余弦趋势的时间序列模型比较"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">季节性趋势和余弦趋势的时间序列模型比较</div></div><div class="info-2"><div class="info-item-1">本文总结了对有季节性趋势的数据（比如某地连续几年的月度气温数据）的两种建模方法的比较，参考书目：时间序列分析分析及应用：R语言（Jonathan D.Cryer著）.  对于一个有周期性的数据, 我们往往可以对每个观测时间点获得数据的均值做一定的假设来说明其周期性的趋势，将其从随机项中剥离出来，并进一步实现一个回归模型. 我们可以表示为 \begin{equation*}     Y_t=\mu_t+X_t, \end{equation*}  其中 $ Y_t $ 是在时间 $ t $ 处的观测值, $ \mu_t $ 是观测值 $ Y_t $ 的均值函数, 是确定的， $ X_t $ 是一漂移项且满足对任意的 $ t $ 都有 $ \mathbb{E}(X_t)=0 $，注意我们总是假定从数据得到的时间序列是宽平稳的，这一点非常重要，因为这使得我们可以合理地对协方差函数/自相关函数的表示做简化. 下面对两种模型进行展开（本文中认为 $ 12 $ 个月为一个周期，即年气温的变化）：  季节均值模型 $ \mu_t $ 的一个很自然的假设是存在 $ 12 $ 个参数 $ \beta...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/02/25/%E5%A4%9A%E5%85%83%E6%AD%A3%E6%80%81%E5%88%86%E5%B8%83/" title="多元正态分布"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-25</div><div class="info-item-2">多元正态分布</div></div><div class="info-2"><div class="info-item-1">本文内容参考了 George Casella 所著的统计推断（第二版）及高惠璇应用多元统计分析有关多维随机变量的内容.  本文对多元正态分布的一些基础的结论做了一些总结. 多元正态分布是用相互独立且同 $ N(0,1) $ 分布的随机变量通过线性变换来定义的：设 $ \boldsymbol{U}=(U_1,U_2,\cdots,U_n)'$ 为随机向量，各分量间相互独立且同 $ N(0,1) $ 分布；设 $ \boldsymbol{\mu} $ 为 $ n $ 维常数向量， $ \boldsymbol{A}$ 为 $ n\times p $ 常数矩阵，则称 $ \boldsymbol{X}=\boldsymbol{AU}+\boldsymbol{\mu} $ 的分布为 $ n $ 元正态分布，或称 $ \boldsymbol{X} $ 为 $ n $ 元正态随机向量，记为 $ \boldsymbol{X}\sim N(\boldsymbol{\mu},\boldsymbol{AA}') $.  二元正态分布 一般来说较为熟知的多元正态分布是二元正态分布，其密度函数形式是 \be...</div></div></div></a><a class="pagination-related" href="/2026/02/25/%E4%B8%80%E9%81%93%E7%A8%8D%E6%98%BE%E5%A4%8D%E6%9D%82%E7%9A%84%E9%9A%8F%E6%9C%BA%E6%A0%B7%E6%9C%AC%E6%96%B9%E5%B7%AE%E6%80%A7%E8%B4%A8%E7%9A%84%E9%A2%98%E7%9B%AE/" title="一道稍显复杂的随机样本方差性质的题目"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-25</div><div class="info-item-2">一道稍显复杂的随机样本方差性质的题目</div></div><div class="info-2"><div class="info-item-1">设 $ X_1,\cdots,X_n $ 为一随机样本，其均值和方差分别记为 $ \overline{X} $ 和 $ S^2 $. (a) 证明： \begin{equation*}     S^2=\dfrac{1}{2n(n-1)}\sum_{i=1}^n\sum_{j=1}^n(X_i-X_j)^2; \end{equation*}  假设 $ X_i $ 的四阶矩存在且有限，记 $ \theta_1=\mathbb{E}X_i,~\theta_j=\mathbb{E}(X_i-\theta_1)^j,~j=2,3,4. $ (b) 证明 $ \text{Var}S^2=\dfrac{1}{n}\left(\theta_4-\dfrac{n-3}{n-1}\theta_2^2\right) $; (c) 用 $ \theta_1,\cdots,\theta_4 $ 表示 $ \text{Cov}(\overline{X},S^2) $，问 $ \text{Cov}(\overline{X},S^2) $ 何时得 $ 0 $ ?  解答 (a) 只要展开并验证即可. 我们有...</div></div></div></a><a class="pagination-related" href="/2026/04/04/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E9%9D%9E%E5%B9%B3%E7%A8%B3%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E6%A8%A1%E5%9E%8B/" title="时间序列分析——非平稳时间序列模型"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-04-04</div><div class="info-item-2">时间序列分析——非平稳时间序列模型</div></div><div class="info-2"><div class="info-item-1">平稳时间序列模型的建模已经可以对一些实际场景建模，但是平稳性实际是一个很强的条件，有更多的数据是不能以 $ \text{ARMA}(p,q) $ 模型建模的. 一个典型的非平稳的时间序列模型可以从均值上反映，即均值非常数，随时间 $ t $ 变化而变化，可以写为 $ \mu_t=g(t) $. 在季节性趋势和余弦趋势的时间序列模型比较一文中关于余弦趋势模型的建模就是一个典型的例子. 如果序列的自协方差函数和 $ t $ 有关，那么也是非平稳的. 事实上，我们可以从 $ \text{AR}(p) $ 模型的表达式出发，让其不满足平稳性条件来一窥非平稳时间序列. 我们考虑 $ \text{AR}(1) $ 模型，令 $ \phi=3 $，即 \begin{equation*}     Y_t=3Y_{t-1}+e_t, \end{equation*}  那么经过 $ t-1 $ 步迭代我们有 \begin{equation*}     Y_t=e_t+3e_{t-1}+\cdots+3^{t-1}e_1+3^tY_0, \end{equation*}  其中令 $ Y_0=0 $ 是...</div></div></div></a><a class="pagination-related" href="/2026/04/29/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E6%A8%A1%E5%9E%8B%E5%8F%82%E6%95%B0%E4%BC%B0%E8%AE%A1/" title="时间序列分析——模型参数估计"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-04-29</div><div class="info-item-2">时间序列分析——模型参数估计</div></div><div class="info-2"><div class="info-item-1">本文内容接时间序列分析——非平稳时间序列模型. 在做完模型阶数的选择后，进一步地我们可以进行模型参数的估计，从而真正完全确定模型长什么样. 我们有多种技术来进行参数估计. 我们先前已经验证了，对于 $ \text{ARMA}(p,q) $ 模型的自相关系数，样本自相关系数是其相合估计量. 模型中的系数可以通过 Yule-Walker 方程利用自相关函数反解出来. 这些关系将在后面的估计中使用到. 本文主要介绍矩估计、最小二乘估计和极大似然估计. 均从简单的模型出发推广一般形式.  矩估计  $ \text{MA}(q) $ 模型 我们首先以 $ \text{MA}(1) $ 为例说明矩估计是怎么进行的. 首先在该模型下， $ Y_t=e_t-\theta e_{t-1},\mathbb{E}(Y_t)=0 $. 我们有 ρ1=−θ1+θ2\rho_1=\dfrac{-\theta}{1+\theta^2}ρ1​=1+θ2−θ​，将其视为关于 $ \theta $ 的一元二次方程，就能解得 \begin{equation*}     \theta=\dfrac{-1\pm\sqrt...</div></div></div></a><a class="pagination-related" href="/2026/01/28/%E9%80%86%E9%AB%98%E6%96%AF%E5%88%86%E5%B8%83%E7%9A%84%E5%88%86%E5%B8%83%E5%87%BD%E6%95%B0%E6%8E%A8%E5%AF%BC/" title="逆高斯分布的分布函数推导"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-01-28</div><div class="info-item-2">逆高斯分布的分布函数推导</div></div><div class="info-2"><div class="info-item-1">本文是从本人的知乎上搬过来的，用 AI 小修了一下. 逆高斯分布 (Inverse Gaussian Distribution) 在生存分析中具有重要地位. 本文参考了 Chhikara (1974) 关于逆高斯分布性质的文章. 鉴于网络上鲜有关于逆高斯分布函数推导过程的详细资料，故整理此文.   1. 证明思路 其实证明的思路非常简单，主要采用 换元法 以及 一元二次方程的求根公式. 虽然计算过程略显繁琐，但逻辑十分清晰.  2. 推导过程  2.1 密度函数变形 首先，逆高斯分布的密度函数为： \begin{equation*} f(t) = \sqrt{\dfrac{1}{2\pi t^3}}\exp\left[-\dfrac{\lambda}{2\mu^2}\dfrac{(t-\mu)^2}{t}\right] \end{equation*}  为了凑出 标准正态分布 $ \mathcal{N}(0,1) $ 的形式，我们需要对指数部分进行变换. 考虑如下换元，并计算其微分： \begin{equation*} v = \sqrt{\lambda}\left(\dfrac...</div></div></div></a><a class="pagination-related" href="/2026/05/15/%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E6%A8%A1%E5%9E%8B%E8%AF%8A%E6%96%AD%E4%B8%8E%E6%A8%A1%E5%9E%8B%E9%A2%84%E6%B5%8B/" title="时间序列分析——模型诊断与模型预测"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-05-15</div><div class="info-item-2">时间序列分析——模型诊断与模型预测</div></div><div class="info-2"><div class="info-item-1">本文内容接时间序列分析——模型参数估计. 现在我们基本完成了时间序列相关的模型构建、模型性质考察、模型选择、模型参数估计的任务. 接下来一个很重要的问题是：我们拟合的模型是否适当？我们在建立 $ \text{ARMA}(p,q) $ 模型时，实际上假定了 $ e_t $ 之间是独立的，且服从正态分布 $ N(0,\sigma_e^2) $ （当然在没有正态性时，我们仍然可以通过通过最小二乘法获得参数的估计，无需极大似然方法）. 说明模型不适当的一个例子可以看时间序列分析——非平稳时间序列模型一文中有关 $ \text{EACF} $ 的开头内容. 上面对于噪声项的假定实际上就是我们模型诊断的关键. 接下来关于模型诊断的内容主要围绕噪声项正态性及独立性的检验来进行说明.  模型诊断  $ e_t $ 正态性的检验 传统的数据正态性检验可以使用 $ \text{Q-Q} $ 图来看和正态分布的分位数线条的差异，但时间序列的特殊性使得我们不能使用这种方法，因为序列具有相关性. 下面要介绍的 Jarque-Bera 检验就是对时间序列噪声正态性检验的一个工具. 我们先从一般情况说起. 假...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Eason</div><div class="author-info-description">SUFE统计学大四本科生一枚~
+（已保研至FDU）
+</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">32</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/hzy2024"><i class="fab fa-github"></i><span>访问我的 GitHub</span></a><div class="card-info-social-icons"><a class="social-icon" href="/img/qq.jpg" target="_blank" title="QQ"><i class="fab fa-qq" style="color: #1e3050;"></i></a><a class="social-icon" href="https://space.bilibili.com/345987732?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #fb7299;"></i></a><a class="social-icon" href="https://www.zhihu.com/people/perplexity-67" target="_blank" title="知乎"><i class="fab fa-zhihu" style="color: #1772f6;"></i></a><a class="social-icon" href="mailto:2023110611@stu.sufe.edu.cn" target="_blank" title="E-mail"><i class="fas fa-envelope" style="color: #0078d7;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">佛系更新ing...</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%90%84%E5%88%86%E9%87%8F%E7%8B%AC%E7%AB%8B%E7%9A%84%E6%AD%A3%E6%80%81%E9%9A%8F%E6%9C%BA%E5%90%91%E9%87%8F%E7%9A%84%E4%BA%8C%E6%AC%A1%E5%9E%8B"><span class="toc-number">1.</span> <span class="toc-text"> 各分量独立的正态随机向量的二次型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E8%88%AC%E6%AD%A3%E6%80%81%E9%9A%8F%E6%9C%BA%E5%90%91%E9%87%8F%E7%9A%84%E4%BA%8C%E6%AC%A1%E5%9E%8B"><span class="toc-number">2.</span> <span class="toc-text"> 一般正态随机向量的二次型</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9D%9E%E4%B8%AD%E5%BF%83-t-%E5%88%86%E5%B8%83%E5%92%8C%E9%9D%9E%E4%B8%AD%E5%BF%83-f-%E5%88%86%E5%B8%83"><span class="toc-number">3.</span> <span class="toc-text"> 非中心 $ t $ 分布和非中心 $ F $ 分布</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%9A%E5%85%83%E6%AD%A3%E6%80%81%E6%83%85%E5%BD%A2%E4%B8%8B%E7%9A%84%E4%B8%89%E5%A4%A7%E6%8A%BD%E6%A0%B7%E5%88%86%E5%B8%83"><span class="toc-number">4.</span> <span class="toc-text"> 多元正态情形下的三大抽样分布</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#wishart-%E5%88%86%E5%B8%83"><span class="toc-number">4.1.</span> <span class="toc-text"> Wishart 分布</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#hotelling-t2-%E5%88%86%E5%B8%83"><span class="toc-number">4.2.</span> <span class="toc-text"> Hotelling $ T^2 $ 分布</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#wilks-lambda-%E5%88%86%E5%B8%83"><span class="toc-number">4.3.</span> <span class="toc-text"> Wilks $ \Lambda $ 分布</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%A9%E7%94%A8%E6%8A%BD%E6%A0%B7%E5%88%86%E5%B8%83%E8%BF%9B%E8%A1%8C%E5%81%87%E8%AE%BE%E6%A3%80%E9%AA%8C"><span class="toc-number">5.</span> <span class="toc-text"> 利用抽样分布进行假设检验</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9D%87%E5%80%BC%E5%90%91%E9%87%8F%E7%9A%84%E6%A3%80%E9%AA%8C"><span class="toc-number">5.1.</span> <span class="toc-text"> 均值向量的检验</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8D%95%E4%B8%80%E6%80%BB%E4%BD%93%E4%B8%8B%E7%9A%84%E5%9D%87%E5%80%BC%E5%90%91%E9%87%8F%E6%A3%80%E9%AA%8C"><span class="toc-number">5.1.1.</span> <span class="toc-text"> 单一总体下的均值向量检验</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%A4%E4%B8%AA%E6%80%BB%E4%BD%93%E7%9A%84%E5%9D%87%E5%80%BC%E6%AF%94%E8%BE%83%E6%A3%80%E9%AA%8C"><span class="toc-number">5.1.2.</span> <span class="toc-text"> 两个总体的均值比较检验</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A4%9A%E4%B8%AA%E6%80%BB%E4%BD%93%E7%9A%84%E5%9D%87%E5%80%BC%E6%AF%94%E8%BE%83%E6%A3%80%E9%AA%8C"><span class="toc-number">5.1.3.</span> <span class="toc-text"> 多个总体的均值比较检验</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8D%8F%E6%96%B9%E5%B7%AE%E9%98%B5%E7%9A%84%E6%A3%80%E9%AA%8C"><span class="toc-number">5.2.</span> <span class="toc-text"> 协方差阵的检验</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8D%95%E4%B8%AA%E6%80%BB%E4%BD%93%E5%8D%8F%E6%96%B9%E5%B7%AE%E9%98%B5%E7%9A%84%E6%A3%80%E9%AA%8C"><span class="toc-number">5.2.1.</span> <span class="toc-text"> 单个总体协方差阵的检验</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A4%9A%E6%80%BB%E4%BD%93%E5%8D%8F%E6%96%B9%E5%B7%AE%E9%98%B5%E6%A3%80%E9%AA%8C"><span class="toc-number">5.2.2.</span> <span class="toc-text"> 多总体协方差阵检验</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%8B%AC%E7%AB%8B%E6%80%A7%E6%A3%80%E9%AA%8C"><span class="toc-number">5.3.</span> <span class="toc-text"> 独立性检验</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/08/06/%E6%95%B0%E5%80%BC%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E8%A7%A3%E7%BA%BF%E6%80%A7%E6%96%B9%E7%A8%8B%E7%BB%84%E7%9A%84%E7%9B%B4%E6%8E%A5%E6%B3%95%E4%B8%8E%E8%BF%AD%E4%BB%A3%E6%B3%95/" title="数值分析——解线性方程组的直接法与迭代法">数值分析——解线性方程组的直接法与迭代法</a><time datetime="2026-08-06T02:01:31.000Z" title="发表于 2026-08-06 10:01:31">2026-08-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/07/31/%E6%95%B0%E5%80%BC%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%87%BD%E6%95%B0%E9%80%BC%E8%BF%91%E4%B8%8E%E5%BF%AB%E9%80%9F%20Fourier%20%E5%8F%98%E6%8D%A2/" title="数值分析——函数逼近与快速 Fourier 变换">数值分析——函数逼近与快速 Fourier 变换</a><time datetime="2026-07-31T01:41:42.000Z" title="发表于 2026-07-31 09:41:42">2026-07-31</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/07/24/%E9%AB%98%E7%AD%89%E4%BB%A3%E6%95%B0%E4%B8%AD%E7%9A%84%E4%B8%80%E4%BA%9B%E5%AE%9A%E4%B9%89%E5%8F%8A%E7%BB%93%E8%AE%BA/" title="高等代数中的一些定义及结论">高等代数中的一些定义及结论</a><time datetime="2026-07-24T15:59:45.000Z" title="发表于 2026-07-24 23:59:45">2026-07-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/07/10/EM-%E7%AE%97%E6%B3%95/" title="EM 算法">EM 算法</a><time datetime="2026-07-10T13:24:41.000Z" title="发表于 2026-07-10 21:24:41">2026-07-10</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/06/12/%E5%A4%9A%E5%85%83%E7%BB%9F%E8%AE%A1%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%88%A4%E5%88%AB%E5%88%86%E6%9E%90/" title="多元统计分析——判别分析">多元统计分析——判别分析</a><time datetime="2026-06-12T09:41:00.000Z" title="发表于 2026-06-12 17:41:00">2026-06-12</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Eason</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.4</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.5.4"></script><script src="/js/main.js?v=5.5.4"></script><div class="js-pjax"><script>(() => {
+  const loadMathjax = () => {
+    if (!window.MathJax) {
+      window.MathJax = {
+        loader: {
+          load: [
+            // Four font extension packages (optional)
+            //- '[tex]/bbm',
+            //- '[tex]/bboldx',
+            //- '[tex]/dsfont',
+            '[tex]/mhchem'
+          ],
+          paths: {
+            'mathjax-newcm': '[mathjax]/../@mathjax/mathjax-newcm-font',
+
+            //- // Four font extension packages (optional)
+            //- 'mathjax-bbm-extension': '[mathjax]/../@mathjax/mathjax-bbm-font-extension',
+            //- 'mathjax-bboldx-extension': '[mathjax]/../@mathjax/mathjax-bboldx-font-extension',
+            //- 'mathjax-dsfont-extension': '[mathjax]/../@mathjax/mathjax-dsfont-font-extension',
+            'mathjax-mhchem-extension': '[mathjax]/../@mathjax/mathjax-mhchem-font-extension'
+          }
+        },
+        output: {
+          font: 'mathjax-newcm',
+        },
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+          packages: {
+            '[+]': [
+              'mhchem'
+            ]
+          }
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          enableMenu: true,
+          menuOptions: {
+            settings: {
+              enrich: false  // Turn off Braille and voice narration text automatic generation
+            }
+          },
+          renderActions: {
+            findScript: [10, doc => {
+              for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+                const display = !!node.type.match(/; *mode=display/)
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+                const text = document.createTextNode('')
+                node.parentNode.replaceChild(text, node)
+                math.start = {node: text, delim: '', n: 0}
+                math.end = {node: text, delim: '', n: 0}
+                doc.math.push(math)
+              }
+            }, '']
+          }
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax@4.1.0/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.startup.document.state(0)
+      MathJax.texReset()
+      MathJax.typesetPromise()
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
