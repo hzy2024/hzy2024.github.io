@@ -1,0 +1,1081 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>集成学习——上篇 | Eason's page</title><meta name="author" content="Eason"><meta name="copyright" content="Eason"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="本文内容参考了李航《机器学习方法（第 2 版）》、周志华《集成学习方法》等书目，并且参考了很多关于集成学习相关算法的原始文献如 XGBoost、LightGBM 等的内容，并且配以具体案例建模和代码，内容上较为详尽，本人认为基本涵盖了集成学习的大部分广泛应用的内容，对实际工作相当有帮助. 部分背景性知识和内容组织使用到了 AI 辅助.  集成学习（ensemble learning） 是一种机器学">
+<meta property="og:type" content="article">
+<meta property="og:title" content="集成学习——上篇">
+<meta property="og:url" content="http://hzy2024.github.io/2026/10/24/%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E4%B8%8A%E7%AF%87/index.html">
+<meta property="og:site_name" content="Eason&#39;s page">
+<meta property="og:description" content="本文内容参考了李航《机器学习方法（第 2 版）》、周志华《集成学习方法》等书目，并且参考了很多关于集成学习相关算法的原始文献如 XGBoost、LightGBM 等的内容，并且配以具体案例建模和代码，内容上较为详尽，本人认为基本涵盖了集成学习的大部分广泛应用的内容，对实际工作相当有帮助. 部分背景性知识和内容组织使用到了 AI 辅助.  集成学习（ensemble learning） 是一种机器学">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://hzy2024.github.io/img/avatar.jpg">
+<meta property="article:published_time" content="2026-10-24T13:42:47.000Z">
+<meta property="article:modified_time" content="2026-11-23T15:27:38.908Z">
+<meta property="article:author" content="Eason">
+<meta property="article:tag" content="GBDT">
+<meta property="article:tag" content="bagging">
+<meta property="article:tag" content="boosting">
+<meta property="article:tag" content="stacking">
+<meta property="article:tag" content="加法模型">
+<meta property="article:tag" content="树集成">
+<meta property="article:tag" content="集成学习">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://hzy2024.github.io/img/avatar.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "集成学习——上篇",
+  "url": "http://hzy2024.github.io/2026/10/24/%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E4%B8%8A%E7%AF%87/",
+  "image": "http://hzy2024.github.io/img/avatar.jpg",
+  "datePublished": "2026-10-24T13:42:47.000Z",
+  "dateModified": "2026-11-23T15:27:38.908Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Eason",
+      "url": "http://hzy2024.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://hzy2024.github.io/2026/10/24/%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E4%B8%8A%E7%AF%87/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.7.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.3.1/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        const data = { value }
+
+        if (ttl != null) {
+          data.expiry = Date.now() + ttl * 86400000
+        }
+
+        localStorage.setItem(key, JSON.stringify(data))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return
+
+        try {
+          const data = JSON.parse(itemStr)
+
+          if (data.expiry && Date.now() > data.expiry) {
+            localStorage.removeItem(key)
+            return
+          }
+
+          return data.value
+        } catch {
+          localStorage.removeItem(key)
+        }
+      }
+    }
+
+    const scriptCache = new Map()
+    const cssCache = new Map()
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => {
+        if (scriptCache.has(url)) {
+          return scriptCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+
+          script.src = url
+          script.async = true
+
+          for (const key in attr) {
+            script.setAttribute(key, attr[key])
+          }
+
+          script.onload = resolve
+          script.onerror = reject
+
+          document.head.appendChild(script)
+        })
+
+        scriptCache.set(url, promise)
+
+        return promise
+      },
+      getCSS: (url, id) => {
+        if (cssCache.has(url)) {
+          return cssCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+
+          link.rel = 'stylesheet'
+          link.href = url
+
+          if (id) {
+            link.id = id
+          }
+
+          link.onload = resolve
+          link.onerror = reject
+
+          document.head.appendChild(link)
+        })
+
+        cssCache.set(url, promise)
+
+        return promise
+      },
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+      const activateDarkMode = () => {
+        document.documentElement.dataset.theme = 'dark'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.dataset.theme = 'light'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '集成学习——上篇',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 8.1.2"></head><body><div class="bg-animation" id="web_bg" style="background-image: url(/img/background.GIF);"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">23</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">45</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Eason's page</span></a><a class="nav-page-title" href="/"><span class="site-name">集成学习——上篇</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">集成学习——上篇</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-10-24T13:42:47.000Z" title="发表于 2026-10-24 21:42:47">2026-10-24</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-11-23T15:27:38.908Z" title="更新于 2026-11-23 23:27:38">2026-11-23</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a><i class="fas fa-angle-right post-meta-separator"></i><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/%E6%96%87%E7%8C%AE%E9%98%85%E8%AF%BB/">文献阅读</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><div class="note info no-icon flat"><p>本文内容参考了李航《机器学习方法（第 2 版）》、周志华《集成学习方法》等书目，并且参考了很多关于集成学习相关算法的原始文献如 XGBoost、LightGBM 等的内容，并且配以具体案例建模和代码，内容上较为详尽，本人认为基本涵盖了集成学习的大部分广泛应用的内容，对实际工作相当有帮助. 部分背景性知识和内容组织使用到了 AI 辅助.</p>
+</div>
+<p><strong>集成学习（ensemble learning）</strong> 是一种机器学习范式：它针对同一个学习任务，构建多个假设（Hypotheses / 基学习器），并按照某种特定的策略将它们结合起来，以获得比任一单个假设更优越的泛化性能. 其核心思想在于构建多个基学习器（即从输入空间到输出空间的函数），并通过某种策略将它们组成一个更优的学习器使得泛化误差更小.<br />
+以数学语言讲，假设我们有输入空间 $ \mathcal{X} $ 和对应的输出空间 $ \mathcal{Y} $，我们的目标是学习一个映射 $ f:\mathcal{X}\to\mathcal{Y} $. 给定训练集 $ \mathcal{D}=\lbrace(\boldsymbol{x}_1,y_1),\cdots,(\boldsymbol{x}_N,y_N)\rbrace $，我们首先训练出一组个体学习器 $ \mathcal{H}=\lbrace h_1,\cdots,h_T \rbrace $，其中 $ h_i $ 可以是任意的模型如决策树、支持向量机等等. 我们引入一种策略 $ C $，使得</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    H(x)=C(h_1…'>\begin{equation*}
+    H(x)=C(h_1(\boldsymbol{x}),h_2(\boldsymbol{x}),\cdots,h_T(\boldsymbol{x})).
+\end{equation*}
+</p>
+<p>集成学习的目标就是，寻找一组 $ \mathcal{H} $ 和对应结合策略 $ C $，使得在未知的测试分布上，集成的泛化误差（期望风险）严格小于表现最好的单个基学习器</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \mathcal{R…'>\begin{equation*}
+    \mathcal{R}_{\exp}(H)&lt;\min_{ t\in\lbrace 1,2,\cdots,T\rbrace }\mathcal{R}_{\exp}(h_t).
+\end{equation*}
+</p>
+<p>从上面的说明可以看到，集成学习并不是一个算法，而是抽象地概括了一类<strong>学习理念</strong>，通俗来说就是“众人拾柴火焰高”. <strong>当然，集成学习有效有两个基本前提.</strong> 第一，<strong>所有的基学习器必须是弱可学习的（weakly learnable）</strong>，在二分类问题中就是说其错误分类的样本占比必须小于总样本量的一半，这在直观上也好理解，如果连这点都达不到，我们还不如进行随机猜测. 第二，<strong>基学习器间必须存在差异</strong>，简单来讲就是 $ h_i(\boldsymbol{x})\ne h_j(\boldsymbol{x}),\forall i\ne j $. 否则两个学习器效果一致，没有必要同时采用.<br />
+常见的集成学习范式主要可以分为三类：</p>
+<ul>
+<li><strong>Bagging（并行/装袋）</strong>：各个基学习器之间无强依赖关系，独立并行训练。典型代表有 <strong>随机森林（Random Forest）</strong>.</li>
+<li><strong>Boosting（串行/提升）</strong>：各个基学习器之间存在强依赖关系，逐个训练。典型代表有 <strong>AdaBoost, GBDT, XGBoost, LightGBM, CatBoost</strong>.</li>
+<li><strong>Stacking / Blending（堆叠/混合）</strong>：将多个不同类型的模型预测结果作为新的特征，再训练一个“元模型”（Meta-Learner）进行最终输出.<br />
+在介绍具体内容之前，我们首先要回顾统计学里的一个重要概念：<strong>偏差-方差分解</strong>. 对于真实映射 $ f $ 的一个估计 $ \hat{f} $，我们有</li>
+</ul>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \mathbb{E}…'>\begin{align*}
+    \mathbb{E}[\hat{f}(\boldsymbol{X})-f(\boldsymbol{x})]^2&amp;=\mathbb{E}\left[\hat{f}(\boldsymbol{X})-\mathbb{E}[\hat{f}(\boldsymbol{X})]+\mathbb{E}[\hat{f}(\boldsymbol{X})]-f(\boldsymbol{x})\right]^2\\
+    &amp;=\mathbb{E}\left[\hat{f}(\boldsymbol{X})-\mathbb{E}[\hat{f}(\boldsymbol{X})]\right]^2+\left[\mathbb{E}[\hat{f}(\boldsymbol{X})]-f(\boldsymbol{x})\right]^2\\&amp;+2\mathbb{E}\left[\hat{f}(\boldsymbol{X})-\mathbb{E}[\hat{f}(\boldsymbol{X})](\mathbb{E}[\hat{f}(\boldsymbol{X})]-f(\boldsymbol{x}))\right]\\
+    &amp;=\text{Var}(\hat{f})+\text{Bias}(\hat{f})^2.
+\end{align*}
+</p>
+<p>注意这里 $ f $ 是真实的函数，因此没有随机性， $ \hat{f} $ 作为一个估计才是有随机性的. 交叉项的期望则因为第二项是固定函数，取第一项的期望直接得到其为零. 偏差-方差分解式将会揭示 bagging 方法和 boosting 方法的区别.<br />
+<strong>本篇内容是集成学习这一主题的上篇，主要介绍 bagging 方法、boosting 方法中的 AdaBoost、梯度提升方法中的 GBDT 方法，在下篇中，将详细介绍 GBDT 方法的 XGBoost、LightGBM、CatBoost 等用于不同任务类型的工业级的实现方法，以及 Stacking/Blending 方法.</strong></p>
+<h1 id="bagging-方法"><a class="markdownIt-Anchor" href="#bagging-方法"></a> Bagging 方法</h1>
+<p>有关 bagging 方法的最初提出是 Breiman，就是在决策树领域的那位大师（有关内容可见本人另一篇博客<a href="/2026/10/08/%E5%86%B3%E7%AD%96%E6%A0%91/" title="决策树">决策树</a>）. 如果我们有数据集 $ \mathcal{D} $，那么就可以用其训练出一个学习器 $ f(\boldsymbol{x},\mathcal{D}) $（这里把数据集加上以示区分，后续会看到这样写的原因）. 如果我们另外有一系列 $ \mathcal{D}_1,\cdots,\mathcal{D}_k $，其中数据都是从和数据集 $ \mathcal{D} $ 中相同的数据分布中生成的且均相互独立，那么我们又可以训练出若干学习器 $ f(\boldsymbol{x},\mathcal{D}_1),f(\boldsymbol{x},\mathcal{D}_2),\cdots,f(\boldsymbol{x},\mathcal{D}_k) $. 现在我们就想使用集成学习的思想构建一个表现一致优于这些学习器的学习器. 对于回归任务，一个最简单的方法就是选择所有学习器预测值的平均，即</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    f_A(\bolds…'>\begin{equation*}
+    f_A(\boldsymbol{x})=\mathbb{E}_{\mathcal{D}}[f(\boldsymbol{x},\mathcal{D})]\approx\frac{1}{k}\sum_{i=1}^kf(\boldsymbol{x},\mathcal{D}_i).
+\end{equation*}
+</p>
+<p>这里取期望是对固定样本量的数据集的联合分布求的，而下标 $ A $ 代表的是<strong>聚合（aggregating）</strong>. 如果是分类任务，一种简单的方法是<strong>投票法</strong>，也即令</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    N_j=\#\lbr…'>\begin{equation*}
+    N_j=\#\lbrace k:f(\boldsymbol{x},\mathcal{D}_k)=j\rbrace\Rightarrow f_A(\boldsymbol{x})=\mathop{\mathrm{argmax}}\limits_{j}N_j.
+\end{equation*}
+</p>
+<p>这里 $ j $ 表示样本的实际类别.<br />
+但是，我们在实际问题中只有一个数据集 $ \mathcal{D} $ 可供学习，数据的获取是需要代价的. 为了解决数据缺乏的问题，<strong>我们通过从 $ \mathcal{D} $ 构建得到的真实数据的经验分布中进行若干次等样本数抽样，并获得模拟的数据集 $ \mathcal{D}^{(1)},\cdots,\mathcal{D}^{(B)} $. 这就用到了 Bootstrap 的思想（未来本人会写一篇关于 Bootstrap 方法的博客来讨论这个问题）.</strong> 需要注意的是，在生成每个数据集时，<strong>我们实际上进行的是有放回抽样</strong>. 有了这些数据集，我们就可以来构建对应任务的学习器 $ f_B(\boldsymbol{x}) $ 了. 这一过程被称为<strong>自助聚合（bootstrap aggregating）</strong>，简称为 <strong>bagging</strong>.<br />
+Bagging 方法有效的重要因素是能否构建出差异较大的学习器，而这就和数据本身的特性相关联. 如果对数据做改动，只能引起学习器的微小变化，那么 bagging 方法的效果就不好，否则能够显著改善学习器的性能. Breiman 本人在另外一篇文章中有研究，<strong>神经网络、决策树、线性回归的变量选择均为不稳定方法，而 k-近邻方法属于稳定方法</strong>. 这给我们选择学习器构建的具体形式提供了一些思路. 他在 bagging 方法的这篇文章里也使用数据集具体测试了其中的几种方法说明上述学习器表现.<br />
+Bagging 方法的有效不是没有原因的. 沿用上面的记号，对于回归任务，我们有如下不等式</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \mathbb{E}…'>\begin{align*}
+    \mathbb{E}_{\mathcal{D}}[y-f(\boldsymbol{x},\mathcal{D})]^2&amp;=y^2-2yf_A(\boldsymbol{x})+\mathbb{E}_{\mathcal{D}}[f^2(\boldsymbol{x},\mathcal{D})]\\
+    &amp;\ge y^2-2yf_A(\boldsymbol{x})+\mathbb{E}_{\mathcal{D}}^2[f(\boldsymbol{x},\mathcal{D})]\\
+    &amp;=(y-f_A(\boldsymbol{x}))^2.
+\end{align*}
+</p>
+<p>其中大于等于号用到了 Jensen 不等式. 上述不等式的意思是, 对于某一个学习器而言，其在单个样本上的均方误差总是不小于经过 bagging 得到的学习器的均方误差，这也就是说在回归任务上，采用多个学习器的平均是一个好的选择，而具体的改进效果则需要看 Jensen 不等式中两者的差值有多大，越大则改进效果越好. <strong>但对于分类任务不总是这样，如果基学习器的效果都很差，那么聚合后甚至会得到更差的表现.</strong> 但是通过对不稳定的学习器聚合效果更好这一原则仍然是适用的. 关于分类问题的具体讨论我们这里不展开，读者可以直接参考文献 <a href="https://link.springer.com/content/pdf/10.1007/BF00058655.pdf" title="" target="">Bagging Predictors</a>.</p>
+<h2 id="随机森林"><a class="markdownIt-Anchor" href="#随机森林"></a> 随机森林</h2>
+<p>Bagging 方法中最具代表的就是<strong>随机森林（random forest）</strong>，这个方法还是 Breiman 提出的. 其给出了随机森林的定义如下：</p>
+<div class="note info no-icon flat"><p><strong>随机森林</strong>是由一族具有树结构的分类器 $ \lbrace h(\boldsymbol{x},\Theta_k),k=1,\cdots\rbrace $ 构成的分类器. 其中 $ \lbrace\Theta_k\rbrace $ 表示一组相互独立且同分布的随机向量，对于给定的输入样本 $ \boldsymbol{x} $，每棵树均投出独立的一票，最终由得票最多的类别作为预测输出.</p>
+</div>
+<p>值得注意的是，<strong>随机森林和单纯的 bagging 方法有所不同</strong>. 这里的 $ \Theta_k $ 不仅仅是从原始训练集中采用 bootstrap 方法得到的一组样本量大小的训练集，<strong>还会从所有特征中随机挑选固定数量的特征用于树的构建</strong>，所以说， $ \Theta $ 实际上代表了<strong>任意一种树的构建规则</strong>. 这是随机森林区别于 bagging 方法的一个特点. 另外，虽然 Breiman 给出的定义只针对分类任务而言，<strong>但是随机森林仍然可以用于回归任务，并且也已经在业界得到了广泛的应用.</strong></p>
+<h3 id="收敛性与泛化误差界的讨论"><a class="markdownIt-Anchor" href="#收敛性与泛化误差界的讨论"></a> 收敛性与泛化误差界的讨论</h3>
+<p>现在假设我们有分类器 $ h_1(\boldsymbol{x}),h_2(\boldsymbol{x}),\cdots,h_K(\boldsymbol{x}) $，并且训练数据是从真实数据对应的随机向量 $ (\boldsymbol{X},Y) $ 对应的分布中抽取的. 现在我们定义<strong>边际函数（margin function）</strong> 为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    mg(\boldsy…'>\begin{equation*}
+    mg(\boldsymbol{X},Y)=\frac{1}{K}\sum_{k=1}^K\mathbb{I}(h_k(\boldsymbol{X})=Y)-\max_{j\ne Y}\frac{1}{K}\sum_{k=1}^K\mathbb{I}(h_k(\boldsymbol{X})=j).
+\end{equation*}
+</p>
+<p>注意这里的 $ (\boldsymbol{X},Y) $ 是一个<strong>测试样本</strong>，和训练集独立. 边际函数衡量了投给正确类别 $ Y $ 的平均票数和投给其它类别的平均票数的最大值相差多少，值越大说明投票结果的可信程度就越高，分类器效果越好. 如果这个值小于 $ 0 $，那么说明投票结果是错误的，即错分类. 因此，分类器的泛化误差可以用指标</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    PE^{\ast}=…'>\begin{equation*}
+    PE^{\ast}=\mathbb{P}_{\boldsymbol{X},Y}(mg(\boldsymbol{X},Y)&lt;0)
+\end{equation*}
+</p>
+<p>来定义. 这里的概率测度定义在随机向量 $ (\boldsymbol{X},Y) $ 的分布上. 注意，上面的指标适用于任何分类器. 而对于随机森林，我们有 $ h_k(\boldsymbol{X})=h(\boldsymbol{X},\Theta_k) $. 利用强大数定律，我们可以得到如下定理：</p>
+<div class="note primary no-icon flat"><p>随着树的数量的增加，对于任意的序列 $ \lbrace\Theta_k\rbrace_{k=1}^{\infty} $，有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    PE^{\ast}\…'>\begin{equation*}
+    PE^{\ast}\stackrel{\text{a.s.}}{\longrightarrow}\mathbb{P}_{\boldsymbol{X},Y}(\mathbb{P}_{\Theta}(h(\boldsymbol{X},\Theta)=Y)-\max_{j\ne Y}\mathbb{P}_{\Theta}(h(\boldsymbol{X},\Theta)=j)&lt;0).
+\end{equation*}
+</p>
+</div>
+<p><strong>证明</strong> 我们只需要证明在样本空间外存在一个零测集 $ C $，使得在 $ C $ 之外，对任意 $ \boldsymbol{x},j $ 均有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \frac{1}{N…'>\begin{equation*}
+    \frac{1}{N}\sum_{n=1}^N\mathbb{I}(h(\Theta_n,\boldsymbol{x})=j)\stackrel{\text{a.s.}}{\longrightarrow}\mathbb{P}_{\Theta}(h(\Theta,\boldsymbol{x})=j).
+\end{equation*}
+</p>
+<p>对于固定的训练集和固定的随机向量 $ \Theta $，由等式 $ h(\Theta,\boldsymbol{x})=j $ 所确定的 $ \boldsymbol{x} $ 成立的集合，本质是若干超矩形的并，这是由树模型的特征所决定的：我们每次对特征的划分，实际上都是在对空间进行切分. 由于树的特征和切分次数均有限，因此我们把最后得到的所有空间划分记为 $ S_1,\cdots,S_K $. 定义示性函数 $ \phi $，满足 $ \lbrace\boldsymbol{x}:h(\Theta,\boldsymbol{x})=j\rbrace=S_k\Leftrightarrow\phi(\Theta)=k $，并令 $ N_k $ 为前 $ N $ 次试验中 $ \phi(\Theta_n)=k $ 的次数. 那么</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \frac{1}{N…'>\begin{equation*}
+    \frac{1}{N}\sum_{n=1}^N\mathbb{I}(h(\Theta_n,\boldsymbol{x})=j)=\frac{1}{N}\sum_{k=1}^K\sum_{n:\phi(\Theta_n)=k}\mathbb{I}(\boldsymbol{x}\in S_{\phi(\Theta_n)})=\sum_{k}\frac{N_k}{N}\mathbb{I}(\boldsymbol{x}\in S_k).
+\end{equation*}
+</p>
+<p>对于每一个 $ k $，由强大数定律总有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+   \frac{N_k}{…'>\begin{equation*}
+   \frac{N_k}{N}=\frac{1}{N}\sum_{n=1}^N\mathbb{I}(\phi(\Theta_n)=k)\stackrel{\text{a.s.}}{\longrightarrow}\mathbb{P}_{\Theta}(\phi(\Theta)=k).  
+\end{equation*} 
+</p>
+<p>由于有限个零测集的并仍然是零测集，因此除去那些对于每块划分 $ k $ 不收敛的点构成的零测集 $ C $，我们总有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \frac{1}{N…'>\begin{equation*}
+    \frac{1}{N}\sum_{n=1}^N\mathbb{I}(h(\Theta_n,\boldsymbol{x})=j)\stackrel{\text{a.s.}}{\longrightarrow}\sum_{k}\mathbb{P}_{\Theta}(\phi(\Theta)=k)\mathbb{I}(\boldsymbol{x}\in S_k)=\mathbb{P}_{\Theta}(h(\Theta,\boldsymbol{x})=j).
+\end{equation*}
+</p>
+<div class="note warning no-icon flat"><p>这个证明看似简单，但深入了解后本人认为是有些晦涩难懂的. 不知读者是否真正理解了证明过程. <strong>首先这里的随机变量是 $ \Theta_n $，其次 $ S_1,\cdots,S_K $ 是固定的，并且尤为重要的是对于这个符号的理解.</strong> $ S_1,\cdots,S_K $ <strong>并不是某棵特定的树对空间的划分，而是所有可能的树的形态对于空间的所有可能划分构成的集合族. 这个集合族里的集合并非两两不交，而是可能相交乃至相互包含. 但这并不影响后续等式的推导，因为我们在定义函数 $ \phi $ 时要求某棵决策树在某个类别上所形成的对空间的划分区域必须严格对应于这个集合族里的一个 $ S_k $，这是双射，从而才能建立后续的等式关系</strong>. 最后一步等式，则是因为示性函数 $ \mathbb{I}(\boldsymbol{x}\in S_k)=\mathbb{P}(h(\Theta,\boldsymbol{x})=j|\phi(\Theta)=k) $ 是一个取值只能为 $ 0-1 $ 的条件概率. 最后一个问题是 $ S_1,\cdots,S_K $ 为什么有限？这是因为样本有限，并且对于样本的特征，我们只能采取<strong>单一的划分方式</strong>，比如在 CART 中，对连续型变量取可能分点区间的中点，而对离散特征令其为等于或不等于某个值，通过这样对每个特征指定规则，我们只能得到有限棵不同的树，也就对应于有限的样本空间的可能划分.</p>
+</div>
+<p>这个定理说明随机森林<strong>不会随着树的增加而过拟合</strong>，不过对于泛化误差并没有做出太多的刻画.<br />
+接下来我们说明泛化误差的相关界. 首先定义随机森林的边际函数为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    mr(\boldsy…'>\begin{equation*}
+    mr(\boldsymbol{X},Y)=\mathbb{P}_{\Theta}(h(\boldsymbol{X},\Theta)=Y)-\max_{j\ne Y}\mathbb{P}_{\Theta}(h(\boldsymbol{X},\Theta)=j),
+\end{equation*}
+</p>
+<p>以及分类器集合 $ \lbrace h(\boldsymbol{x},\Theta) \rbrace $ 的<strong>强度（strength）</strong> 为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    s=\mathbb{…'>\begin{equation*}
+    s=\mathbb{E}_{\boldsymbol{X},Y}[mr(\boldsymbol{X},Y)].
+\end{equation*}
+</p>
+<p>强度实际上衡量了分类器的优劣程度，强度越大分类器效果越好. 假设 $ s\ge 0 $ 由 Chebyshev 不等式，我们有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    PE^{\ast}&amp;…'>\begin{align*}
+    PE^{\ast}&amp;=\mathbb{P}_{\Theta}(mr(\boldsymbol{X},Y)&lt;0)=\mathbb{P}_{\Theta}(mr(\boldsymbol{X},Y)-s&lt;-s)\\&amp;\le\mathbb{P}_{\Theta}((mr(\boldsymbol{X},Y)-s)^2&gt;s^2)\le\frac{\text{Var}(mr)}{s^2}.
+\end{align*}
+</p>
+<p>注意，这里的泛化误差就是指理论上的，不再采用 $ mg(\boldsymbol{X},Y) $ 这一结果，因为我们知道 $ mg(\boldsymbol{X},Y)\stackrel{\text{a.s.}}{\longrightarrow}mr(\boldsymbol{X},Y) $. 接下来我们希望获得关于边际函数的更显式的界的表达. 首先定义 $ \hat{j}(\boldsymbol{X},Y)=\mathop{\mathrm{argmax}}\limits_{j\ne Y}\mathbb{P}_{\Theta}(h(\boldsymbol{X},\Theta)=j) $，那么利用示性函数我们可以写出</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    mr(\boldsy…'>\begin{align*}
+    mr(\boldsymbol{X},Y)=\mathbb{E}_{\Theta}[\mathbb{I}(h(\boldsymbol{X},\Theta)=Y)-\mathbb{I}(h(\boldsymbol{X},\Theta)=\hat{j}(\boldsymbol{X},Y))]:=\mathbb{E}_{\Theta}[rmg(\Theta,\boldsymbol{X},Y)].
+\end{align*}
+</p>
+<p>这里 $ rmg(\cdot,\cdot,\cdot) $ 定义为<strong>原始边际函数（raw margin functions）</strong>. 其期望就是边际函数. 对任意两个独立同分布的 $ \Theta,\Theta' $，我们有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \text{Var}…'>\begin{align*}
+    \text{Var}(mr)&amp;=\mathbb{E}_{\Theta,\Theta&#039;}[\text{Cov}_{\boldsymbol{X},Y}(rmg(\Theta,\boldsymbol{X},Y),rmg(\Theta&#039;,\boldsymbol{X},Y))]\\
+    &amp;=\mathbb{E}_{\Theta,\Theta&#039;}(\rho(\Theta,\Theta&#039;)\text{sd}(\Theta)\text{sd}(\Theta&#039;)).
+\end{align*}
+</p>
+<p>这里需要注意期望、协方差都是对谁求的. 我们现在的方差也是对 $ (\boldsymbol{X},Y) $ 求的，并且两棵树<strong>对于数据而言可能并不独立，只是关于树的构建方法独立！</strong> 并且求协方差这一步用到了线性算子的交换性. $ \rho(\Theta,\Theta') $ 就定义为两棵树原始边际函数之间的协方差，而 $ \text{sd}(\Theta) $ 为对应的树的边际函数的标准差. 因此根据 Jensen 不等式我们又有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \text{Var}…'>\begin{align*}
+    \text{Var}(mr)=\bar{\rho}(\mathbb{E}_{\Theta}[\text{sd}(\Theta)])^2\le\bar{\rho}\mathbb{E}_{\Theta}[\text{Var}(\Theta)].
+\end{align*}
+</p>
+<p>这里我们定义相关系数均值为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \bar{\rho}…'>\begin{equation*}
+    \bar{\rho}=\frac{\mathbb{E}_{\Theta,\Theta&#039;}(\rho(\Theta,\Theta&#039;)\text{sd}(\Theta)\text{sd}(\Theta&#039;))}{\mathbb{E}_{\Theta,\Theta&#039;}[\text{sd}(\Theta)\text{sd}(\Theta&#039;)]}.
+\end{equation*}
+</p>
+<p>而</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \mathbb{E}…'>\begin{align*}
+    \mathbb{E}_{\Theta}[\text{Var}(\Theta)]&amp;=\mathbb{E}_{\Theta}[\mathbb{E}_{\boldsymbol{X},Y}[rmg(\Theta,\boldsymbol{X},Y)^2]-(\mathbb{E}_{\boldsymbol{X},Y}[rmg(\Theta,\boldsymbol{X},Y)])^2]\\
+    &amp;\le 1-\mathbb{E}_{\Theta}[(\mathbb{E}_{\boldsymbol{X},Y}[rmg(\Theta,\boldsymbol{X},Y)])^2]\le 1-s^2.
+\end{align*}
+</p>
+<p>这里的第一个不等号用到了原始边际函数取值只能为 $ \lbrace-1,0,1\rbrace $，因为不可能将同一个样本分到两个类别中，而第二个不等号则再次用到了 Jensen 不等式. 结合上述不等式，我们得到了如下定理：</p>
+<div class="note primary no-icon flat"><p>随机森林模型的一个理论泛化误差上界为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    PE^\ast\le…'>\begin{equation*}
+    PE^\ast\le\bar{\rho}\cdot\frac{1-s^2}{s^2}.
+\end{equation*}
+</p>
+</div>
+<p>因此，为了让泛化误差尽可能小，我们需要让树与树之间的相关度越低越好，而单棵树的识别能力越强却好. 这就需要做权衡了. 相关度低需要选取的特征尽可能不重叠，而识别能力强则需要尽可能多的特征. 这为下面随机森林的具体实现提供了一个思路.</p>
+<h3 id="算法实现"><a class="markdownIt-Anchor" href="#算法实现"></a> 算法实现</h3>
+<p>随机森林的算法实现其实就是在决策树基础上的稍许改进. 具体有以下几点变化：</p>
+<ol>
+<li>在每个结点选取最优特征时，我们并不使用数据集的所有特征，<strong>而是随机从中挑选出固定个数的特征，然后再基于信息增益/基尼指数准则进行树的分裂</strong>. 假设我们有 $ M $ 个特征，我们可以从中挑选任意个特征，在实践中，对于分类任务我们一般采用 $ \lfloor\sqrt{M}\rfloor $ 个特征，而对于回归任务一般采用 $ \lfloor M/3\rfloor $ 个特征. Breiman 的文章里是采用了选取 $ 1 $ 个或者 $ \text{int}(\log_2 M)+1 $ 个特征进行对比试验的；</li>
+<li><strong>采用包外（out of bag, OOB）泛化误差估计</strong>. 我们在 Bootstrap 采样的时候，等概率地从原始数据集中选出一个样本，假设样本量为 $ n $，那么在生成某个 Bootstrap 训练集时，某一样本始终未被抽取到的概率就是</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \left(1-\f…'>\begin{equation*}
+    \left(1-\frac{1}{n}\right)^n\to\frac{1}{\mathrm{e}}\approx 36.8\%.
+\end{equation*}
+</p>
+<p>当然，每棵树对应的 Bootstrap 训练集肯定会不同，实际评估泛化误差又是怎么做的呢？具体而言，我们看<strong>每一条数据</strong>. 对于某一条数据 $ i $，<strong>我们把对应的 Bootstrap 训练集中没有出现该样本的那些树取出并进行投票，得到预测 $ \hat{y}_i^{\text{oob}} $</strong>，然后计算最终的准确率</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \text{oob …'>\begin{equation*}
+    \text{oob score}=\frac{1}{N}\sum_{i=1}^N\mathbb{I}(\hat{y}_i^{\text{oob}}=y_i).
+\end{equation*}
+</p>
+<p>这样保证了我们不会看到训练集中的数据，从而本质上实现了联合盲测和交叉验证.<br />
+3. <strong>特征重要性排序</strong>. 这点当然也可以在决策树上实现，不过这里还是再强调一下. 在 <code>python</code> 的机器学习库 <code>sklearn</code> 中，采用的是<strong>Gini 重要度</strong>，又称<strong>平均不纯度减少量（mean decrease in purity, MDI）</strong>. 在本人的决策树的博客中，已经定义过单个节点分裂带来的增益 $ \Delta\text{Gini}(t) $，这里不展开重述，但是并非所有节点带来的增益效应都相同，如果在根结点上和某个连接叶子结点的内部结点上，两者增益值相同，那么由于根结点携带了更多的样本，因此应当获得更多的增益. 由此，我们定义某棵树特征 $ j $ 的 Gini 纯度累计为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \sum_{t:\t…'>\begin{equation*}
+    \sum_{t:\text{feature(t)}=j}\text{Importance(t)}=\sum_{t:\text{feature(t)}=j}\frac{N_t}{N}\times\Delta\text{Gini}(t).
+\end{equation*}
+</p>
+<p>这里求和是对<strong>所有以 $ j $ 为分裂特征的结点</strong>进行的，$ N_t $ 表示节点 $ t $ 所携带的样本量. 在实际树生成的时候，Gini 指数的减少量和节点对应的样本数目都已经确定，因此上面的计算非常快. 当然，这个计算是对单一的树而言，<strong>接着我们还要对生成的每棵树的特征 $ j $ 都进行这样的计算然后再取平均，得到 MDI</strong>. 对所有特征计算完后进行归一化（实际也可以直接比较），按照值从大到小就得到了特征重要性的排序. MDI 值大的特征就越重要. 然而， Breiman 的文章中不是这样操作的. 实际上采用上面的方法有一个缺陷：<strong>偏袒连续型变量或取值很多的特征</strong>. 因为这些特征的候选分点多，有更多机会被选为分裂点，导致虚假的重要度累积. Breiman 文献中的方法采用的是<strong>置换特征重要度（feature importance permutation）</strong>. 具体方法是：对于某棵树 $ t $ 的包外数据集，首先正常预测得到准确率 $ \text{Acc}_t $，然后针对某一特征 $ m $，<strong>仅对这一列数据随机打乱顺序，其他列全部不动</strong>，然后再进行预测得到一个新的准确率 $ \text{Acc}_{t,\text{perm}}^{(m)} $. 计算得到两者的差 $ D_t^{(m)} $ 并且在每一棵树上都对该特征同样操作得到最终的特征重要性指标</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \text{Impo…'>\begin{equation*}
+    \text{Importance}(m)=\frac{1}{T}\sum_{t=1}^TD_t^{(m)}.
+\end{equation*}
+</p>
+<p>这个值很大，说明准确率前后下降极大，预测就很依赖该特征，重要度因此也高. 对该指标排序即可得到特征重要性. <strong>但是对于两个强相关特征，置换法可能会失效，因为对某一个特征打乱，仍然保留另一个特征的信息，从而对预测的影响很小</strong>. 但大部分场景下置换法仍然很有效. <strong>因此，在实际的严谨分析中，还会结合使用同一个包中的 <code>sklearn.inspection.permutation_importance</code></strong>.<br />
+接下来我们就给出一个和包 <code>sklearn</code> 中随机森林实现对齐的代码，并和直接调包的结果在经典的 Breast Cancer 数据集上进行比对. 我们在实际操作时可以选择或不选择使用包外泛化误差估计. <code>sklearn</code> 包中是使用 CART 作为每棵树的构建的，是目前决策树生成的标准做法. <strong>重要提示：这里实现的随机森林只支持连续特征的输入，包括已经集成在包中的算法，因此对于非数值型特征需要使用编码的方式对其数值化.</strong> 下面的代码使用了 AI 辅助生成.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> Counter</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">DecisionTreeCART</span>:</span><br><span class="line">    <span class="string">&quot;&quot;&quot;与 sklearn 机制一致的单棵分类决策树&quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, max_features=<span class="literal">None</span>, min_samples_split=<span class="number">2</span></span>):</span><br><span class="line">        <span class="variable language_">self</span>.max_features = max_features</span><br><span class="line">        <span class="variable language_">self</span>.min_samples_split = min_samples_split</span><br><span class="line">        <span class="variable language_">self</span>.root = <span class="literal">None</span></span><br><span class="line">        <span class="variable language_">self</span>.feature_importances_ = <span class="literal">None</span>  <span class="comment"># 记录单树内每个特征的基尼纯度减少量 (MDI)</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">fit</span>(<span class="params">self, X, y</span>):</span><br><span class="line">        n_samples, n_features = X.shape</span><br><span class="line">        <span class="variable language_">self</span>.max_features = <span class="variable language_">self</span>.max_features <span class="keyword">or</span> <span class="built_in">int</span>(np.sqrt(n_features))</span><br><span class="line">        <span class="variable language_">self</span>.feature_importances_ = np.zeros(n_features)</span><br><span class="line">        <span class="variable language_">self</span>.root = <span class="variable language_">self</span>._grow_tree(X, y)</span><br><span class="line">        <span class="comment"># 归一化单树的重要性</span></span><br><span class="line">        <span class="keyword">if</span> np.<span class="built_in">sum</span>(<span class="variable language_">self</span>.feature_importances_) &gt; <span class="number">0</span>:</span><br><span class="line">            <span class="variable language_">self</span>.feature_importances_ /= np.<span class="built_in">sum</span>(<span class="variable language_">self</span>.feature_importances_)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_grow_tree</span>(<span class="params">self, X, y</span>):</span><br><span class="line">        n_samples, n_features = X.shape</span><br><span class="line">        n_labels = <span class="built_in">len</span>(np.unique(y))</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> n_labels == <span class="number">1</span> <span class="keyword">or</span> n_samples &lt; <span class="variable language_">self</span>.min_samples_split:</span><br><span class="line">            leaf_val = Counter(y).most_common(<span class="number">1</span>)[<span class="number">0</span>][<span class="number">0</span>]</span><br><span class="line">            <span class="keyword">return</span> &#123;<span class="string">&#x27;leaf&#x27;</span>: <span class="literal">True</span>, <span class="string">&#x27;value&#x27;</span>: leaf_val&#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 随机特征选择 (Forest-RI)</span></span><br><span class="line">        feat_idxs = np.random.choice(n_features, <span class="variable language_">self</span>.max_features, replace=<span class="literal">False</span>)</span><br><span class="line">        best_feat, best_thresh, best_gain = <span class="variable language_">self</span>._best_split(X, y, feat_idxs)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> best_feat <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            <span class="keyword">return</span> &#123;<span class="string">&#x27;leaf&#x27;</span>: <span class="literal">True</span>, <span class="string">&#x27;value&#x27;</span>: Counter(y).most_common(<span class="number">1</span>)[<span class="number">0</span>][<span class="number">0</span>]&#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 累加 MDI 基尼减少量（乘以该节点的样本权重）</span></span><br><span class="line">        <span class="variable language_">self</span>.feature_importances_[best_feat] += best_gain * (<span class="built_in">len</span>(y) / <span class="built_in">len</span>(X))</span><br><span class="line"></span><br><span class="line">        left_mask = X[:, best_feat] &lt;= best_thresh</span><br><span class="line">        left = <span class="variable language_">self</span>._grow_tree(X[left_mask], y[left_mask])</span><br><span class="line">        right = <span class="variable language_">self</span>._grow_tree(X[~left_mask], y[~left_mask])</span><br><span class="line">        <span class="keyword">return</span> &#123;<span class="string">&#x27;leaf&#x27;</span>: <span class="literal">False</span>, <span class="string">&#x27;feat&#x27;</span>: best_feat, <span class="string">&#x27;thresh&#x27;</span>: best_thresh, <span class="string">&#x27;left&#x27;</span>: left, <span class="string">&#x27;right&#x27;</span>: right&#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_best_split</span>(<span class="params">self, X, y, feat_idxs</span>):</span><br><span class="line">        best_gain = -<span class="number">1.0</span></span><br><span class="line">        best_feat, best_thresh = <span class="literal">None</span>, <span class="literal">None</span></span><br><span class="line">        parent_gini = <span class="variable language_">self</span>._gini(y)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> feat <span class="keyword">in</span> feat_idxs:</span><br><span class="line">            X_col = X[:, feat]</span><br><span class="line">            thresholds = np.unique(X_col)</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">len</span>(thresholds) &lt;= <span class="number">1</span>:</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            midpoints = (thresholds[:-<span class="number">1</span>] + thresholds[<span class="number">1</span>:]) / <span class="number">2.0</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> thresh <span class="keyword">in</span> midpoints:</span><br><span class="line">                left_mask = X_col &lt;= thresh</span><br><span class="line">                y_l, y_r = y[left_mask], y[~left_mask]</span><br><span class="line">                <span class="keyword">if</span> <span class="built_in">len</span>(y_l) == <span class="number">0</span> <span class="keyword">or</span> <span class="built_in">len</span>(y_r) == <span class="number">0</span>:</span><br><span class="line">                    <span class="keyword">continue</span></span><br><span class="line">                <span class="comment"># 计算纯度增益</span></span><br><span class="line">                gain = parent_gini - (<span class="built_in">len</span>(y_l)/<span class="built_in">len</span>(y) * <span class="variable language_">self</span>._gini(y_l) + <span class="built_in">len</span>(y_r)/<span class="built_in">len</span>(y) * <span class="variable language_">self</span>._gini(y_r))</span><br><span class="line">                <span class="keyword">if</span> gain &gt; best_gain:</span><br><span class="line">                    best_gain = gain</span><br><span class="line">                    best_feat = feat</span><br><span class="line">                    best_thresh = thresh</span><br><span class="line">        <span class="keyword">return</span> best_feat, best_thresh, best_gain</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_gini</span>(<span class="params">self, y</span>):</span><br><span class="line">        counts = np.bincount(y)</span><br><span class="line">        probs = counts / <span class="built_in">len</span>(y)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1.0</span> - np.<span class="built_in">sum</span>(probs ** <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">predict</span>(<span class="params">self, X</span>):</span><br><span class="line">        <span class="keyword">return</span> np.array([<span class="variable language_">self</span>._predict_one(x, <span class="variable language_">self</span>.root) <span class="keyword">for</span> x <span class="keyword">in</span> X])</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">_predict_one</span>(<span class="params">self, x, node</span>):</span><br><span class="line">        <span class="keyword">if</span> node[<span class="string">&#x27;leaf&#x27;</span>]:</span><br><span class="line">            <span class="keyword">return</span> node[<span class="string">&#x27;value&#x27;</span>]</span><br><span class="line">        <span class="keyword">if</span> x[node[<span class="string">&#x27;feat&#x27;</span>]] &lt;= node[<span class="string">&#x27;thresh&#x27;</span>]:</span><br><span class="line">            <span class="keyword">return</span> <span class="variable language_">self</span>._predict_one(x, node[<span class="string">&#x27;left&#x27;</span>])</span><br><span class="line">        <span class="keyword">return</span> <span class="variable language_">self</span>._predict_one(x, node[<span class="string">&#x27;right&#x27;</span>])</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">SklearnAlignedRandomForest</span>:</span><br><span class="line">    <span class="string">&quot;&quot;&quot;全面对齐 sklearn API 的随机森林分类器&quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, n_estimators=<span class="number">100</span>, max_features=<span class="string">&#x27;sqrt&#x27;</span>, min_samples_split=<span class="number">2</span>, oob_score=<span class="literal">True</span></span>):</span><br><span class="line">        <span class="variable language_">self</span>.n_estimators = n_estimators</span><br><span class="line">        <span class="variable language_">self</span>.max_features = max_features</span><br><span class="line">        <span class="variable language_">self</span>.min_samples_split = min_samples_split</span><br><span class="line">        <span class="variable language_">self</span>.oob_score = oob_score</span><br><span class="line"></span><br><span class="line">        <span class="comment"># 对齐 sklearn 的对外暴露属性</span></span><br><span class="line">        <span class="variable language_">self</span>.estimators_ = []</span><br><span class="line">        <span class="variable language_">self</span>.classes_ = <span class="literal">None</span></span><br><span class="line">        <span class="variable language_">self</span>.n_classes_ = <span class="literal">None</span></span><br><span class="line">        <span class="variable language_">self</span>.n_features_in_ = <span class="literal">None</span></span><br><span class="line">        <span class="variable language_">self</span>.feature_importances_ = <span class="literal">None</span></span><br><span class="line">        <span class="variable language_">self</span>.oob_score_ = <span class="literal">None</span></span><br><span class="line">        <span class="variable language_">self</span>.oob_decision_function_ = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">fit</span>(<span class="params">self, X, y</span>):</span><br><span class="line">        n_samples, <span class="variable language_">self</span>.n_features_in_ = X.shape</span><br><span class="line">        <span class="variable language_">self</span>.classes_ = np.unique(y)</span><br><span class="line">        <span class="variable language_">self</span>.n_classes_ = <span class="built_in">len</span>(<span class="variable language_">self</span>.classes_)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 计算每棵树考察的特征数量</span></span><br><span class="line">        <span class="keyword">if</span> <span class="variable language_">self</span>.max_features == <span class="string">&#x27;sqrt&#x27;</span> <span class="keyword">or</span> <span class="variable language_">self</span>.max_features <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">            max_feats = <span class="built_in">int</span>(np.sqrt(<span class="variable language_">self</span>.n_features_in_))</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            max_feats = <span class="variable language_">self</span>.max_features</span><br><span class="line"></span><br><span class="line">        <span class="variable language_">self</span>.estimators_ = []</span><br><span class="line">        <span class="comment"># 初始化用于统计 OOB 预测概率的矩阵: [n_samples, n_classes]</span></span><br><span class="line">        oob_votes = np.zeros((n_samples, <span class="variable language_">self</span>.n_classes_))</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(<span class="variable language_">self</span>.n_estimators):</span><br><span class="line">            <span class="comment"># 1. 行采样 (Bootstrap)</span></span><br><span class="line">            boot_idx = np.random.choice(n_samples, n_samples, replace=<span class="literal">True</span>)</span><br><span class="line">            oob_idx = np.setdiff1d(np.arange(n_samples), boot_idx)</span><br><span class="line"></span><br><span class="line">            tree = DecisionTreeCART(max_features=max_feats, min_samples_split=<span class="variable language_">self</span>.min_samples_split)</span><br><span class="line">            tree.fit(X[boot_idx], y[boot_idx])</span><br><span class="line">            <span class="variable language_">self</span>.estimators_.append(tree)</span><br><span class="line"></span><br><span class="line">            <span class="comment"># 2. 累加 OOB 样本的投票</span></span><br><span class="line">            <span class="keyword">if</span> <span class="variable language_">self</span>.oob_score <span class="keyword">and</span> <span class="built_in">len</span>(oob_idx) &gt; <span class="number">0</span>:</span><br><span class="line">                preds = tree.predict(X[oob_idx])</span><br><span class="line">                <span class="keyword">for</span> idx, pred <span class="keyword">in</span> <span class="built_in">zip</span>(oob_idx, preds):</span><br><span class="line">                    oob_votes[idx, pred] += <span class="number">1</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 3. 统计 MDI 特征重要性（对所有树求平均）</span></span><br><span class="line">        all_importances = np.array([tree.feature_importances_ <span class="keyword">for</span> tree <span class="keyword">in</span> <span class="variable language_">self</span>.estimators_])</span><br><span class="line">        <span class="variable language_">self</span>.feature_importances_ = np.mean(all_importances, axis=<span class="number">0</span>)</span><br><span class="line">        <span class="variable language_">self</span>.feature_importances_ /= np.<span class="built_in">sum</span>(<span class="variable language_">self</span>.feature_importances_) <span class="comment"># 确保和为 1</span></span><br><span class="line"></span><br><span class="line">        <span class="comment"># 4. 计算 OOB 评估分数（按样本聚合）</span></span><br><span class="line">        <span class="keyword">if</span> <span class="variable language_">self</span>.oob_score:</span><br><span class="line">            row_sums = oob_votes.<span class="built_in">sum</span>(axis=<span class="number">1</span>)[:, np.newaxis]</span><br><span class="line">            <span class="comment"># 归一化为概率分布</span></span><br><span class="line">            <span class="variable language_">self</span>.oob_decision_function_ = np.divide(oob_votes, row_sums, out=np.zeros_like(oob_votes), where=row_sums != <span class="number">0</span>)</span><br><span class="line">            </span><br><span class="line">            <span class="comment"># 过滤从未落入 OOB 的极个别样本</span></span><br><span class="line">            valid = oob_votes.<span class="built_in">sum</span>(axis=<span class="number">1</span>) &gt; <span class="number">0</span></span><br><span class="line">            oob_preds = np.argmax(<span class="variable language_">self</span>.oob_decision_function_[valid], axis=<span class="number">1</span>)</span><br><span class="line">            <span class="variable language_">self</span>.oob_score_ = np.mean(oob_preds == y[valid])</span><br><span class="line"></span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">predict</span>(<span class="params">self, X</span>):</span><br><span class="line">        <span class="comment"># 收集所有树的预测，多数表决</span></span><br><span class="line">        tree_preds = np.array([tree.predict(X) <span class="keyword">for</span> tree <span class="keyword">in</span> <span class="variable language_">self</span>.estimators_])</span><br><span class="line">        <span class="keyword">return</span> np.array([Counter(tree_preds[:, i]).most_common(<span class="number">1</span>)[<span class="number">0</span>][<span class="number">0</span>] <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(X.shape[<span class="number">0</span>])])</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    <span class="keyword">from</span> sklearn.datasets <span class="keyword">import</span> load_breast_cancer</span><br><span class="line">    <span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br><span class="line">    <span class="keyword">from</span> sklearn.ensemble <span class="keyword">import</span> RandomForestClassifier <span class="keyword">as</span> SklearnRF</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 加载真实数据</span></span><br><span class="line">    data = load_breast_cancer()</span><br><span class="line">    X, y = data.data, data.target</span><br><span class="line">    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=<span class="number">0.2</span>, random_state=<span class="number">123</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 1. 训练我们手写的模型</span></span><br><span class="line">    custom_rf = SklearnAlignedRandomForest(n_estimators=<span class="number">100</span>, max_features=<span class="string">&#x27;sqrt&#x27;</span>, oob_score=<span class="literal">True</span>)</span><br><span class="line">    custom_rf.fit(X_train, y_train)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># 2. 训练 Sklearn 原生模型</span></span><br><span class="line">    sk_rf = SklearnRF(n_estimators=<span class="number">100</span>, max_features=<span class="string">&#x27;sqrt&#x27;</span>, oob_score=<span class="literal">True</span>, random_state=<span class="number">123</span>)</span><br><span class="line">    sk_rf.fit(X_train, y_train)</span><br><span class="line"></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;<span class="subst">&#123;<span class="string">&#x27;指标项&#x27;</span>:&lt;<span class="number">25</span>&#125;</span> | <span class="subst">&#123;<span class="string">&#x27;手写实现 (My RF)&#x27;</span>:&lt;<span class="number">18</span>&#125;</span> | <span class="subst">&#123;<span class="string">&#x27;官方库 (Sklearn RF)&#x27;</span>:&lt;<span class="number">18</span>&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;-&quot;</span> * <span class="number">70</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;<span class="subst">&#123;<span class="string">&#x27;测试集准确率&#x27;</span>:&lt;<span class="number">25</span>&#125;</span> | <span class="subst">&#123;np.mean(custom_rf.predict(X_test) == y_test):&lt;<span class="number">18.4</span>f&#125;</span> | <span class="subst">&#123;sk_rf.score(X_test, y_test):&lt;<span class="number">18.4</span>f&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;<span class="subst">&#123;<span class="string">&#x27;包外估计得分 (oob_score_)&#x27;</span>:&lt;<span class="number">25</span>&#125;</span> | <span class="subst">&#123;custom_rf.oob_score_:&lt;<span class="number">18.4</span>f&#125;</span> | <span class="subst">&#123;sk_rf.oob_score_:&lt;<span class="number">18.4</span>f&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;<span class="subst">&#123;<span class="string">&#x27;重要度前两名特征索引&#x27;</span>:&lt;<span class="number">25</span>&#125;</span> | <span class="subst">&#123;<span class="built_in">str</span>(np.argsort(custom_rf.feature_importances_)[::-<span class="number">1</span>][:<span class="number">2</span>]):&lt;<span class="number">18</span>&#125;</span> | <span class="subst">&#123;<span class="built_in">str</span>(np.argsort(sk_rf.feature_importances_)[::-<span class="number">1</span>][:<span class="number">2</span>]):&lt;<span class="number">18</span>&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出结果</span></span><br><span class="line">指标项                         | 手写实现 (My RF)    | 官方库 (Sklearn RF)  </span><br><span class="line">----------------------------------------------------------------------</span><br><span class="line">测试集准确率                    | <span class="number">0.9912</span>             | <span class="number">0.9912</span>            </span><br><span class="line">包外估计得分 (oob_score_)       | <span class="number">0.9560</span>             | <span class="number">0.9582</span>            </span><br><span class="line">重要度前两名特征索引             | [<span class="number">27</span> <span class="number">21</span>]            | [ <span class="number">7</span> <span class="number">23</span>]   </span><br></pre></td></tr></table></figure>
+<p>输出结果不太一样，但准确率一致，可以认为是正常现象，因为虽然用同一个随机种子，但伪随机数生成器的方法可能存在差异.</p>
+<h1 id="boosting-方法"><a class="markdownIt-Anchor" href="#boosting-方法"></a> Boosting 方法</h1>
+<p>Bagging 方法通过将多个独立生成的低偏差、高方差的学习器进行聚合，得到最后的学习器，大大降低了方差. Boosting 方法则走了另外一条路线：依次学习一组基学习器或弱学习器，每一步针对前一步为止预测不准确的数据重点学习一个基学习器，最后将所有的基学习器按权重线性组合起来作为最终模型或强学习器，相当于在每一步不断降低偏差，最终得到一个准确的学习器.<br />
+Boosting 方法的起源是从计算学习理论的<strong>PAC（probably approximate correct）学习框架</strong>开始的. 在这个框架下，Michael Kearns 和 Leslie Valiant 提出了一个问题：弱可学习是否等价于强可学习？弱可学习的定义已经在先前说明了，而<strong>强可学习（strong learnability）</strong> 指的是一个学习器能以任意高的概率达到任意小的错误率. Robert Schapire 在他的论文 &quot;<em>The Strength of Weak Learnability</em>&quot; 中就提出了 boosting 方法的雏形，说明了<strong>弱可学习等价于强可学习</strong>. 因此为了得到决策规则复杂、效果好的学习器，我们只需要生成很多弱学习器并将他们组合起来. 现在对于 boosting 方法而言，两个主要问题就是：<strong>在每一步如何选取预测不准确需要重点训练的样本？如何将弱学习器组成一个强学习器？</strong> 为了回答这两个问题，一系列算法就陆续被开发出来了，并且有各自的特点.</p>
+<h2 id="adaboost"><a class="markdownIt-Anchor" href="#adaboost"></a> AdaBoost</h2>
+<h3 id="算法说明与训练误差界分析"><a class="markdownIt-Anchor" href="#算法说明与训练误差界分析"></a> 算法说明与训练误差界分析</h3>
+<p><strong>AdaBoost（Adaptive Boosting）</strong> 是由 Yoav Freund 和 Schapire 在 1995 年提出的，原始文献为 &quot;<em>A Decision-Theoretic Generalization of On-Line Learning and an Application to Boosting</em>&quot;. 两人还因此获得了 2003 年的哥德尔奖，目前这篇论文也已经成为了机器学习发展史上引用量最高的论文之一.<br />
+AdaBoost 是针对二分类问题的 boosting 算法. 假设我们有训练数据集 $ \mathcal{D}=\lbrace(\boldsymbol{x}_1,y_1),\cdots,(\boldsymbol{x}_N,y_N)\rbrace $，其中实例 $ \boldsymbol{x}_i\in\mathcal{X}\subset\mathbb{R}^D $，类别 $ y_i\in\mathcal{Y}=\lbrace+1,-1\rbrace $，其中 $ \mathcal{X} $ 是实例的输入空间或特征空间， $ \mathcal{Y} $ 是实例的类别集合. AdaBoost 算法可以阐述如下：</p>
+<div class="note primary no-icon flat"><p><strong>（AdaBoost）</strong><br />
+输入：训练数据集 $ \mathcal{D} $，基本学习器学习算法.<br />
+输出：分类器 $ F(\boldsymbol{x}) $.</p>
+<p>(1) 初始化训练数据的权重分布</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{w}_1=(w_{1,1},\cdots,w_{1,N})&#039;,\quad w_{1,i}=\frac{1}{N},i=1,2,\cdots,N.
+\end{equation*}
+</p>
+<p>(2) 对 $ m=1,2,\cdots,M $,<br />
+(a) 从具有权重分布 $ \boldsymbol{w}_m $ 的训练数据集学习，得到基本学习器：</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    G_m(\bolds…'>\begin{equation*}
+    G_m(\boldsymbol{x}):\mathcal{X}\to\lbrace+1,-1\rbrace;
+\end{equation*}
+</p>
+<p>即</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    G_m(\bolds…'>\begin{equation*}
+    G_m(\boldsymbol{x})=\mathop{\mathrm{argmin}}\limits_{G}\sum_{i=1}^Nw_{m,i}\mathbb{I}(G_m(\boldsymbol{x}_i)\ne y_i).
+\end{equation*}
+</p>
+<p>(b) 计算 $ G_m(\boldsymbol{x}) $ 在训练数据集上的分类误差率</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \varepsilo…'>\begin{equation*}
+    \varepsilon_m=\sum_{i=1}^N\mathbb{P}(G_m(\boldsymbol{x}_i)\ne y_i)=\sum_{i=1}^Nw_{m,i}\mathbb{I}(G_m(\boldsymbol{x}_i)\ne y_i);
+\end{equation*}
+</p>
+<p>(c) 计算 $ G_m(\boldsymbol{x}) $ 的系数</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \alpha_m=\…'>\begin{equation*}
+    \alpha_m=\frac{1}{2}\log\frac{1-\varepsilon_m}{\varepsilon_m};
+\end{equation*}
+</p>
+<p>(d) 更新训练数据集的权重分布</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \boldsymbo…'>\begin{align*}
+    \boldsymbol{w}_{m+1}&amp;=(w_{m+1,1},\cdots,w_{m+1,i},\cdots,w_{m+1,N})&#039;,\\
+    w_{m+1,i}&amp;=\frac{w_{m,i}}{z_m}\exp(-\alpha_my_iG_m(\boldsymbol{x}_i)),\quad i=1,2,\cdots,N,\\
+\end{align*}
+</p>
+<p>其中 $ z_m $ 为归一化因子</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    z_m=\sum_{…'>\begin{equation*}
+    z_m=\sum_{i=1}^Nw_{m,i}\exp(-\alpha_my_iG_m(\boldsymbol{x}_i)).
+\end{equation*}
+</p>
+<p>(3) 构建基本学习器的线性组合并得到最终分类器为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    F(\boldsym…'>\begin{equation*}
+    F(\boldsymbol{x})=\text{sign}(f(\boldsymbol{x}))=\text{sign}\left(\sum_{m=1}^M\alpha_mG_m(\boldsymbol{x})\right).
+\end{equation*}
+</p>
+</div>
+<p>我们对算法做出几点说明：</p>
+<ol>
+<li>我们对 $ \boldsymbol{w} $ 均匀初始化，代表一开始训练我们并不知道任何数据是否容易被错误分类的信息. 在更新权重分布时还可以把更新式写成</li>
+</ol>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    w_{m+1,i}=…'>\begin{equation*}
+    w_{m+1,i}=\begin{cases}
+        \dfrac{w_{m,i}}{z_m}\exp(-\alpha_m),&amp; G_m(\boldsymbol{x}_i)=y_i,\\
+        \dfrac{w_{m,i}}{z_m}\exp(\alpha_m), &amp; G_m(\boldsymbol{x}_i)\ne y_i.
+    \end{cases}
+\end{equation*}
+</p>
+<p>可以看出，<strong>对于分类正确的样本，在下一轮中会赋予更低的权重，而分类错误的样本则会提高相应权重</strong>. 上面的误分类和正确分类的更新权重之比为 $ \exp(2\alpha_m)=\dfrac{1-\varepsilon_m}{\varepsilon_m} $，因此误分类样本的在下一步学习中会起到更大作用.</p>
+<ol start="2">
+<li><strong>$ \alpha_m $ 代表的是学习器的重要性</strong>. 从 $ \varepsilon_m $ 的定义可以看出，其含义是带权重的分类错误率. 而 $ \alpha_m $ 的值关于 $ \varepsilon_m $ 是非线性的，这有助于增强对分类错误率低的分类器的考虑，因此其值的大小就反映了每个分类器的重要性大小. 并且只要 $ \varepsilon_m\le\dfrac{1}{2} $ 就有 $ \alpha_m\ge0 $. 注意这里所有 $ \alpha_m $ 的和不是 $ 1 $. $ f(\boldsymbol{x}) $ 的符号最终决定 $ \boldsymbol{x} $ 的类别，其绝对值则表示确信度.</li>
+<li>AdaBoost 通过增加弱学习器来提高整体的分类性能. <strong>一般来说，会选取决策树桩（decision stump）作为基学习器</strong>，即由一个根结点直接连接两个叶结点的简单决策树，生成简单计算高效. 但<strong>如果迭代次数过多，可能导致模型产生过拟合. 因此需要合理控制迭代次数，一般采用早停法，当在验证集上的性能不再提升或下降时就停止迭代.</strong> 有趣的是，Schapire 等人观测到一个现象：在训练误差降至零之后，测试误差往往还能下降. 为此，Schapire、Freund、Bartlett 和 Lee（1998）等人提出了间隔理论来解释这一现象. 然而 Breiman 举出了反例说明这个理论有缺陷，后续也有学者对此问题进行了研究.</li>
+</ol>
+<p>现在我们来说明 AdaBoost 算法的训练误差界相关的定理.</p>
+<div class="note primary no-icon flat"><p><strong>（AdaBoost 的训练误差界）</strong> AdaBoost 算法最终模型的训练误差界为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \frac{1}{N…'>\begin{equation*}
+    \frac{1}{N}\sum_{i=1}^N\mathbb{I}(F(\boldsymbol{x}_i)\ne y_i)\le\frac{1}{N}\sum_{i=1}^N\exp(-y_if(\boldsymbol{x}_i))=\prod_{m=1}^Mz_m\le\exp\left(-2\sum_{m=1}^M\rho_m^2\right).
+\end{equation*}
+</p>
+<p>这里 $ \rho_m=\dfrac{1}{2}-\varepsilon_m $. 进一步，如果存在 $ \rho&gt;0 $ 使得 $ \rho_m\ge\rho,\forall m=1,2,\cdots,M $，那么就有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \frac{1}{N…'>\begin{equation*}
+    \frac{1}{N}\sum_{i=1}^N\mathbb{I}(F(\boldsymbol{x}_i)\ne y_i)\le\exp\left(-2M\rho^2\right).
+\end{equation*}
+</p>
+</div>
+<p><strong>证明</strong> 首先当错分类时，我们有 $ y_if(\boldsymbol{x}_i)&lt;0\Rightarrow\exp(-y_if(\boldsymbol{x}_i))\ge 1 $，因此得到第一个不等号. 而第二个不等号，我们有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \frac{1}{N…'>\begin{align*}
+    \frac{1}{N}\sum_{i=1}^N\exp(-y_if(\boldsymbol{x}_i))&amp;=\frac{1}{N}\sum_{i=1}^N\exp\left(-\sum_{m=1}^M\alpha_my_i G_m(\boldsymbol{x_i})\right)\\
+    &amp;=\sum_{i=1}^Nw_{1,i}\prod_{m=1}^M\exp(-\alpha_my_iG_m(\boldsymbol{x}_i))\\
+    &amp;=z_1\sum_{i=1}^N\frac{w_{1i}\exp(-\alpha_1y_iG_1(\boldsymbol{x}_i))}{z_1}\prod_{m=2}^M\exp(-\alpha_my_iG_m(\boldsymbol{x}_i))\\
+    &amp;=z_1\sum_{i=1}^Nw_{2,i}\prod_{m=2}^{M}\exp(-\alpha_my_iG_m(\boldsymbol{x}_i))\\
+    &amp;=z_1z_2\sum_{i=1}^Nw_{3,i}\prod_{m=3}^M\exp(-\alpha_my_iG_m(\boldsymbol{x}_i))\\
+    &amp;=\cdots=\prod_{m=1}^Mz_m.
+\end{align*}
+</p>
+<p>而进一步地我们有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    z_m&amp;=\sum_…'>\begin{align*}
+    z_m&amp;=\sum_{i=1}^Nw_{m,i}\exp(-\alpha_my_iG_m(\boldsymbol{x}_i))\\
+    &amp;=\sum_{y_i=G_m(\boldsymbol{x}_i)}w_{m,i}\exp(-\alpha_m)+\sum_{y_i\ne G_m(\boldsymbol{x}_i)}w_{m,i}\exp(\alpha_m)\\
+    &amp;=(1-\varepsilon_m)\exp(-\alpha_m)+\varepsilon_m\exp(\alpha_m)\\
+    &amp;=2\sqrt{\varepsilon_m(1-\varepsilon_m)}=\sqrt{1-4\rho_m^2}.
+\end{align*}
+</p>
+<p>利用不等式 $ 1-x\le\exp(-x)\Rightarrow\sqrt{1-x}\le\exp(-x/2) $，我们就得到</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \prod_{m=1…'>\begin{equation*}
+    \prod_{m=1}^Mz_m\le\exp\left(-2\sum_{m=1}^M\rho_m^2\right).
+\end{equation*}
+</p>
+<p>对 $ \rho_m $ 加以共同下界得到的训练误差界是显然的. 因此， AdaBoost 的训练误差随着基学习器个数的增加而指数级下降. 而这个共同下界从推导就知道不是必需的，这也是设计 AdaBoost 之初所考虑的，这样我们可以任意组合不同类型的弱学习器而无需担心误差不能减小.</p>
+<h3 id="前向分步算法解释"><a class="markdownIt-Anchor" href="#前向分步算法解释"></a> 前向分步算法解释</h3>
+<p>Friedman、Hastie 和 Tibshirani 在 &quot;<em>Additive Logistic Regression: A Statistical View of Boosting</em>&quot;（Annals of Statistics, 2000）中，说明了 AdaBoost 算法是<strong>模型为加法模型、损失函数为指数函数、学习算法为前向分步算法</strong>的二分类学习方法. 在这个框架下，这几位作者还提出了 Logitboost 算法. <strong>加法模型（additive model）</strong> 指的是形如</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    f(\boldsym…'>\begin{equation*}
+    f(\boldsymbol{x})=\sum_{m=1}^M\beta_m h(\boldsymbol{x};\boldsymbol{\theta}_m)
+\end{equation*}
+</p>
+<p>的模型，其中 $ h(\boldsymbol{x};\boldsymbol{\theta}_m) $ 称为<strong>基函数（base function）</strong>，而 $ \boldsymbol{\theta}_m $ 为其参数， $ \beta_m $ 为各基函数系数. 加法模型的参数就是所有的基函数参数和系数. 显然 AdaBoost 就是加法模型中的一种. 在给定某个损失函数 $ L(y,f) $ 时，加法模型的学习问题就变成了 ERM（即经验风险最小化）问题，我们要使得损失函数最小化</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \min_{\bet…'>\begin{equation*}
+    \min_{\beta_m,\boldsymbol{\theta}_m}\sum_{i=1}^N L\left(y_i,\sum_{m=1}^M\beta_mh(\boldsymbol{x}_i;\boldsymbol{\theta}_m)\right)
+\end{equation*}
+</p>
+<p>一般来说这个优化问题是很复杂的. 而<strong>前向分步算法（forward stagewise algorithm）</strong> 是一种求解其的有效方法. 其想法是：如果我们每次只学习一个基函数和系数，逐步逼近目标函数，就能简化优化的复杂度. 具体而言，初始化 $ f_0(\boldsymbol{x})=0 $，对 $ m=1,2,\cdots,M $，每次都最小化损失函数得到参数</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    (\beta_m,\…'>\begin{equation*}
+    (\beta_m,\boldsymbol{\theta}_m)=\mathop{\mathrm{argmin}}\limits_{\beta,\boldsymbol{\theta}}\sum_{i=1}^NL(y_i,f_{m-1}(\boldsymbol{x}_i)+\beta h(\boldsymbol{x}_i;\boldsymbol{\theta})).
+\end{equation*}
+</p>
+<p>更新模型 $ f_m(\boldsymbol{x})=f_{m-1}(\boldsymbol{x})+\beta_m h(\boldsymbol{x};\boldsymbol{\theta_m}) $ 即可.</p>
+<div class="note warning no-icon flat"><p><strong>这里需要注意的是，前向分步算法的优化结果和直接进行全局优化并不等价！</strong> 前向分步算法实际上是<strong>贪心算法，是对最终结果的近似</strong>. 并且我们并不真正希望达到全局最优，因为这样往往容易过拟合，前向分步算法实际上类似于<strong>做了隐式正则化</strong>，这样就防止了过拟合，一定程度上能够提高预测准确率.</p>
+</div>
+<p>现在我们就可以来说明前向分步算法和 AdaBoost 的关系了. 现在我们有指数损失函数</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    L(y,f(\bol…'>\begin{equation*}
+    L(y,f(\boldsymbol{x}))=\exp(-yf(\boldsymbol{x})),
+\end{equation*}
+</p>
+<p>并且经过前 $ m-1 $ 步迭代得到 $ f_{m-1}(\boldsymbol{x})=\alpha_1G_1(\boldsymbol{x})+\cdots+\alpha_{m-1}G_{m-1}(\boldsymbol{x}) $. 对于第 $ m $ 步，我们需要使得</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    (\alpha_m,…'>\begin{align*}
+    (\alpha_m,G_m(\boldsymbol{x}))&amp;=\mathop{\mathrm{argmin}}\limits_{\alpha,G}\sum_{i=1}^N\exp[-y_i(f_{m-1}(\boldsymbol{x}_i)+\alpha G(\boldsymbol{x}_i))]\\&amp;:=\mathop{\mathrm{argmin}}\limits_{\alpha,G}\sum_{i=1}^N\bar{w}_{m,i}\exp(-y_i\alpha G(\boldsymbol{x}_i)).
+\end{align*}
+</p>
+<p>其中 $ \bar{w}_{m,i} $ 和我们的优化目标无关，只和 $ f_{m-1}(\boldsymbol{x}_i) $ 有关. 上式的优化可以分为两步. 首先求出最优的 $ G_m $，再求 $ \alpha $. 为说明这一点，注意</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \sum_{i=1}…'>\begin{equation*}
+    \sum_{i=1}^N\bar{w}_{m,i}\exp(-y_i\alpha G(\boldsymbol{x}_i))=\sum_{y_i\ne G(\boldsymbol{x}_i)}\bar{w}_{m,i}(\mathrm{e}^{\alpha}-\mathrm{e}^{-\alpha})+\sum_{i=1}^N\bar{w}_{m,i}\mathrm{e}^{-\alpha},
+\end{equation*}
+</p>
+<p>因此无论 $ \alpha $ 取什么正数，我们只需要优化左边这个去掉系数 $ \mathrm{e}^{\alpha}-\mathrm{e}^{-\alpha} $ 的函数，也就是说，</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    G_m(\bolds…'>\begin{equation*}
+    G_m(\boldsymbol{x})=\mathop{\mathrm{argmin}}\limits_{G}\sum_{i=1}^N\bar{w}_{m,i}\mathbb{I}(y_i\ne G(\boldsymbol{x}_i)).
+\end{equation*}
+</p>
+<p>接下来我们求关于 $ \alpha $ 的最小即可. 由于</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \sum_{i=1}…'>\begin{equation*}
+    \sum_{i=1}^N\bar{w}_{m,i}\exp(-y_i\alpha G_m(\boldsymbol{x}_i))=\sum_{y_i=G_m(\boldsymbol{x}_i)}\bar{w}_{m,i}\exp(-\alpha)+\sum_{y_i\ne G_m(\boldsymbol{x}_i)}\bar{w}_{m,i}\exp(\alpha),
+\end{equation*}
+</p>
+<p>其形状为一对勾函数，由基本不等式的取等条件即知</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \exp(2\alp…'>\begin{equation*}
+    \exp(2\alpha_m)=\frac{\sum_{y_i=G_m(\boldsymbol{x}_i)}\bar{w}_{m,i}}{\sum_{y_i\ne G_m(\boldsymbol{x}_i)}\bar{w}_{m,i}}\Leftrightarrow\alpha_m=\frac{1}{2}\log\frac{1-\varepsilon_m}{\varepsilon_m}.
+\end{equation*}
+</p>
+<p>这里</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \varepsilo…'>\begin{equation*}
+    \varepsilon_m=\frac{\sum_{y_i\ne G_m(\boldsymbol{x}_i)}\bar{w}_{m,i}}{\sum_{i=1}^N\bar{w}_{m,i}}=\sum_{i=1}^Nw_{m,i}\mathbb{I}(y_i\ne G_m(\boldsymbol{x}_i)).
+\end{equation*}
+</p>
+<p>由于我们有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \bar{w}_{m…'>\begin{equation*}
+    \bar{w}_{m,i}=\exp(-y_if_{m-1}(\boldsymbol{x}_i))=\bar{w}_{m-1,i}\exp(-y_i\alpha_{m-1}G_{m-1}(\boldsymbol{x}_i)),
+\end{equation*}
+</p>
+<p>而在 AdaBoost 算法中，有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    w_{m,i}=\f…'>\begin{equation*}
+    w_{m,i}=\frac{w_{m-1,i}}{z_{m-1}}\exp(-\alpha_my_iG_{m-1}(\boldsymbol{x}_i)),
+\end{equation*}
+</p>
+<p>因此 $ \bar{w}_{m,i},w_{m,i} $ 之间只相差一个常量 $ c_{m-1} $，那么根据 $ \varepsilon_m $ 的形式就知道，这里的 $ \varepsilon_m $ 和 AdaBoost 算法中定义的是完全一致的，并且新的系数更新也只差一个归一化常数，因此两者是完全等价的.</p>
+<h2 id="梯度提升方法"><a class="markdownIt-Anchor" href="#梯度提升方法"></a> 梯度提升方法</h2>
+<p><strong>梯度提升（gradient boosting）方法</strong>是由 Jerome Friedman 提出的，其可用于分类、回归、重要性排序等多种任务，原始文献为 &quot;<em>Greedy Function Approximation: A Gradient Boosting Machine</em>&quot;. 首先 Friedman 回顾了一般情况下机器学习中的函数逼近问题：在给定损失函数 $ L(y,f(\boldsymbol{x})) $ 的基础上，在真实的关于数据 $ (y,\boldsymbol{x}) $ 的联合分布上得到最佳逼近函数</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    f^\ast=\ma…'>\begin{equation*}
+    f^\ast=\mathop{\mathrm{argmin}}\limits_{f}\mathbb{E}_{y,\boldsymbol{x}}[L(y,f(\boldsymbol{x}))]=\mathop{\mathrm{argmin}}\limits_{f}\mathbb{E}_{\boldsymbol{x}}[\mathbb{E}_y[L(y,f(\boldsymbol{x}))|\boldsymbol{x}]].
+\end{equation*}
+</p>
+<p>并且文中只关注加法模型. 一般来说我们总是假定每个基函数 $ h(\boldsymbol{x},\boldsymbol{\theta}_m) $ 中的 $ \boldsymbol{\theta}_m $ 总是服从一个参数族，而我们的优化过程是在参数空间上进行的. 而我们一般的优化方法就是熟知的梯度（最速）下降. 假设带参数的优化函数为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \Phi(\bold…'>\begin{equation*}
+    \Phi(\boldsymbol{\theta})=\mathbb{E}_{y,\boldsymbol{x}}[L(y,F(\boldsymbol{x};\boldsymbol{\theta}))],
+\end{equation*}
+</p>
+<p>那么我们就需要对 $ \Phi $ 进行极小化. 若记</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{g}_m=\lbrace g_{jm}\rbrace=\left\lbrace\left[\frac{\partial\Phi(\boldsymbol{\theta})}{\partial\theta_j}\right]_{\boldsymbol{\theta}=\boldsymbol{\theta}_{m-1}} \right\rbrace
+\end{equation*}
+</p>
+<p>为第 $ m-1 $ 步更新时用到的梯度，并且每次通过线搜索</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \rho_m=\ma…'>\begin{equation*}
+    \rho_m=\mathop{\mathrm{argmin}}\limits_{\rho}\Phi(\boldsymbol{\theta}_{m-1}-\rho\boldsymbol{g}_m)
+\end{equation*}
+</p>
+<p>选取学习率为 $ \rho_m $，那么 $ \boldsymbol{p}_m=-\rho_m\boldsymbol{g}_m $ 就是对应的更新. 假设我们总共迭代了 $ M $ 步，最终我们得到的参数估计就是</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \hat{\bold…'>\begin{equation*}
+    \hat{\boldsymbol{\theta}}=\sum_{m=0}^M\boldsymbol{p}_m=\boldsymbol{p}_0-\sum_{m=1}^M\rho_m\boldsymbol{g_m}.
+\end{equation*}
+</p>
+<p>这里 $ \boldsymbol{p}_0 $ 是任意选取的一个初始点. 不过这里我们并不使用这种方法，而是采用类似非参数的方法<strong>在泛函空间内进行梯度下降.</strong> 这就是说，假设我们视 $ f(\boldsymbol{x}) $ 在输入空间上的<strong>每一点 $ \boldsymbol{x} $</strong> 为待估参数，<strong>现在我们想要极小化的是关于 $ f $ 的函数</strong></p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \Phi(f)=\m…'>\begin{equation*}
+    \Phi(f)=\mathbb{E}_{y,\boldsymbol{x}}[L(y,f(\boldsymbol{x}))]=\mathbb{E}_{\boldsymbol{x}}[\mathbb{E}_y[L(y,f(\boldsymbol{x}))|\boldsymbol{x}]],
+\end{equation*}
+</p>
+<p>或者等价的，我们需要逐点优化条件期望</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \phi(f(\bo…'>\begin{equation*}
+    \phi(f(\boldsymbol{x}))=\mathbb{E}_y[L(y,f(\boldsymbol{x}))|\boldsymbol{x}].
+\end{equation*}
+</p>
+<p>理想情况下我们甚至可以有不可数多个待优化的点，但是我们在现实中只能获取到有限个数的样本点，从而我们只能对有限的 $ \lbrace f(\boldsymbol{x}_i)\rbrace_{i=1}^N $ 去进行拟合. 模仿梯度下降的形式，我们应该有类似的解的形式</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \hat{f}(\b…'>\begin{equation*}
+    \hat{f}(\boldsymbol{x})=\sum_{m=0}^Mf_m(\boldsymbol{x}).
+\end{equation*}
+</p>
+<p>其中 $ f_0 $ 是初始猜测，而 $ \lbrace f_m \rbrace_{m=1}^M $ 被称作<strong>增量函数（incremental function）</strong>，也即所谓的步长或提升. 而对于梯度下降法，我们有 $ f_m(\boldsymbol{x})=-\rho_mg_m(\boldsymbol{x}) $，其中</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    g_m(\bolds…'>\begin{equation*}
+    g_m(\boldsymbol{x})=\left[\frac{\partial\phi(F(\boldsymbol{x}))}{\partial F(\boldsymbol{x})}\right]_{F(\boldsymbol{x})=F_{m-1}(\boldsymbol{x})},\quad F_{m-1}(\boldsymbol{x})=\sum_{m=0}^{m-1}f_{i}(\boldsymbol{x}).
+\end{equation*}
+</p>
+<p>如果某些正则性条件满足，保证期望和积分可交换次序，那么根据 $ \phi $ 的定义我们还有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    g_m(\bolds…'>\begin{equation*}
+    g_m(\boldsymbol{x})=\mathbb{E}_y\left[\left.\frac{\partial L(y,F(\boldsymbol{x}))}{\partial F(\boldsymbol{x})}\right|\boldsymbol{x}\right]_{F(\boldsymbol{x})=F_{m-1}(\boldsymbol{x})}.
+\end{equation*}
+</p>
+<p>最优的步长 $ \rho_m $ 依旧可以通过和梯度下降完全一致的方法得到.<br />
+上面的方法在数据有限时是不可行的，因为我们无法对每个数据点计算条件期望. 而且即便可以估计，我们的最终目标是在未知的点处得到一个较好的估计，因此我们需要对最终的解加上一些平滑性约束，从邻近的点借用信息. 也就是说我们对每个 $ f_m $ 可以假定有 $ \beta_m h(\boldsymbol{x};\boldsymbol{\theta}_m) $ 的形式回到先前说的参数模型的形式，并且直接对参数优化. 但是这样的做法会由于损失函数过于复杂而无法求解. <strong>这时候我们就需要用到前向分步算法了</strong>，现在我们想要得到的基函数应该是通过求解优化问题</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    h_m(\bolds…'>\begin{equation*}
+    h_m(\boldsymbol{x};\boldsymbol{\theta}_m)=\mathop{\mathrm{argmin}}\limits_{\beta,h}\sum_{i=1}^NL(y_i,F_{m-1}(\boldsymbol{x}_i)+\beta h(\boldsymbol{x}_i;\boldsymbol{\theta}))
+\end{equation*}
+</p>
+<p>得到的. 这可以解释为，<strong>类比参数的梯度下降，我们需要在方向 $ h(\boldsymbol{x};\boldsymbol{\theta}_m) $ 属于基函数族 $ h(\boldsymbol{x};\boldsymbol{\theta}) $ 这一约束下，求解最优的基函数及步长 $ \beta_m $.</strong> 这就是梯度提升最核心的思想所在. 然而，这个带约束优化并不好进行，我们目前知道的泛函空间下的梯度下降的方向选取应当是<strong>负梯度</strong></p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    -g_m(\bold…'>\begin{equation*}
+    -g_m(\boldsymbol{x}_i)=-\left[\frac{\partial L(y_i,F(\boldsymbol{x}_i))}{\partial F(\boldsymbol{x}_i)}\right]_{F(\boldsymbol{x})=F_{m-1}(\boldsymbol{x})},
+\end{equation*}
+</p>
+<p>这样对于每个样本点我们都能给出对应的梯度下降步长. <strong>但我们并不知道其他点处对应的梯度. 原因在于，我们给出的 $ g_m $ 是无约束优化的结果，对 $ F $ 不做任何限制，因此我们无法获取在样本点以外函数的任何性质.</strong> 如何使得我们最终构造的学习器具有泛化能力呢？Friedman 提出了一个非常巧妙的办法：<strong>既然我们现在想要做的是带约束的优化，而结果和无约束优化有偏差，那么我们就想要让两者在数据集上的偏差达到最小</strong>，于是我们可以采用最小二乘的想法，获得</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \boldsymbo…'>\begin{equation*}
+    \boldsymbol{\theta}_m=\mathop{\mathrm{argmin}}\limits_{\boldsymbol{\theta},\beta}\sum_{i=1}^N[-g_m(\boldsymbol{x}_i)-\beta h(\boldsymbol{x};\boldsymbol{\theta})]^2.
+\end{equation*}
+</p>
+<p>也就是说，我们希望通过基函数去拟合所谓的<strong>伪响应（pseudoresponce）或称为伪残差 $ \lbrace \tilde{y_i}=-g_m(\boldsymbol{x}_i)\rbrace_{i=1}^N $</strong>，然后用确定好的参数得到新的基函数，再通过线搜索得到最优的步长 $ \beta_m $. 只要基函数的性质够好，能够进行最小二乘解的操作，那么算法就能够实现. 现在我们就可以将梯度提升的算法总结如下：</p>
+<div class="note primary no-icon flat"><p>输入：训练数据集 $ \mathcal{D}=\lbrace(\boldsymbol{x}_i,y_i)\rbrace_{i=1}^N $ 以及假定的基函数形式.<br />
+输出：梯度提升方法得到的逼近函数 $ F_M(\boldsymbol{x}) $.</p>
+<ol>
+<li>
+<p>初始化 $ F_0(\boldsymbol{x})=\mathop{\mathrm{argmin}}_{\rho}\sum_{i=1}^NL(y_i,\rho) $;</p>
+</li>
+<li>
+<p>对 $ m=1,2,\cdots,M $，进行如下操作：<br />
+(a) 计算伪响应</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 8:  \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+     \tilde{y}…'> \begin{equation*}
+     \tilde{y}_i=-\left[\frac{\partial L(y_i,F(\boldsymbol{x}_i))}{\partial F(\boldsymbol{x}_i)}\right]_{F(\boldsymbol{x})=F_{m-1}(\boldsymbol{x})},i=1,\cdots,N;
+ \end{equation*} 
+</p>
+<p>(b) 得到基函数参数</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+ \boldsymbol{\…'>\begin{equation*}
+ \boldsymbol{\theta}_m=\mathop{\mathrm{argmin}}\limits_{\boldsymbol{\theta},\beta}\sum_{i=1}^N[-g_m(\boldsymbol{x}_i)-\beta h(\boldsymbol{x};\boldsymbol{\theta})]^2; 
+\end{equation*}
+</p>
+<p>(c) 通过线搜索得到</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+ \beta_m=\math…'>\begin{equation*}
+ \beta_m=\mathop{\mathrm{argmin}}\limits_{\beta}\sum_{i=1}^NL(y_i,F_{m-1}(\boldsymbol{x}_i)+\beta h(\boldsymbol{x}_i;\boldsymbol{\theta}_m));
+\end{equation*}
+</p>
+<p>(d) 更新 $ F_m(\boldsymbol{x})=F_{m-1}(\boldsymbol{x})+\beta_m h(\boldsymbol{x};\boldsymbol{\theta}_m) $.</p>
+</li>
+</ol>
+</div>
+<p><strong>梯度提升的思想是后续基于这一方法开发出来的算法的基石，并不会脱离此基本框架，而仅仅是在此基础上做各种各样的计算优化.</strong> 梯度提升对于回归和分类任务都很有效，下面针对每类情况展开说明，然后重点阐述针对基函数为决策树情形下的梯度提升方法——GBDT.</p>
+<h3 id="回归任务"><a class="markdownIt-Anchor" href="#回归任务"></a> 回归任务</h3>
+<p>梯度提升方法用于回归任务时，采用的损失函数不仅可以是平方损失，还可以是绝对损失、Huber 损失等等. 如果我们采用的是最基础的平方损失函数 $ L(y,F(\boldsymbol{x}))=\dfrac{1}{2}(y-F(\boldsymbol{x}))^2 $，代入上面通用的算法式子，很显然在第 $ m $ 步有 $ \tilde{y}_i=y_i-F_{m-1}(\boldsymbol{x}_i) $，这时伪残差就变成了真正意义的模型残差. 并且由于此时损失函数为平方损失，在对 $ \rho_m $ 进行线搜索的时候，和选取参数 $ \boldsymbol{\theta}_m $ 的步骤中使用的是仅差一系数的回归平方损失，因此对基函数参数的选取和对步长的选取可合并为一步，我们就有如下算法：</p>
+<div class="note primary no-icon flat"><p><strong>（损失函数为平方损失时的梯度提升方法）</strong></p>
+<ol>
+<li>初始化 $ F_0(\boldsymbol{x})=\bar{y} $ 为样本均值；</li>
+<li>对 $ m=1,\cdots,M $，执行如下操作：<br />
+(a) $ \tilde{y}_i=y_i-F_{m-1}(\boldsymbol{x}_i),i=1,2,\cdots,N $；<br />
+(b) 更新参数 $ (\beta_m,\boldsymbol{\theta}_m)=\mathop{\mathrm{armgin}}_{\boldsymbol{\theta},\beta}\sum_{i=1}^N[\tilde{y}_i-\beta h(\boldsymbol{x}_i;\boldsymbol{\theta})]^2 $；<br />
+(c) 令 $ F_m(\boldsymbol{x})=F_{m-1}(\boldsymbol{x})+\beta_m h(\boldsymbol{x};\boldsymbol{\theta}_m) $.</li>
+</ol>
+</div>
+<p>如果我们采用损失函数为绝对值损失 $ L(y,F)=|y-F| $，那么容易得到 $ \tilde{y}_i=\text{sign}(y_i-F_{m-1}(\boldsymbol{x}_i)) $，这里 $ \text{sign} $ 就是符号函数，规定了在零处取值为零. 如果我们知道了更新参数 $ \boldsymbol{\theta}_m $，那么对 $ \beta_m $ 的线搜索可以写成更简单的形式</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \rho_m&amp;=\m…'>\begin{align*}
+    \rho_m&amp;=\mathop{\mathrm{argmin}}\limits_{\rho}\sum_{i=1}^N|y_i-F_{m-1}(\boldsymbol{x}_i)-\rho h(\boldsymbol{x}_i;\boldsymbol{\theta}_m)|\\
+    &amp;=\mathop{\mathrm{argmin}}\limits_{\rho}\sum_{i=1}^N|h(\boldsymbol{x}_i;\boldsymbol{\theta}_m)|\left|\frac{y_i-F_{m-1}(\boldsymbol{x}_i)}{h(\boldsymbol{x}_i;\boldsymbol{\theta}_m)}-\rho \right|\\
+    &amp;=\text{median}_W\left\lbrace\frac{y_i-F_{m-1}(\boldsymbol{x}_i)}{h(\boldsymbol{x}_i;\boldsymbol{\theta}_m)}\right\rbrace_{i=1}^N,\quad w_i=|h(\boldsymbol{x}_i,\boldsymbol{\theta}_m)|.
+\end{align*}
+</p>
+<p>即可以表示成加权中位数的形式. 这样我们还可以得到 LAD（Least Absolute Deviation，最小绝对偏差） 形式的梯度提升算法，并且这种方法是稳健的，有助于对抗数据中的极端值.<br />
+还有一种稳健的损失函数是 Huber 损失</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    L(y,F)=\be…'>\begin{equation*}
+    L(y,F)=\begin{cases}
+        \dfrac{1}{2}(y-F)^2, &amp; |y-F|\le\delta,\\
+        \delta(|y-F|-\delta/2),&amp;|y-F|&gt;\delta.
+    \end{cases}
+\end{equation*}
+</p>
+<p>这种损失可以在重尾分布下保持稳健性，又能在预测和真实值偏离小的情况下保持计算上的高效. <strong>相应的回归叫做 M-回归</strong>. 对应的伪响应也是分段函数</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \tilde{y}_…'>\begin{equation*}
+    \tilde{y}_i=\begin{cases}
+        y_i-F_{m-1}(\boldsymbol{x}_i) &amp; |y_i-F_{m-1}(\boldsymbol{x}_i)|\le\delta,\\
+        \delta\cdot\text{sign}(y_i-F_{m-1}(\boldsymbol{x}_i)), &amp; |y_i-F_{m-1}(\boldsymbol{x_i})|&gt;\delta.
+    \end{cases}
+\end{equation*}
+</p>
+<p>因此还可注意到分点 $ \delta $ 处损失函数的导数是连续的，且在全空间上导数有界. $ \delta $ 实际是一个超参数，其规定了哪些数据是“异常值”以决定是否需要使用绝对值损失. 一般来说我们可以选取 $ |y-F^\ast(\boldsymbol{x})| $ 对应的分布的 $ \alpha $ 分位数，把尾部的数据隔离. 由于我们并不知道真实的映射 $ F^\ast $，因此我们在迭代过程中就采用前 $ m-1 $ 步拟合得到的学习器来选取 $ \delta $，因此有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \delta_m=\…'>\begin{equation*}
+    \delta_m=\text{quantile}_\alpha\lbrace|y_i-F_{m-1}(\boldsymbol{x}_i)|\rbrace_{i=1}^N.
+\end{equation*}
+</p>
+<p>下一小节针对 GBDT 我们会详细展开如何选取步长的操作.</p>
+<h3 id="分类任务"><a class="markdownIt-Anchor" href="#分类任务"></a> 分类任务</h3>
+<p>分类任务主要就是二分类和多分类问题. 对于二分类问题，我们总是假定对应于仅有两个取值的观测 $ y\in\lbrace+1,1\rbrace $ 取 $ +1 $ 的概率有 logistic 分布的形式</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \mathbb{P}…'>\begin{equation*}
+    \mathbb{P}(y=+1|\boldsymbol{x})=\frac{1}{1+\exp(-F(\boldsymbol{x}))}\Leftrightarrow F(\boldsymbol{x})=\log\left[\frac{\mathbb{P}(y=1|\boldsymbol{x})}{\mathbb{P}(y=-1|\boldsymbol{x})}\right],
+\end{equation*}
+</p>
+<p>并且我们使用的损失函数为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    L(y,F)=\lo…'>\begin{equation*}
+    L(y,F)=\log(1+\exp(-yF)).
+\end{equation*}
+</p>
+<p>自然地我们有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \tilde{y}_…'>\begin{equation*}
+    \tilde{y}_i=\frac{y_i}{1+\exp(y_iF_{m-1}(\boldsymbol{x}))}.
+\end{equation*}
+</p>
+<p>还有一种定义方式是采用 $ 0,1 $ 标签 $ y\in\lbrace0,1\rbrace $，概率取值形式不变但是损失函数变为 Bernoulli 分布的负对数似然损失（即交叉熵损失）</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    L(y,F)=-y\…'>\begin{equation*}
+    L(y,F)=-y\log\mathbb{P}(y=1|\boldsymbol{x})-(1-y)\log\mathbb{P}(y=0|\boldsymbol{x})=\log(1+\exp(F))-yF.
+\end{equation*}
+</p>
+<p>对应的更新伪响应为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \tilde{y}_…'>\begin{equation*}
+    \tilde{y}_i=-\frac{\exp(F_{m-1}(\boldsymbol{x}_i))}{1+\exp(F_{m-1}(\boldsymbol{x_i}))}+y_i:=y_i-p_i.
+\end{equation*}
+</p>
+<p>注意这里我们做的二分类标签改变了，但这并不影响我们的结果. 因为我们总是可以通过 $ y\Leftrightarrow 2y-1 $ 这一可逆变换还原回原标签，<strong>而在零一标签上我们的推导计算会更加方便，后续涉及 XGBoost 等较新的 boosting 方法时，一般集成在 <code>python</code> 的库都会使用这一形式，因此读者需要加以区分. 但是两者的计算结果是完全一致的，读者可自行验证.</strong><br />
+对于多分类问题，我们的首先需要把标签作独热编码表示，若有 $ K $ 个类别，那么就采用 $ K $ 维向量 $ \boldsymbol{y}=(y_1,\cdots,y_K)' $ 来表示样本属于哪一类，其中这 $ K $ 个分量仅有一个能取 $ 1 $，其余都为零，以代表类别. 而对于每个类别我们最后也是给出一个软标签 $ F_k(\boldsymbol{x}) $，最后输出时输出值最大的作为预测类别. 我们采用交叉熵损失</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    L(\lbrace …'>\begin{equation*}
+    L(\lbrace y_k,F_k(\boldsymbol{x})_{k=1}^K\rbrace)=-\sum_{k=1}^Ky_k\log p_k(\boldsymbol{x}),
+\end{equation*}
+</p>
+<p>其中 $ p_k(\boldsymbol{x})=\mathbb{P}(y_k=1|\boldsymbol{x}) $. 并且使用对称的多项 logistic 变换</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    F_k(\bolds…'>\begin{equation*}
+    F_k(\boldsymbol{x})=\log p_k(\boldsymbol{x})-\frac{1}{K}\sum_{j=1}^K\log p_j(\boldsymbol{x}),
+\end{equation*}
+</p>
+<p>从该式我们可以得到</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    F_i(\bolds…'>\begin{equation*}
+    F_i(\boldsymbol{x})-F_1(\boldsymbol{x})=\log p_i(\boldsymbol{x})-\log p_1(\boldsymbol{x})\Leftrightarrow\frac{p_i(\boldsymbol{x})}{p_1(\boldsymbol{x})}=\frac{\exp(F_i(\boldsymbol{x}))}{\exp(F_1(\boldsymbol{x}))}.
+\end{equation*}
+</p>
+<p>对 $ i $ 求和，就可以等价地可以反解出</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    p_k(\bolds…'>\begin{equation*}
+    p_k(\boldsymbol{x})=\frac{\exp(F_k(\boldsymbol{x}))}{\sum_{k=1}^K\exp(F_k(\boldsymbol{x}))}.
+\end{equation*}
+</p>
+<p>于是对损失函数求导可以得到每一分量的伪残差为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \tilde{y}_…'>\begin{equation*}
+    \tilde{y}_{ik}=-\left[\frac{\partial L(\lbrace y_{il},F_l(\boldsymbol{x}_i)\rbrace_{l=1}^K)}{\partial F_k(\boldsymbol{x}_i)}\right]_{\lbrace F_l(\boldsymbol{x})=F_{l,m-1}(\boldsymbol{x})\rbrace_{l=1}^K}=y_{ik}-p_{k,m-1}(\boldsymbol{x}_i).
+\end{equation*}
+</p>
+<p>注意别忘了 $ \sum_{k=1}^Ky_{ik}=1 $ 这个隐性约束. 下一小节针对 GBDT 我们会展开说明如何进行步长选取的操作.</p>
+<h3 id="gbdt"><a class="markdownIt-Anchor" href="#gbdt"></a> GBDT</h3>
+<h4 id="概念与基本结构"><a class="markdownIt-Anchor" href="#概念与基本结构"></a> 概念与基本结构</h4>
+<p><strong>梯度提升决策树（GBDT，gradient boosted decision tree）就是将决策树作为基函数的学习方法</strong>. 在 Friedman 的文章中提出的所有有关树的梯度提升例子全部可以称为 GBDT，但他本人在文献中并没有直接称呼这个名字，而是叫作 TreeBoost. 后来在知名的机器学习著作 <em>《Elements of Statistical Learning》</em> 中，其又被称为 MART（Multiple Additive Regression Trees，多加性回归树），在业界的传播中才最终确定了 GBDT 这个名字. GBDT 在业界的应用实在过于广泛，无论是在分类任务、回归任务，还是在排序任务上，其表现都极为出色. 时至今日，由 GBDT 衍生而来的方法仍然在各种领域得到了广泛应用. 我们按照在分类、回归、排序任务的顺序介绍 GBDT 算法的应用，对于可用于多种用途的算法，本文和接下来的下篇内容可能都会有所涉及.<br />
+<strong>首先要说明的一点是，对于 GBDT，我们在构建每棵树时保持叶子结点的数目完全一致，记为 $ J $，并且统一采用 CRAT 回归树（这点非常重要！）其中一个原因是，我们在上面对梯度提升方法的讨论中，对于分类任务采用的是软标签选取概率值最大的类别进行分类的形式而非投票，加之 boosting 的学习器生成是串行的方式，每一次学习的基函数会和前一次有强依赖性</strong>，其次这不仅是为后面的理论分析提供方便，后面也将会看到这样的操作在工程方面也有实际意义. 由于我们假设了叶子结点数相同，任何回归树都具有形式</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    h(\boldsym…'>\begin{equation*}
+    h(\boldsymbol{x};\lbrace b_j,R_j\rbrace_{j=1}^J)=\sum_{j=1}^Jb_j\mathbb{I}(\boldsymbol{x}\in R_j)
+\end{equation*}
+</p>
+<p>的形式，这里 $ R_j $ 是对全空间的一个划分. 在使用 GBDT 时，我们知道在计算出伪响应之后，若要确定第 $ m $ 棵树的参数 $ \lbrace b_{jm},R_{jm}\rbrace_{j=1}^J $，那么就需要和伪响应进行最小二乘拟合. 由于每块区域都是不交的，因此如果我们知道区域划分，那么就一定有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    b_{jm}=\te…'>\begin{equation*}
+    b_{jm}=\text{ave}_{\boldsymbol{x}_i\in R_{jm}}\tilde{y}_i.
+\end{equation*}
+</p>
+<p>并且事实上，由于我们想要选取的步长可以一并地和这些预测值乘在一起，因此整个更新的过程可以写成</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    F_m(\bolds…'>\begin{equation*}
+    F_m(\boldsymbol{x})=F_{m-1}(\boldsymbol{x})+\sum_{j=1}^J\gamma_{jm}\mathbb{I}(\boldsymbol{x}\in R_{jm}).\quad(\gamma_{jm}=\beta_mb_{jm})
+\end{equation*}
+</p>
+<p>我们还可以进一步简化最后的优化步骤. 再次因为 $ R_{jm} $ 是两两不交的，因此我们可以把耦合的损失函数拆成若干部分进行优化. 这就是说，我们原来的目标从</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \lbrace\ga…'>\begin{equation*}
+    \lbrace\gamma_{jm}\rbrace_{j=1}^J=\mathop{\mathrm{argmin}}\limits_{\lbrace\gamma_{j}\rbrace_{j=1}^J}\sum_{i=1}^NL\left(y_i,F_{m-1}(\boldsymbol{x}_i)+\sum_{j=1}^J\gamma_j\mathbb{I}(\boldsymbol{x}\in R_{jm})\right)
+\end{equation*}
+</p>
+<p>转变成了对每一个</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \gamma_{jm…'>\begin{equation*}
+    \gamma_{jm}=\mathop{\mathrm{argmin}}\limits_{\gamma}\sum_{\boldsymbol{x}_i\in R_{jm}}L(y_i,F_{m-1}\left(\boldsymbol{x}_i)+\gamma\right).
+\end{equation*}
+</p>
+<p><strong>问题在于，怎么构建树？</strong> 这个问题实际上是 NP——完全的（在本人决策树的博客中有提及），也就是说我们无法通过对所有情况的搜索得到最后的解. 因此，我们选取的建树规则只能达到次优的情况. 针对不同的问题，构建树的方式也有所不同，因此这里我们并不急于直接给出一个通用的方案. <strong>在下篇介绍 GBDT 在分类、回归任务上的算法应用时，我们会针对性地给出一些方法.</strong></p>
+<h4 id="正则化"><a class="markdownIt-Anchor" href="#正则化"></a> 正则化</h4>
+<p>GBDT 同样可能存在过拟合的问题，因此我们仍可以采取某些正则化的手段来保证训练误差不下降的同时提升泛化性能. 一种正则化是控制迭代步数 $ M $，其为一超参数，值的选取可以通过交叉验证或在某独立的验证基上进行. 不过前人研究也发现，<strong>通过收缩（shrinkage）进行的正则化往往比限制迭代步数更有效.</strong> 具体而言，我们是把加法模型中的学习器更新步骤替换为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    F_{m}(\bol…'>\begin{equation*}
+    F_{m}(\boldsymbol{x})=F_{m-1}(\boldsymbol{x})+\nu \cdot\beta_m h(\boldsymbol{x};\boldsymbol{\theta}_m),\quad 0&lt;\nu\le 1.
+\end{equation*}
+</p>
+<p>Friedman 在文中也给出了一个经验法则：首先选取尽可能大的某个 $ M $，然后（使用网格法等）调整 $ \nu $ 的值使得验证集上的泛化误差达到固定在该训练次数时的极小值附近. 选定两个值后，观察训练的情况，如果到最后一步迭代在训练集上的误差仍然在下降，那么应当增大 $ \nu $ 或增大 $ M $，<strong>但优先推荐增大 $ M $，因为这样不会浪费先前的计算结果，直接继续进行即可.</strong> 验证集上的泛化误差评估方式可以采用留一法、 $ k $ 折交叉验证等等.</p>
+<h4 id="特征重要性评估"><a class="markdownIt-Anchor" href="#特征重要性评估"></a> 特征重要性评估</h4>
+<p>像常规的决策树模型一样，GBDT 也可以做特征重要性的评估. 为了说明到底是什么特征对我们最终得到的模型 $ \widehat{F}(\boldsymbol{x}) $ 的影响最，我们对某个输入特征 $ x_j $ 定义<strong>相对影响度</strong> $ I_j $ 来刻画其重要性：</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    I_j=\left(…'>\begin{equation*}
+    I_j=\left(\mathbb{E}_{\boldsymbol{x}}\left[\frac{\partial\widehat{F}(\boldsymbol{x})}{\partial x_j}\right]^2\cdot\text{Var}_{\boldsymbol{x}}[x_j]\right)^{1/2}.
+\end{equation*}
+</p>
+<p>这里的偏导数其实就刻画了这个特征对函数整体的影响程度，并在全空间上通过求平均及乘标准差来客观评判影响程度. 当然这一偏导数在决策树的语境下并不严格存在，因此需要一种较好的用于替代的估计量. 在 CART 的原始文献中，Breiman 和 Friedman 等人就提出了这样一个替代性的刻画相对影响度的量</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \widehat{I…'>\begin{equation*}
+    \widehat{I}_j^2(T)=\sum_{t=1}^{J-1}\hat{i}_t^2\mathbb{I}(v_t=j),
+\end{equation*}
+</p>
+<p>这里的求和表示对所有内部结点进行. 事实上，求和仅对内部结点中使用特征 $ x_j $ 作为切分特征的那些结点进行求和，而 $ \hat{i}_t^2 $ 则是由分裂该结点带来所带来的平方误差经验改善量，记为</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \hat{i}_t^…'>\begin{equation*}
+    \hat{i}_t^2=\frac{w_Lw_R}{w_L+w_R}(\bar{y}_L-\bar{y}_R)^2
+\end{equation*}
+</p>
+<p>这里 $ \bar{y}_L,\bar{y}_R $ 分别代表左右子树拥有的数据的响应的均值，而 $ w_L,w_R $ 代表左右子树所有数据的权重之和. 事实上，回顾 CART 回归树的构建，现在我们的目标转变为了拟合伪残差 $ \tilde{y}_i $，<br />
+针对特定的一个待分裂结点 $ t $，<strong>我们现在把不带权的平方损失推广到了一个加权的平方损失</strong></p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \sum_{\bol…'>\begin{equation*}
+    \sum_{\boldsymbol{x}_i\in t}w_i(\tilde{y}_i-\bar{y})^2,\quad\bar{y}=\frac{\sum_{\boldsymbol{x}_i\in t}w_iy_i}{\sum_{\boldsymbol{x}_i\in t}w_i}.
+\end{equation*}
+</p>
+<p>实际上我们通过下面的计算可以得到平方误差经验改善量：</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \hat{i}_t^…'>\begin{align*}
+    \hat{i}_t^2&amp;=\sum_{\boldsymbol{x}_i\in t}w_i(\tilde{y}_i-\bar{y})^2-\sum_{\boldsymbol{x}_i\in t_L}w_i(\tilde{y}_i-\bar{y}_L)^2-\sum_{\boldsymbol{x}_i\in t_R}w_i(\tilde{y}_i-\bar{y}_R)^2\\
+    &amp;=\sum_{\boldsymbol{x}_i\in t}(w_i\tilde{y}_i^2-w_i\bar{y}^2)-\sum_{\boldsymbol{x}_i\in t_L}(w_i\tilde{y}_i^2-w_i\bar{y}_L^2)-\sum_{\boldsymbol{x}_i\in t_R}(w_i\tilde{y}_i^2-w_i\bar{y}_R^2)\\
+    &amp;=-(w_L+w_R)\left(\frac{w_L\bar{y}_L+w_R\bar{y}_R}{w_L+w_R}\right)^2+w_L\bar{y}_L^2+w_R\bar{y}_R^2\\
+    &amp;=\frac{(w_L\bar{y}_L^2+w_R\bar{y}_R^2)(w_L+w_R)-(w_L\bar{y}_L+w_R\bar{y}_R)^2}{w_L+w_R}=\frac{w_Lw_R}{w_L+w_R}(\bar{y}_L-\bar{y}_R)^2.
+\end{align*}
+</p>
+<p>这就是上面的平方误差经验改善量的由来. 当设定 $ w_i\equiv1 $ 时，我们的优化 CART 回归树的目标是没有任何区别的，即要优化 $ t $ 的左右子树 $ t_L $ 和 $ t_R $ 的平方损失之和，而针对不同问题取不同的 $ w_i $，则会得到不同的结果. 后面我们介绍 XGBoost 等算法的时候会得到殊途同归的结果，因此读者可以对此有一初步印象.<br />
+而做模型可解释性的时候，业界常会搭配 <strong>SHAP（SHapley Additive exPlanation）值</strong>来对模型中的特征进行解释. 这一指标诞生的灵感来源于博弈论中的沙普利值（Shapley value），由 Scott Lundberg 等人于 2017 年提出（原始论文为在 NeurlPS 上发表的 <em>A Unified Approach to Interpreting Model Predictions</em>&quot;）. 随后他在 2018 年提出的 TreeSHAP 则针对树模型进行了大幅优化（论文为在 Nature 上发表的 <em>From local explanations to global understanding with explainable AI for trees</em>）. 我们根据这两篇文章来简要介绍一下这个特征重要性的解释指标.<br />
+假设我们现在有一个预测模型 $ f $，可以是任意的，其特征总个数为 $ M $，但是预测模型很难解释其成因，集成学习的模型大部分都具有这个特点. <strong>因此，我们希望用一个解释模型（explanation model） $ g $ 来作为 $ f $ 的近似替代.</strong> 文章主要关注的是<strong>局部方法</strong>，旨在解释单个输入 $ x $ 的预测结果 $ f(x) $，近似的预测范围就在这个样本附近. （对应有全局方法，即解释模型在整个数据集上的整体规律）一般来说解释模型会用一个简化输入向量 $ x'\in\lbrace0,1\rbrace^M $，其分量是 $ 0-1 $ 变量， $ 1 $ 表示观察到了该特征取原值，否则表示特征未知或缺失，并且通过一个依赖于当前我们的所有特征的 $ x $ 的映射 $ h_x $ 来将简化特征映射回原始空间，即 $ x=h_x(x') $. 局部方法想要保证，当 $ x'\approx z' $ 时，我们有 $ g(z')\approx f(h_x(z')) $，意思是只要我们知道的特征数量变动不大，就能保证解释模型在剩余未知特征变动的情况下都能取得和原模型相似的效果. 对于现有的很多模型，其都可以抽象为<strong>加性特征归因方法（additive feature attribution methods）</strong>，即总是存在对应于原模型的一个解释模型，其为 $ 0-1 $ 二值变量的线性函数:</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    g(z&#039;)=\phi…'>\begin{equation*}
+    g(z&#039;)=\phi_0+\sum_{i=1}^M\phi_iz_i&#039;,
+\end{equation*}
+</p>
+<p>其中 $ z'=(z_1',\cdots,z_M)'\in\lbrace0,1\rbrace^M,\phi_i\in\mathbb{R} $ 表示的是某一特征的归因值， $ M $ 表示简化输入特征的个数. 理想情况下，有三条简单的性质可以唯一决定加性特征归因映射：</p>
+<div class="note info no-icon flat"><p><strong>性质 1</strong>（局部准确性）当对某个特征输入 $ x $ 逼近原模型 $ f $ 时，至少应当有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    f(x)=g(x&#039;)…'>\begin{equation*}
+    f(x)=g(x&#039;)=\phi_0+\sum_{i=1}^M\phi_ix_i&#039;
+\end{equation*}
+</p>
+<p>在该点成立，其中 $ x=h_x(x')=(x_1,\cdots,x_M). $ 即解释模型的输出应当与原始模型匹配.</p>
+<p><strong>性质 2</strong>（缺失性）</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    x_i&#039;=0\Rig…'>\begin{equation*}
+    x_i&#039;=0\Rightarrow\phi_i=0.
+\end{equation*}
+</p>
+<p>也就是说，如果在某一维度上我们都没有任何特征输入，那么就不能对我们的最终决策产生影响.</p>
+<p><strong>性质 3</strong>（一致性）令 $ f_x(z')=f(h_x(z')),z'\backslash i $ 表示令 $ z_i'=0 $，对任意两个模型 $ f,f' $，以及输入 $ z'\in\lbrace0,1\rbrace^M $ 都有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    f_x&#039;(z&#039;)-f…'>\begin{equation*}
+    f_x&#039;(z&#039;)-f_x&#039;(z&#039;\backslash i)\ge f_x(z&#039;)-f_x(z&#039;\backslash i),
+\end{equation*}
+</p>
+<p>那么 $ \phi_i(f',x)\ge\phi_i(f,x) $. 也就是说，如果如果模型发生变化，使得对某个输入而言其边际贡献增加或保持不变，那么该输入对应的归因值在更改的模型上的值不应减少.</p>
+</div>
+<p><strong>满足加性特征归因定义和上述三条性质的解释模型 $ g $ 只有一个</strong>，即通过以下方式定义每个归因值：</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \phi_i(f,x…'>\begin{equation*}
+    \phi_i(f,x)=\sum_{z&#039;\subseteq x&#039;}\frac{|z&#039;|!(M-|z&#039;|-1)!}{M!}[f_x(z&#039;)-f_x(z&#039;\backslash i)],
+\end{equation*}
+</p>
+<p>其中 $ |z'| $ 表示 $ z' $ 的所有非零分量的数量， $ z'\subseteq x' $ 表示 $ z' $ 的所有非零分量是 $ x' $ 的非零分量的子集. 这一定理借用了博弈论中的经典结论，我们也不给出证明. <strong>其中 $ \phi_i $ 就被称为 Shapley 值.</strong> Shapley 值实际上可以被看作原模型在给定某些值时的条件期望. 比如说我们现在给定了某些特征 $ z_S $ ，其对应的简化特征为 $ z' $（即 $ z_S=h_x(z') $），那么我们应当有式子</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    f_x(z&#039;)=f(…'>\begin{equation*}
+    f_x(z&#039;)=f(h_x(z&#039;))=f(z_S)=\mathbb{E}[f(z)|z_S],
+\end{equation*}
+</p>
+<p>这里的条件期望就是对原始特征空间求的. 举个例子，我们可以有如下这样的链路：</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    0\to \math…'>\begin{equation*}
+    0\to \mathbb{E}[f(z)]=\phi_0\to\mathbb{E}[f(z)|z_1=x_1]=\phi_0+\phi_1\to\mathbb{E}[f(z)|z_{1,2}=x_{1,2}]=\phi_0+\phi_1+\phi_2\to ...
+\end{equation*}
+</p>
+<p>多一个特征就对应的 Shapley 值加上. <strong>注意，Shapley 值可以是负的，就是说某些特征可能会带来负效应</strong>，所以在加性特征归因的情况下，我们的特征重要性度量就非常容易理解了. <strong>另外值得注意的是，注意，上面实际上是带缺失特征的输入的情况，大部分模型无法处理缺失值的情况，因此我们总是用后面的条件期望去逼近真实情况，而这个条件期望的数据分布则可能是我们人为假定的，即通过对缺失数据的填充或者通过更取巧的一些计算方式来进行.</strong><br />
+现在的问题在于，如何估计 $ \mathbb{E}[f(z)|z_S] $ 并不容易，并且前面给出的 Shapley 值的计算公式直接计算是指数级别的，相当困难. 聚焦于树模型，首先我们先再次进行一些符号上的说明（<strong>注意，符号和前面用的有所不同，主要参考的是现在说的 SHAP 相关的文献的符号</strong>）， $ T $ 代表集成模型中树的总数， $ L $ 代表任意一棵树的最大叶子结点数， $ D $ 是任意一棵树的最大深度.<br />
+首先我们要对计算式的符号表达做一些改进，现在有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    \phi_i=\su…'>\begin{equation*}
+    \phi_i=\sum_{S\subseteq N\backslash\lbrace i\rbrace}\frac{|S|!(M-|S|-1)!}{M!}[f_x(S\cup\lbrace i\rbrace)-f_x(S)].
+\end{equation*}
+</p>
+<p>这里 $ f_x(S)=f(h_x(z'))=\mathbb{E}[f(x)|x_S],N $ 表示所有输入特征构成的集合（区别于特征数量 $ M $！）. 上面的计算式读者对照前面给出的应该不难理解.<br />
+Lundberg 他们先给出了一个直观但复杂度高的算法来计算 Shapley 值，伪代码如下（<strong>我们将这个算法记作算法 1</strong>）：</p>
+<figure class="highlight text"><table><tr><td class="code"><pre><span class="line">procedure EXPVALUE(x, S, tree = &#123;v, a, b, t, r, d&#125;)</span><br><span class="line">    procedure G(j, w)</span><br><span class="line">        if v_j != internal then       // 如果节点 j 是叶子节点</span><br><span class="line">            return w · v_j            // 返回权重 w 乘以叶子输出值 v_j</span><br><span class="line">        else</span><br><span class="line">            if d_j ∈ S then           // 如果当前分裂特征在已知集合 S 中</span><br><span class="line">                return x_&#123;d_j&#125; &lt;= t_j ? G(a_j, w) : G(b_j, w)  // 按样本真实特征值走左/右分支，权重不变</span><br><span class="line">            else                      // 如果当前分裂特征不在 S 中（未知/缺失）</span><br><span class="line">                return G(a_j, w · r_&#123;a_j&#125; / r_j) + G(b_j, w · r_&#123;b_j&#125; / r_j)</span><br><span class="line">                // 按训练样本覆盖比例对左右分支加权求和</span><br><span class="line">            end if</span><br><span class="line">        end if</span><br><span class="line">    end procedure</span><br><span class="line">    return G(1, 1)                    // 从根节点 1 开始，初始权重为 1</span><br><span class="line">end procedure</span><br></pre></td></tr></table></figure>
+<p>其中 $ v $ 表示结点类型/取值的一个向量，如果结点是内部结点其值就是 $ internal $，如果是叶子结点，那么就对应了一个输出值 $ f(x) $. $ a,b $ 两个向量分别代表当前内部结点的左右结点的索引，向量 $ t $ 包含了每一内部结点的切分阈值， $ d $ 是用于分裂内部结点的特征的一个索引向量（即对于某个内部结点要记录用于切分的那个特征）， $ r $ 是一个存储每一结点覆盖度的向量（即有多少数目的样本归属于对应的子树）.<br />
+我们来解读一下这个算法. <strong>首先要注意，这个算法是用于计算 $ f_x $ 对应的值的，最后还要把所有情况归纳汇总</strong>. 这个算法实际上就是无脑地遍历了 $ 2^{M-1} $ 个所有可能的去掉第 $ i $ 个特征的集合，然后从一棵树的顶端开始往下走去估计 $ \mathbb{E}[f(x)|x_S] $. 当我们走到其中某个叶子结点 $ j $ 时，如果 $ j\in S $ 即为已知特征时，我们就按照对应的分裂条件 $ x_{d_j}\le t_j $ 来决定往左子树还是右子树走；如果特征不在我们这次选取的特征集合 $ S $ 中，那么按条件期望，我们应当对左右子树按所携带的样本数目的多少来给两棵树分配权重. 于是就有了伪代码中在当前子树权重 $ w $ 的基础上给左子树乘上 $ \dfrac{r_{a_j}}{r_j} $，给右子树乘上 $ \dfrac{r_{b_j}}{r_j} $ 的结果. 如果我们走到叶子结点了，那么就返回权重乘输出值 $ w\cdot v_j $. 最后别忘了把所有情况汇总求和得到 Shapley 值. 从上面的计算过程可以看到，这个算法的时间复杂度是 $ O(TL2^M) $，因为我们要对每棵树都算一个 Shapley 值，每棵树的遍历又总共会走过 $ 2L-1 $ 个结点，加法和乘法也为此当量. 这个复杂度是指数级的，因此计算相当困难，而且也要花费大量的空间存储结果，不能用于实际.<br />
+为了对这个算法进行改进，Lundberg 等人开发了 <strong>Tree SHAP 算法</strong>. 这一算法的想法是，我们既然要对所有可能子集遍历，<strong>那换个角度看，其实我们只要看每个叶子结点最后会收集到哪些对应的特征子集以及它们的权重就可以了.</strong> 乍看我们只需要记录有多少子集通过树的每条分支，但是这样会把不同大小的子集混在一起，因为存在可能的包含关系，这样就无法对子集进行正确的加权计算了，因为我们的最终计算式实际上依赖于特征数目 $ |S| $ 的. 为了解决这个问题，需要对每一种可能的子集大小进行追踪，采用了 <code>EXTEND</code> 和 <code>UNWIND</code> 两种方法来对子集进行计数，并且去掉存在重复特征的可能情况. 我们先给出算法，然后对其进行详细的说明. <strong>原文中的伪代码存在笔误，本人利用 AI 修改成了更容易看懂的形式.</strong></p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line">procedure TS(x, tree = &#123;v, a, b, t, r, d&#125;)</span><br><span class="line">    φ = 长度为特征数 M 的全 0 数组              // 下标 1..M</span><br><span class="line"></span><br><span class="line">    procedure RECURSE(j, m, p_z, p_o, p_i)</span><br><span class="line">        m = EXTEND(m, p_z, p_o, p_i)          // 把当前边 (p_z, p_o, 特征 p_i) 加入路径状态 m</span><br><span class="line">        if v[j] != internal then              // 【情况1：到达叶子节点 j】</span><br><span class="line">            for i &lt;- 2 to len(m) do           // m[1] 是根节点虚拟占位，从 m[2] 开始才是真实特征</span><br><span class="line">                w = sum(UNWIND(m, i).w)       // 剥离特征 i，把剩下的组合权重加总得到 w</span><br><span class="line">                φ[m[i].d] = φ[m[i].d] + w * (m[i].o - m[i].z) * v[j]</span><br><span class="line">            end for</span><br><span class="line">        else                                  // 【情况2：仍在内部节点 j】</span><br><span class="line">            // h (hot) 是样本 x 实际走向的子节点，c (cold) 是样本未走向的子节点</span><br><span class="line">            h, c = (x[d[j]] &lt;= t[j]) ? (a[j], b[j]) : (b[j], a[j])</span><br><span class="line">            i_z = 1</span><br><span class="line">            i_o = 1</span><br><span class="line">            k = FINDFIRST(m.d, d[j])          // 检查特征 d[j] 是否在祖先节点出现过</span><br><span class="line">            if k != nothing then              // 如果出现过，先撤销旧记录，把旧比例合入 i_z, i_o</span><br><span class="line">                i_z = m[k].z</span><br><span class="line">                i_o = m[k].o</span><br><span class="line">                m = UNWIND(m, k)</span><br><span class="line">            end if</span><br><span class="line">            // 往下递归 hot 分支与 cold 分支</span><br><span class="line">            RECURSE(h, m, i_z * r[h] / r[j], i_o, d[j])</span><br><span class="line">            RECURSE(c, m, i_z * r[c] / r[j], 0,   d[j])</span><br><span class="line">        end if</span><br><span class="line">    end procedure</span><br><span class="line"></span><br><span class="line">    procedure EXTEND(m, p_z, p_o, p_i)</span><br><span class="line">        l = len(m) + 1                        // 扩展后的新长度（等于：当前真实特征数 + 1）</span><br><span class="line">        m = copy(m)</span><br><span class="line">        在 m 末尾追加第 l 个元素 m[l]</span><br><span class="line">        m[l].(d, z, o, w) = (p_i, p_z, p_o, (l == 1 ? 1 : 0))</span><br><span class="line">        for i &lt;- l - 1 down to 1 do           // 逆序更新 DP 数组 w</span><br><span class="line">            m[i+1].w = m[i+1].w + p_o * m[i].w * (i / l)</span><br><span class="line">            m[i].w   = p_z * m[i].w * ((l - i) / l)</span><br><span class="line">        end for</span><br><span class="line">        return m</span><br><span class="line">    end procedure</span><br><span class="line"></span><br><span class="line">    procedure UNWIND(m, i)</span><br><span class="line">        l = len(m)</span><br><span class="line">        n = m[l].w</span><br><span class="line">        m_new = copy(m[1 ... l-1])            // 截短为前 l-1 个元素</span><br><span class="line">        for j &lt;- l - 1 down to 1 do           // 逆推还原去掉特征 i 之前的 DP 数组 w</span><br><span class="line">            if m[i].o != 0 then</span><br><span class="line">                t = m_new[j].w</span><br><span class="line">                m_new[j].w = n * l / (j * m[i].o)</span><br><span class="line">                n = t - m_new[j].w * m[i].z * ((l - j) / l)</span><br><span class="line">            else</span><br><span class="line">                m_new[j].w = (m_new[j].w * l) / (m[i].z * (l - j))</span><br><span class="line">            end if</span><br><span class="line">        end for</span><br><span class="line">        for j &lt;- i to l - 1 do                // 把原 m 中第 i 个特征删掉，后面的特征信息左移补位</span><br><span class="line">            m_new[j].(d, z, o) = m[j+1].(d, z, o)</span><br><span class="line">        end for</span><br><span class="line">        return m_new</span><br><span class="line">    end procedure</span><br><span class="line"></span><br><span class="line">    RECURSE(1, [], 1, 1, None)                // 从根节点 1 出发，初始路径为空</span><br><span class="line">    return φ</span><br><span class="line">end procedure</span><br></pre></td></tr></table></figure>
+<p>算法中的一些符号释义：<strong>$ m $ 表示截止到某个结点为止从树根到该结点路径上的所有不重复用于分裂的特征</strong>，其包含四个属性： $ d $ 表示遍历节点的特征索引或针对某一结点取特征索引， $ z $ 表示流经该分支的 $ 0 $ 路径的比例，即该特征不在集合 $ S $ 中的那些子集的比例，而 $ o $ 表示流经该分支的 $ 1 $ 路径的比例，即该特征在集合 $ S $ 中的那些子集的比例， $ w $ 是一个向量，表示用于保存当前存在的给定大小的子集所占的比例. 这个释义还是很抽象，请看接下来的详细解读.<br />
+想要读懂这个算法相当不容易，作者在论文中并没有给出这个算法的详细解释. 现在我们要对某个输入样本 $ x $ 给出每个特征的重要性解释，对于样本我们的路径是确定好的. 我们首先固定一个子集 $ S $，<strong>现在我们只关注某一片叶子的输出 $ v $ 对最后的 Shapley 值的贡献如何.</strong> 假设我们要走到这片叶子，过程中经过一个节点 $ j $ 并且用于分裂的特征为 $ u $. 如果 $ u\in S $，那么其走向就是确定的. 如果走向就顺着样本在进入树时的真实走向（记为 <code>hot</code> 分支 $ h $），那么由算法 1 就知道应当传下去一个权重 $ 1 $，否则会因和样本走向不同（记为 <code>cold</code> 侧 $ c $），对计算没有影响，因此传一个为 $ 0 $ 的权重. 这个分支系数就记为 $ o_u $. 如果 $ u\notin S $，那么我们并不知道具体分类，因此对左右子树按样本数量传入权重，这一覆盖率比例就记为 $ z_u $. 对于一棵树而言，从根到某一叶子结点的路径是固定的，因此我们实际上可以把叶子 $ v $ 对最终输出值的贡献写作连乘的形式</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    f_x(S|v)=v…'>\begin{equation*}
+    f_x(S|v)=v\cdot\left(\prod_{u\in P\cap S}o_u\right)\left(\prod_{u\in P\cap S^c}z_u\right).
+\end{equation*}
+</p>
+<p>其中 $ P $ 是通向叶子 $ v $ 的路径上的所有特征. 如果同一特征被重复使用，那么把这些对应的权重乘起来合并在一起记作 $ o_u $.<br />
+现在我们来看 $ f_x(S\cup\lbrace i\rbrace)-f_x(S) $ 在叶子 $ v $ 上应该如何计算. 如果 $ i\notin P $，即不在这条路径上，那么差值就是 $ 0 $；如果 $ i\in P $，那么计算 $ f_x(S\cup\lbrace i\rbrace) $ 时，就会贡献一个权重 $ o_i $，而此时在 $ f_x(S) $ 中这个特征就不知道，因此贡献权重 $ z_i $，其余乘积不变. 因此我们可以计算出</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: equation* at position 7: \begin{̲e̲q̲u̲a̲t̲i̲o̲n̲*̲}̲
+    f_x(S\cup\…'>\begin{equation*}
+    f_x(S\cup\lbrace i\rbrace|v)-f_x(S|v)=v\cdot(o_i-z_i)\cdot\prod_{u\in(P\backslash\lbrace i\rbrace)\cap S}o_u\cdot\prod_{u\in(P\backslash\lbrace i\rbrace)\cap S^c}z_u.
+\end{equation*}
+</p>
+<p>现在设路径对应的特征集合 $ P $ 中共有 $ L_P $ 个特征，我们上面已经讨论过了，如果 $ i\notin P $，那么上面的差值对这片固定的叶子而言总是 $ 0 $，因此我们只考虑 $ i\in P $ 的情况，此时 $ |P\backslash\lbrace i\rbrace|=L_p-1 $. 记 $ S'=S\cap(P\backslash\lbrace i\rbrace),T=S\cap(N\backslash P) $，则 $ |T| $ 的值根据 $ S $ 的大小可以取 $ 0 $ 到 $ M-L_p $ 中的任意值，并且 $ S=S'\cup T $. 现在我们对所有可能的子集 $ S $ 求和，记 $ v $ 对 $ \phi_i $ 的贡献为 $ \Delta\phi_i(v) $，那么有</p>
+<p class='katex-block katex-error' title='ParseError: KaTeX parse error: No such environment: align* at position 7: \begin{̲a̲l̲i̲g̲n̲*̲}̲
+    \Delta\phi…'>\begin{align*}
+    \Delta\phi_i(v)&amp;=v\cdot(o_i-z_i)\sum_{S\subseteq N\backslash\lbrace i\rbrace}\frac{|S|!(M-|S|-1)!}{M!}\left(\prod_{u\in(P\backslash\lbrace i\rbrace)\cap S}o_u\cdot\prod_{u\in(P\backslash\lbrace i\rbrace)\cap S^c}z_u\right)\\
+    &amp;=v\cdot(o_i-z_i)\sum_{S&#039;\subseteq P\backslash\lbrace i\rbrace}\sum_{T\subseteq N\backslash P}\frac{(|S&#039;|+|T|)!(M-|S&#039;|-|T|-1)!}{M!}\left(\prod_{u\in(P\backslash\lbrace i\rbrace)\cap S}o_u\cdot\prod_{u\in(P\backslash\lbrace i\rbrace)\cap S^c}z_u\right)\\
+    &amp;=v\cdot(o_i-z_i)\sum_{S&#039;\subseteq P\backslash\lbrace i\rbrace}\sum_{t=0}^{M-L_p}\binom{M-L_p}{t}\frac{(s+t)!(M-s-t-1)!}{M!}\left(\prod_{u\in S&#039;}o_u\cdot\prod_{u\notin S&#039;}z_u\right)\\
+    &amp;=v\cdot(o_i-z_i)\sum_{S&#039;\subseteq P\backslash\lbrace i\rbrace}\frac{|S&#039;|!(L_p-|S&#039;|-1)!}{L_p!}\left(\prod_{u\in S&#039;}o_u\cdot\prod_{u\in P\backslash\lbrace i\rbrace\backslash S&#039;}z_u\right).
+\end{align*}
+</p>
+<p>这里我们实际上是把任何 $ S $ 拆成了互斥的两部分 $ S',T $，然后利用双重求和和路径上的结点权重积与 $ T $ 无关的特性，最后使用了组合数的卷积公式得到的结果.<br />
+现在只要我们知道每一片叶子每一种特征的结果，那我们实际上就算完了. <strong>问题变为怎么高效计算上面这个求和权重值 $ w $.</strong><br />
+首先我们来看 <code>EXTEND</code> 函数（对应于伪代码 28-38 行，下文符号释义和伪代码一致）. 这是用于在加入一个新的特征时累计特征数目固定时 <code>m.w</code> 的值的变化的函数. 当我们从一个父结点沿着一条边走到某个新的结点时，就有一个新的特征 $ p_i $，其携带了特征的信息以及权重 $ p_z,p_o $. 我们据此来更新动态规划表 $ w $. 对原本大小为 $ s=i-1 $ 的子集，如果将新特征加入子集 $ S $，那么子集大小就变为 $ s+1 $，同时要乘上概率 $ p_o $ 看走向和样本 $ x $ 是否一致，还要将原来的组合权重从 $ \dfrac{s!(d-1-s)!}{d!} $ 调整为 $ \dfrac{(s+1)!(d-1-s)!}{(d+1)!} $，即乘上 $ \dfrac{s+1}{d+1}=\dfrac{i}{l} $. 因为特征数和子集大小都发生了变化. 如果不加入特征集合 $ S $，那么我们只对当前的权重进行调整，即乘上对应的 $ p_z $ 并且将组合权重从 $ \dfrac{s!(d-1-s)!}{d!} $ 调整为 $ \dfrac{s!(d-s)!}{(d+1)!} $，即乘上 $ \dfrac{d-s}{d+1}=\dfrac{l-i}{l} $，因为无论如何我们还是要继续往下走，因此路径长度还在变长. 逆序遍历则是因为要防止数值被旧结果覆盖.<br />
+现在我们来看 <code>UNWIND</code> 操作. 主要是针对两个场景：在算某个特征的贡献时，我们需要将这个特征从 <code>EXTEND</code> 的结果中分离出来，另外一种场景时对于内部结点，如果同一个特征在祖先结点上已经分裂过一次，那么就要将那一次得到的概率权重合并，再重新放进去. <strong>无论哪种情况，我们都可以假装在 <code>m</code> 中新插入了这个特征</strong>. 当 <code>m[i].o!=0</code> 时，由于我们此时的 <code>m[l].w</code> 在 <code>EXTEND</code> 的过程中 <code>m[i+1].w</code> 的更新需要加一个和 <code>m[i].o</code> 有关的值，因此我们在逆向撤销操作的时候，进行除法时相关式子非零，因此需要多一步，即从“先加再乘”变成“先除再减”；而如果 <code>m[i].o</code> 为零，那么在对应的 <code>EXTEND</code> 更新中实际仅有第二步的乘法更新. 读者可以对照前面的 <code>EXTEND</code> 过程逆向写一下这个更新过程. 最后把对应的第 $ i $ 位特征删去，把后面的元素前移即可.<br />
+读懂了这两个操作，看主程序就简单了. 我们是按照深度优先搜索去寻找每一片叶子，如果到了叶子结点，那么就把这片叶子对每一个 $ \phi_i $ 的贡献都求出来存好，如果没有，那么我们看样本实际走的边，分为 <code>h</code> 和 <code>c</code>，并且我们对路径上可能出现的重复特征去重，在进一步递归时把对应的权重拿出来放到下一步递归里面了. <strong>注意，我们在定义冷侧和热侧的时候，即便走到了冷侧，仍然会拿结点的特征阈值对样本对应的特征进行分类！因为 SHAP 值的计算可能会在某些特征未知的情况下进行，而这些值未知的时候，样本会同时向两侧分流. 如果说我们相邻两次使用同一特征对样本进行分类，而该特征在第一次分类时就把样本分到了冷分支，那么就会导致 $ o $ 值为零，从而后续定义的冷热分支实际就没有意义，这也是正确的做法.</strong><br />
+我们这里重点讨论的是 TreeSHAP 的计算，其也适用于所有树集成的方法，<strong>对于单个输入样本</strong>，只要对每棵树都计算每个特征的 SHAP 值，然后把对应特征的值在每棵树上全部加起来进行比较，就能得到每个特征的相对重要性了；如果是<strong>训练集上的整个模型特征重要性，那么就要对每个样本在某一特征上算出来的值取绝对值再对所有样本求平均</strong>. 而对于其他的模型，尤其是“黑盒”类模型如神经网络、等复杂模型，SHAP 值具有良好的模型可解释性表现，并且已经在业界得到了广泛应用，这部分内容直接参考上文提到的 Lundberg 的第一篇文献.</p>
+<div class="note warning no-icon flat"><p>在阅读关于 TreeSHAP 的算法时，本人花了相当长的时间才读懂，<strong>很大一部分原因是这个伪代码的符号区分很混乱，以及作者没有解释每一步的原因，隐藏了思考过程，实际上这简短的几十行伪代码信息密度非常高.</strong> 幸好现在有 AI 的帮助，本人一步一步还原出了作者的原始想法. 这个算法的设计也可以说相当精妙，环环相扣，缺一不可. 这里我们并不准备给出计算用的实际代码，我们在下篇中会有所涉及.</p>
+</div>
+<p><strong>写到这里上篇就结束了</strong>，下篇将介绍 GBDT 的若干广泛使用的算法——XGBoost、LightGBM、CatBoost、LambdaMART 等等，并且简要介绍一下 Stacking/Blending 方法.</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://hzy2024.github.io">Eason</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://hzy2024.github.io/2026/10/24/%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E4%B8%8A%E7%AF%87/">http://hzy2024.github.io/2026/10/24/%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E4%B8%8A%E7%AF%87/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://hzy2024.github.io" target="_blank">Eason's page</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0/">集成学习</a><a class="post-meta__tags" href="/tags/%E6%A0%91%E9%9B%86%E6%88%90/">树集成</a><a class="post-meta__tags" href="/tags/boosting/">boosting</a><a class="post-meta__tags" href="/tags/bagging/">bagging</a><a class="post-meta__tags" href="/tags/stacking/">stacking</a><a class="post-meta__tags" href="/tags/%E5%8A%A0%E6%B3%95%E6%A8%A1%E5%9E%8B/">加法模型</a><a class="post-meta__tags" href="/tags/GBDT/">GBDT</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2026/10/08/%E5%86%B3%E7%AD%96%E6%A0%91/" title="决策树"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">决策树</div></div><div class="info-2"><div class="info-item-1">本文内容参考了李航机器学习方法（第一版、第二版）以及部分关于树模型的原始文献，对决策树——分类树和回归树两种模型进行了总结. 要求读者有一定的关于树的数据结构知识.  决策树（decision tree）是一种想法非常自然的分类方法与回归方法. 其呈现树形结构，在分类问题中表示基于特征对实例类别进行预测的过程，称作分类树；而在回归问题中，表示基于特征对实例数值进行预测的过程，称为回归树. 分类树实质上是定义在特征空间划分上的一个条件概率分布，回归树则是定义在特征空间划分上的数值函数。在分类和回归问题中决策树被认为是判别模型。 决策树的构建是依据经验风险最小化或结构风险最小化的原则通过启发式方法构建的. 决策树的学习一般包括三步：特征选择、决策树生成及决策树剪枝. 其学习技术主要源于 Quinlan 提出的 ID3 算法和 C4.5 算法，以及 Breiman 提出的 CART 算法. 接下来我们就从决策树的定义出发开始，再逐步说明这几种方法是怎么操作的.  决策树模型 上文已经提到分类树和回归树是决策树的两个类别，下面首先给出两者的定义： （分类树） 分类树（classifica...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/avatar.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">Eason</div><div class="author-info-description">SUFE统计学大四本科生一枚~
+（已保研至FDU）
+</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">23</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">45</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">7</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/hzy2024"><i class="fab fa-github"></i><span>访问我的 GitHub</span></a><div class="card-info-social-icons"><a class="social-icon" href="/img/qq.jpg" target="_blank" title="QQ"><i class="fab fa-qq" style="color: #1e3050;"></i></a><a class="social-icon" href="https://space.bilibili.com/345987732?spm_id_from=333.1007.0.0" target="_blank" title="Bilibili"><i class="fab fa-bilibili" style="color: #fb7299;"></i></a><a class="social-icon" href="https://www.zhihu.com/people/perplexity-67" target="_blank" title="知乎"><i class="fab fa-zhihu" style="color: #1772f6;"></i></a><a class="social-icon" href="mailto:2023110611@stu.sufe.edu.cn" target="_blank" title="E-mail"><i class="fas fa-envelope" style="color: #0078d7;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">佛系更新ing...</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#bagging-%E6%96%B9%E6%B3%95"><span class="toc-number">1.</span> <span class="toc-text"> Bagging 方法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%9A%8F%E6%9C%BA%E6%A3%AE%E6%9E%97"><span class="toc-number">1.1.</span> <span class="toc-text"> 随机森林</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%B6%E6%95%9B%E6%80%A7%E4%B8%8E%E6%B3%9B%E5%8C%96%E8%AF%AF%E5%B7%AE%E7%95%8C%E7%9A%84%E8%AE%A8%E8%AE%BA"><span class="toc-number">1.1.1.</span> <span class="toc-text"> 收敛性与泛化误差界的讨论</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%97%E6%B3%95%E5%AE%9E%E7%8E%B0"><span class="toc-number">1.1.2.</span> <span class="toc-text"> 算法实现</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#boosting-%E6%96%B9%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text"> Boosting 方法</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#adaboost"><span class="toc-number">2.1.</span> <span class="toc-text"> AdaBoost</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%97%E6%B3%95%E8%AF%B4%E6%98%8E%E4%B8%8E%E8%AE%AD%E7%BB%83%E8%AF%AF%E5%B7%AE%E7%95%8C%E5%88%86%E6%9E%90"><span class="toc-number">2.1.1.</span> <span class="toc-text"> 算法说明与训练误差界分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%89%8D%E5%90%91%E5%88%86%E6%AD%A5%E7%AE%97%E6%B3%95%E8%A7%A3%E9%87%8A"><span class="toc-number">2.1.2.</span> <span class="toc-text"> 前向分步算法解释</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%A2%AF%E5%BA%A6%E6%8F%90%E5%8D%87%E6%96%B9%E6%B3%95"><span class="toc-number">2.2.</span> <span class="toc-text"> 梯度提升方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9E%E5%BD%92%E4%BB%BB%E5%8A%A1"><span class="toc-number">2.2.1.</span> <span class="toc-text"> 回归任务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E7%B1%BB%E4%BB%BB%E5%8A%A1"><span class="toc-number">2.2.2.</span> <span class="toc-text"> 分类任务</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#gbdt"><span class="toc-number">2.2.3.</span> <span class="toc-text"> GBDT</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A6%82%E5%BF%B5%E4%B8%8E%E5%9F%BA%E6%9C%AC%E7%BB%93%E6%9E%84"><span class="toc-number">2.2.3.1.</span> <span class="toc-text"> 概念与基本结构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AD%A3%E5%88%99%E5%8C%96"><span class="toc-number">2.2.3.2.</span> <span class="toc-text"> 正则化</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%89%B9%E5%BE%81%E9%87%8D%E8%A6%81%E6%80%A7%E8%AF%84%E4%BC%B0"><span class="toc-number">2.2.3.3.</span> <span class="toc-text"> 特征重要性评估</span></a></li></ol></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/10/24/%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0%E2%80%94%E2%80%94%E4%B8%8A%E7%AF%87/" title="集成学习——上篇">集成学习——上篇</a><time datetime="2026-10-24T13:42:47.000Z" title="发表于 2026-10-24 21:42:47">2026-10-24</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/10/08/%E5%86%B3%E7%AD%96%E6%A0%91/" title="决策树">决策树</a><time datetime="2026-10-08T14:33:29.000Z" title="发表于 2026-10-08 22:33:29">2026-10-08</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/09/07/%E6%94%AF%E6%8C%81%E5%90%91%E9%87%8F%E6%9C%BA/" title="支持向量机（SVM）">支持向量机（SVM）</a><time datetime="2026-09-07T03:03:30.000Z" title="发表于 2026-09-07 11:03:30">2026-09-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/08/06/%E6%95%B0%E5%80%BC%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E8%A7%A3%E7%BA%BF%E6%80%A7%E6%96%B9%E7%A8%8B%E7%BB%84%E7%9A%84%E7%9B%B4%E6%8E%A5%E6%B3%95%E4%B8%8E%E8%BF%AD%E4%BB%A3%E6%B3%95/" title="数值分析——解线性方程组的直接法与迭代法">数值分析——解线性方程组的直接法与迭代法</a><time datetime="2026-08-06T02:01:31.000Z" title="发表于 2026-08-06 10:01:31">2026-08-06</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/07/31/%E6%95%B0%E5%80%BC%E5%88%86%E6%9E%90%E2%80%94%E2%80%94%E5%87%BD%E6%95%B0%E9%80%BC%E8%BF%91%E4%B8%8E%E5%BF%AB%E9%80%9F%20Fourier%20%E5%8F%98%E6%8D%A2/" title="数值分析——函数逼近与快速 Fourier 变换">数值分析——函数逼近与快速 Fourier 变换</a><time datetime="2026-07-31T01:41:42.000Z" title="发表于 2026-07-31 09:41:42">2026-07-31</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Eason</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.2</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.7.0</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.7.0"></script><script src="/js/main.js?v=5.7.0"></script><div class="js-pjax"><script>(() => {
+  const changeScriptToMath = article => {
+    article.querySelectorAll('script[type^="math/tex"]').forEach(el => {
+      const display = /mode=display/.test(el.type)
+      const node = document.createElement(display ? 'div' : 'span')
+      node.textContent = display
+        ? `$$${el.textContent}$$`
+        : `$${el.textContent}$`
+      el.parentNode.replaceChild(node, el)
+    })
+  }
+
+  const loadMathjax = () => {
+    const article = document.getElementById('article-container')
+    if (!article || article.querySelector('.hbe-container')) return
+    changeScriptToMath(article)
+
+    if (!window.MathJax) {
+      window.MathJax = {
+        loader: {
+          load: [
+            // Four font extension packages (optional)
+            //- '[tex]/bbm',
+            //- '[tex]/bboldx',
+            //- '[tex]/dsfont',
+            '[tex]/mhchem',
+            'ui/lazy'
+          ],
+          paths: {
+            'mathjax-newcm': '[mathjax]/../@mathjax/mathjax-newcm-font',
+
+            //- // Four font extension packages (optional)
+            //- 'mathjax-bbm-extension': '[mathjax]/../@mathjax/mathjax-bbm-font-extension',
+            //- 'mathjax-bboldx-extension': '[mathjax]/../@mathjax/mathjax-bboldx-font-extension',
+            //- 'mathjax-dsfont-extension': '[mathjax]/../@mathjax/mathjax-dsfont-font-extension',
+            'mathjax-mhchem-extension': '[mathjax]/../@mathjax/mathjax-mhchem-font-extension'
+          }
+        },
+        output: {
+          font: 'mathjax-newcm',
+        },
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+          packages: {
+            '[+]': [
+              'mhchem'
+            ]
+          }
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          lazyMargin: '200px',
+          enableMenu: true,
+          menuOptions: {
+            settings: {
+              enrich: false  // Turn off Braille and voice narration text automatic generation
+            }
+          },
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax@4.1.3/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.typesetClear()
+      MathJax.typesetPromise([ article ])
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
